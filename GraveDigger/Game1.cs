@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -6,38 +7,96 @@ namespace GraveDigger;
 
 public class Game1 : Game
 {
+    enum GameState
+    {
+        Menu,
+        Playing
+    }
+    
+    public static readonly Vector2 ScreenSize = new Vector2(1920, 1080);
+    
+    private GameState currentGameState = GameState.Menu;
+    
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
+    private SpriteManager _spriteManager;
 
+    private Player player;
+    private Level level;
+    
+    private GUI.GUI gui;
+    
+    private KeyboardState previousKeyboardState;
+    
+    // Indicates whether the game has been started.
+    // Used to prevent closing the initial menu with the Escape key.
+    private bool gameStarted = false;
+    
+    
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
+        _spriteManager = new SpriteManager(Content);
         Content.RootDirectory = "Content";
-        IsMouseVisible = true;
     }
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
+        //_graphics.IsFullScreen = true;
+        _graphics.PreferredBackBufferWidth = (int) ScreenSize.X;
+        _graphics.PreferredBackBufferHeight = (int) ScreenSize.Y;
+        _graphics.ApplyChanges();
 
+        SetGameState(GameState.Menu);
+        
         base.Initialize();
     }
-
+    
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-        // TODO: use this.Content to load your game content here
+        
+        SpriteManager.AddSprite("digger", "Images/Characters/keeper_front");
+        SpriteManager.AddSprite("pixel", "Images/pixel");
+        
+        level = new Level();
+        level.LoadTextures();
+        level.Start();
+        
+        player = new Player();
+        player.Start();
+        
+        gui = new GUI.GUI(ScreenSize);
+        gui.LoadContent(Content);
+        gui.Start();
+        
+        gui.OnStartClicked += StartGame; 
+        gui.OnSettingsClicked += OpenSettings; 
+        gui.OnExitClicked += CloseGame;
     }
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-            Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-
-        // TODO: Add your update logic here
-
+        KeyboardState currentKeyboardState = Keyboard.GetState();
+        
+        if (currentGameState == GameState.Menu)
+        {
+            gui.Update(gameTime);
+            
+            if (gameStarted && currentKeyboardState.IsKeyDown(Keys.Escape) && previousKeyboardState.IsKeyUp(Keys.Escape))
+                SetGameState(GameState.Playing);
+        } 
+        else if (currentGameState == GameState.Playing)
+        {
+            level.Update(gameTime);
+            player.Update(gameTime);
+            
+            if (currentKeyboardState.IsKeyDown(Keys.Escape) && previousKeyboardState.IsKeyUp(Keys.Escape))
+                SetGameState(GameState.Menu);
+        }
+        
+        previousKeyboardState = currentKeyboardState;
+        
         base.Update(gameTime);
     }
 
@@ -45,8 +104,43 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        // TODO: Add your drawing code here
+        // BackToFront sorting uses sprite layer depth to draw objects in the correct order.
+        _spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront, 
+            samplerState: SamplerState.PointClamp, 
+            blendState: BlendState.AlphaBlend);
+        level.Draw(_spriteBatch);
+        player.Draw(_spriteBatch);
+        _spriteBatch.End();
+
+        if (currentGameState == GameState.Menu)
+        {
+            _spriteBatch.Begin();
+            gui.Draw(_spriteBatch);
+            _spriteBatch.End();
+        }
 
         base.Draw(gameTime);
+    }
+
+    private void StartGame()
+    {
+        gameStarted = true;
+        SetGameState(GameState.Playing);
+    }
+
+    private void OpenSettings()
+    {
+        Console.WriteLine("Settings");
+    }
+    
+    private void CloseGame()
+    {
+        Exit();
+    }
+    
+    private void SetGameState(GameState gameState)
+    {
+        currentGameState = gameState;
+        IsMouseVisible = gameState == GameState.Menu;
     }
 }
