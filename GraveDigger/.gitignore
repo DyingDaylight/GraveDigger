@@ -1,0 +1,15 @@
+# Rider
+.idea/
+*.sln.iml
+
+# Build
+bin/
+obj/
+
+# User settings
+*.user
+*.DotSettings.user
+
+# OS
+.DS_Store
+Thumbs.db
