@@ -52,7 +52,7 @@ public class Player : Animation
         float depth = Bottom / Game1.ScreenSize.Y;
         SortingOrder = 1f - MathHelper.Clamp(depth, 0f, 1f);
     }
-
+    
     private void UpdateMovement(float dt)
     {
         KeyboardState keyboard = Keyboard.GetState();
@@ -103,7 +103,11 @@ public class Player : Animation
         Console.WriteLine("OnTriggerEnter " + self.Parent + " with " + other.Parent);
         
     }
-    
+
+    public void OnTriggerStay(Collider self, Collider other)
+    {
+    }
+
     public void OnCollisionEnter(Collider self, Collider other)
     {
         Console.WriteLine("OnCollisionEnter " + self.Parent + " with " + other.Parent);
