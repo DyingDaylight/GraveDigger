@@ -32,7 +32,7 @@ public class Sprite : IDrawable, IUpdatable
     public SpriteEffects SpriteEffect { get; set; } = SpriteEffects.None;
 
     public SpriteSheet SpriteSheet;
-    protected Rectangle? sourceRectangle;
+    public Rectangle? sourceRectangle;
     public Rectangle destRectangle;
     
     public Texture2D Texture

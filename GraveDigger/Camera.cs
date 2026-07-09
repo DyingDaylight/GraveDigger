@@ -1,4 +1,5 @@
-﻿using Interfaces;
+﻿using System;
+using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -25,7 +26,8 @@ public class Camera : IUpdatable
 
     public void Update(GameTime gameTime)
     {
-        var offset = new Vector2(_viewport.Width / 2f, _viewport.Height / 2f);
+        var offset = new Vector2(_viewport.Width / 2f, 
+            _viewport.Height / 2f);
         Position = targetPosition - offset;
         
         if (targetPosition.X - offset.X < 0)
@@ -45,6 +47,9 @@ public class Camera : IUpdatable
         {
             Position.Y = Game1.WorldSize.Y - _viewport.Height;
         } 
+        
+        Position.X = MathF.Round(Position.X);
+        Position.Y = MathF.Round(Position.Y);
         
         TransformMatrix = Matrix.CreateTranslation(new Vector3(-Position, 0));
     }

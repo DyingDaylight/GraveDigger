@@ -8,18 +8,18 @@ namespace GraveDigger;
 
 public class Level
 {
-    private const int MapTilesAmount = 9;
+    private const int MapTilesAmount = 3;
     private readonly int[,] tileMapSchema =
     {
-        { 0, 2, 0, 1, 0, 2, 3, 7, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 4, 0, 0, 2, 8, 0, 0, 2, 2, 0, 0, 0 },
-        { 0, 5, 6, 5, 0, 0, 2, 7, 0, 0, 0, 0, 0, 5, 5 },
-        { 0, 3, 2, 5, 0, 2, 6, 7, 0, 0, 0, 0, 0, 5, 5 },
-        { 8, 7, 8, 8, 7, 7, 7, 7, 7, 8, 7, 7, 7, 8, 7 },
-        { 0, 3, 0, 5, 1, 2, 2, 7, 0, 0, 0, 1, 0, 0, 0 },
-        { 0, 2, 6, 2, 0, 3, 2, 7, 0, 0, 0, 0, 1, 0, 0 },
-        { 0, 1, 3, 2, 4, 2, 2, 7, 0, 6, 0, 2, 0, 3, 4 },
-        { 0, 3, 6, 5, 0, 5, 2, 7, 5, 4, 3, 0, 0, 0, 2 },
+        { 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2 },
+        { 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2 },
+        { 1, 2, 2, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 1, 1 },
+        { 1, 2, 2, 2, 0, 2, 2, 1, 0, 0, 0, 0, 0, 1, 1 },
+        { 1, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1, 2, 2, 2, 2 },
+        { 1, 2, 0, 2, 1, 2, 2, 1, 0, 0, 0, 1, 0, 0, 0 },
+        { 0, 2, 2, 2, 0, 2, 2, 1, 0, 0, 0, 0, 1, 0, 0 },
+        { 0, 1, 2, 2, 2, 2, 2, 1, 0, 0, 0, 2, 0, 1, 1 },
+        { 0, 2, 2, 2, 0, 2, 2, 1, 1, 1, 1, 0, 0, 0, 2 },
     };
     
     private List<Prop> props = new List<Prop>();
@@ -59,9 +59,13 @@ public class Level
     
     public void LoadTextures()
     {
-        for (int i = 0; i < MapTilesAmount; i++)
+        /*for (int i = 0; i < MapTilesAmount; i++)
         {
             SpriteManager.AddSprite($"ground{i}", $"Images/Ground/ground{i}");
+        }*/
+        for (int i = 0; i < MapTilesAmount; i++)
+        {
+            SpriteManager.AddSprite($"ground{i}", $"Images/Environment_New/earth_tile{i}");
         }
         SpriteManager.AddSprite("tree", "Images/Props/Tree");
         SpriteManager.AddSprite("crypt", "Images/Props/Crypt");

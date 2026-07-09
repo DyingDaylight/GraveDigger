@@ -14,7 +14,7 @@ public class Game1 : Game
     }
     
     public static Vector2 ScreenSize = new Vector2(1920, 1080);
-    public static readonly Vector2 WorldSize = new Vector2(2720, 2160);
+    public static readonly Vector2 WorldSize = new Vector2(4520, 3960);
     
     private GameState currentGameState = GameState.Menu;
     
@@ -113,15 +113,16 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        GraphicsDevice.Clear(Color.DarkRed);
 
         // BackToFront sorting uses sprite layer depth to draw objects in the correct order.
-        _spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront, 
-            samplerState: SamplerState.PointClamp, 
+        _spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront,
+            samplerState: SamplerState.PointClamp,
             blendState: BlendState.AlphaBlend,
             transformMatrix: camera.TransformMatrix);
         level.Draw(_spriteBatch);
         player.Draw(_spriteBatch);
+        
         _spriteBatch.End();
 
         if (currentGameState == GameState.Menu)

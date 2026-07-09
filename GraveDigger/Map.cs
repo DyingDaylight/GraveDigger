@@ -9,7 +9,7 @@ namespace GraveDigger;
 
 public class Map : IDrawable, IUpdatable
 {
-    private readonly Point tileSize = new Point(128, 128);
+    private readonly Point tileSize = new Point(894, 1390);
     private Point mapSize = new Point();
     
     private List<Sprite> tileSprites = new List<Sprite>();
@@ -49,10 +49,10 @@ public class Map : IDrawable, IUpdatable
       
                 Sprite tile = new Sprite($"ground{tileIndex}");
                 tile.Transform.Position = new Vector2(j * tileSize.X, i * tileSize.Y);
+                tile.sourceRectangle = new Rectangle(1, 1, tileSize.X + 1, tileSize.Y + 1);
                 tile.Pivot = new Vector2(0, 0);
-                tile.Transform.Scale = new Vector2((float) tileSize.X / tile.Texture.Width, 
-                                                   (float) tileSize.Y / tile.Texture.Height);
-                tile.Color = Color.DarkGray;
+                //tile.Transform.Scale = new Vector2((float) tileSize.X / tile.Texture.Width, 
+                //                                   (float) tileSize.Y / tile.Texture.Height);
                 tile.SortingOrder = 1f;
                 tile.Start();
                 tileSprites.Add(tile);
