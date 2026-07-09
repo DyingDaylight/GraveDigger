@@ -13,7 +13,8 @@ public class Game1 : Game
         Playing
     }
     
-    public static readonly Vector2 ScreenSize = new Vector2(1920, 1080);
+    public static Vector2 ScreenSize = new Vector2(1920, 1080);
+    public static readonly Vector2 WorldSize = new Vector2(2720, 2160);
     
     private GameState currentGameState = GameState.Menu;
     
@@ -21,6 +22,7 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
     private SpriteManager _spriteManager;
 
+    private Camera camera;
     private Player player;
     private Level level;
     
@@ -32,7 +34,6 @@ public class Game1 : Game
     // Used to prevent closing the initial menu with the Escape key.
     private bool gameStarted = false;
     
-    
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -43,11 +44,17 @@ public class Game1 : Game
     protected override void Initialize()
     {
         //_graphics.IsFullScreen = true;
-        _graphics.PreferredBackBufferWidth = (int) ScreenSize.X;
-        _graphics.PreferredBackBufferHeight = (int) ScreenSize.Y;
+        _graphics.PreferredBackBufferWidth = 1920;
+        _graphics.PreferredBackBufferHeight = 1080;
         _graphics.ApplyChanges();
 
+        ScreenSize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+        
         SetGameState(GameState.Menu);
+        
+        camera = new Camera(GraphicsDevice.Viewport);
+        
+        Console.WriteLine(GraphicsDevice.Viewport);
         
         base.Initialize();
     }
@@ -98,6 +105,9 @@ public class Game1 : Game
         
         previousKeyboardState = currentKeyboardState;
         
+        camera.SetTarget(player.Transform.Position);
+        camera.Update(gameTime);
+        
         base.Update(gameTime);
     }
 
@@ -108,7 +118,8 @@ public class Game1 : Game
         // BackToFront sorting uses sprite layer depth to draw objects in the correct order.
         _spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront, 
             samplerState: SamplerState.PointClamp, 
-            blendState: BlendState.AlphaBlend);
+            blendState: BlendState.AlphaBlend,
+            transformMatrix: camera.TransformMatrix);
         level.Draw(_spriteBatch);
         player.Draw(_spriteBatch);
         _spriteBatch.End();

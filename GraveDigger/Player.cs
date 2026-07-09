@@ -121,8 +121,8 @@ public class Player : Animation
         float scaledOriginX = Origin.X * Transform.Scale.X;
         float scaledOriginY = Origin.Y * Transform.Scale.Y;
         
-        position.X = MathHelper.Clamp(position.X, scaledOriginX, Game1.ScreenSize.X - Width + scaledOriginX);
-        position.Y = MathHelper.Clamp(position.Y, scaledOriginY, Game1.ScreenSize.Y - Height + scaledOriginY);
+        position.X = MathHelper.Clamp(position.X, scaledOriginX, Game1.WorldSize.X - Width + scaledOriginX);
+        position.Y = MathHelper.Clamp(position.Y, scaledOriginY, Game1.WorldSize.Y - Height + scaledOriginY);
         
         Transform.Position = position;
     }
