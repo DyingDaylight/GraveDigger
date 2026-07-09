@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using Interfaces;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using IDrawable = Interfaces.IDrawable;
 
 namespace GraveDigger;
 
@@ -24,6 +25,9 @@ public class Level
     private List<Prop> props = new List<Prop>();
     private Map map = new Map();
     
+    private List<IUpdatable> updatables = new();
+    private List<IDrawable> drawables = new();
+    private List<Collider> colliders = new();
 
     public void Start()
     {
@@ -36,19 +40,21 @@ public class Level
     public void Update(GameTime gameTime)
     {
         map.Update(gameTime);
-        foreach (Prop prop in props)
-        {
-            prop.Update(gameTime);
-        }
+        foreach (IUpdatable updatable in updatables)
+            updatable.Update(gameTime);
+        
+        foreach (Collider collider in colliders)
+            collider.Update(gameTime);
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
         map.Draw(spriteBatch);
-        foreach (Prop prop in props)
-        {
-            prop.Draw(spriteBatch);
-        }
+        foreach (IDrawable drawable in drawables)
+            drawable.Draw(spriteBatch);
+        
+        foreach (Collider collider in colliders)
+            collider.Draw(spriteBatch);
     }
     
     public void LoadTextures()
@@ -69,6 +75,20 @@ public class Level
         SpriteManager.AddSprite("tombstone4", "Images/Props/Tombstone4");
         SpriteManager.AddSprite("tombstone5", "Images/Props/Tombstone5");
         SpriteManager.AddSprite("tombstone6", "Images/Props/Tombstone6");
+    }
+    
+    private T Add<T>(T obj)
+    {
+        if (obj is IUpdatable updatable)
+            updatables.Add(updatable);
+
+        if (obj is IDrawable drawable)
+            drawables.Add(drawable);
+
+        if (obj is IHasCollider hasCollider)
+            colliders.Add(hasCollider.Collider);
+
+        return obj;
     }
     
     private void CreateMap()
@@ -92,6 +112,7 @@ public class Level
         Prop prop = new Prop(name);
         prop.Transform.Position = position;
         prop.Start();
+        Add(prop);
         props.Add(prop);
         return prop;
     }

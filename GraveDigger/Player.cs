@@ -35,6 +35,8 @@ public class Player : Animation
         
         CurrentRow = 1; 
         Stop();
+        
+        Collider.Start();
     }
     
     public override void Update(GameTime gameTime)
@@ -51,8 +53,16 @@ public class Player : Animation
         float dt = (float) gameTime.ElapsedGameTime.TotalSeconds;
         UpdateMovement(dt);
         UpdateSortingOrder();
+        
+        Collider.Update(gameTime);
     }
-    
+
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        base.Draw(spriteBatch);
+        Collider.Draw(spriteBatch);
+    }
+
     private void UpdateSortingOrder()
     {
         float depth = Bottom / Game1.ScreenSize.Y;

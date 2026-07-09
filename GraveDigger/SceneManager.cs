@@ -78,7 +78,7 @@ public class SceneManager : IUpdatable, IDrawable
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        for (int i = 0; i < updatables.Count; i++)
+        for (int i = 0; i < drawables.Count; i++)
         {
             drawables[i].Draw(spriteBatch);
         }
