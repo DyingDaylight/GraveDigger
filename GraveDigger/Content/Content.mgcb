@@ -44,6 +44,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Characters/keeper_front.png
 
+#begin Images/Characters/keeper_idle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Characters/keeper_idle.png;Images/Characters/keeper_idle
+
 #begin Images/Characters/keeper_side.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -55,6 +67,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Characters/keeper_side.png
+
+#begin Images/Characters/keeper_wasd2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Characters/keeper_wasd2.png
 
 #begin Images/Collectable Object/Forbidden_Graveyard_2D_Platformer_Tileset_Collectable Object - Coin 01.png
 /importer:TextureImporter

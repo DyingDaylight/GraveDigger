@@ -8,11 +8,13 @@ namespace GraveDigger;
 public class Player : Animation
 {
     private const float MovementSpeed = 300;
+    private const int AnimationFps = 4;
     
     public Collider Collider;
 
     public Vector2 previousPosition;
     
+    private int previousRow = -1;
     private bool isColliding = false;
     
     public Player() : base("digger")
@@ -28,6 +30,11 @@ public class Player : Animation
         
         Transform.Position = new Vector2(Game1.ScreenSize.X * 0.5f, Game1.ScreenSize.Y * 0.5f);
         previousPosition = Transform.Position;
+        
+        Transform.Scale = new Vector2(0.15f, 0.15f);
+        
+        CurrentRow = 1; 
+        Stop();
     }
     
     public override void Update(GameTime gameTime)
@@ -48,7 +55,6 @@ public class Player : Animation
     
     private void UpdateSortingOrder()
     {
-        // Update layer depth every frame because the player can move vertically.
         float depth = Bottom / Game1.ScreenSize.Y;
         SortingOrder = 1f - MathHelper.Clamp(depth, 0f, 1f);
     }
@@ -56,37 +62,60 @@ public class Player : Animation
     private void UpdateMovement(float dt)
     {
         KeyboardState keyboard = Keyboard.GetState();
-
         Vector2 direction = Vector2.Zero;
-        if (keyboard.IsKeyDown(Keys.D))
+        bool isMoving = false;
+
+        if (keyboard.IsKeyDown(Keys.W))
         {
-            SpriteEffect = SpriteEffects.FlipHorizontally;
-            direction.X += 1;
+            direction.Y -= 1;
+            CurrentRow = 0; 
+            isMoving = true;
         }
-        
+        else if (keyboard.IsKeyDown(Keys.S))
+        {
+            direction.Y += 1;
+            CurrentRow = 1; 
+            isMoving = true;
+        }
+
         if (keyboard.IsKeyDown(Keys.A))
         {
-            SpriteEffect = SpriteEffects.None;   
             direction.X -= 1;
+            CurrentRow = 2; 
+            isMoving = true;
         }
-        
-        if (keyboard.IsKeyDown(Keys.W))
-            direction.Y -= 1;
-        
-        if (keyboard.IsKeyDown(Keys.S)) 
-            direction.Y += 1;
-        
-        if (direction != Vector2.Zero)
-            direction.Normalize();
-        
-        Transform.Position += direction * MovementSpeed * dt;
-        
+        else if (keyboard.IsKeyDown(Keys.D))
+        {
+            direction.X += 1;
+            CurrentRow = 3; 
+            isMoving = true;
+        }
+    
+        if (isMoving)
+        {
+            if (direction != Vector2.Zero)
+                direction.Normalize();
+
+            if (CurrentRow != previousRow)
+            {
+                Reset();
+                previousRow = CurrentRow;
+            }
+
+            Play(AnimationFps);
+            Transform.Position += direction * MovementSpeed * dt;
+        }
+        else
+        {
+            Stop();
+            previousRow = -1;
+        }
+    
         ClampToScreen();
     }
     
     private void ClampToScreen()
     {
-        // Clamp the sprite origin so the whole player remains inside the screen.
         Vector2 position = Transform.Position;
 
         float scaledOriginX = Origin.X * Transform.Scale.X;
@@ -101,20 +130,11 @@ public class Player : Animation
     public void OnTriggerEnter(Collider self, Collider other)
     {
         Console.WriteLine("OnTriggerEnter " + self.Parent + " with " + other.Parent);
-        
     }
-
-    public void OnTriggerStay(Collider self, Collider other)
-    {
-    }
-
+    
     public void OnCollisionEnter(Collider self, Collider other)
     {
         Console.WriteLine("OnCollisionEnter " + self.Parent + " with " + other.Parent);
-        
-        //SceneManager.Remove(other.Parent);
-        //SceneManager.Remove(other);
-        
         isColliding = true;
     }
 }

@@ -7,11 +7,17 @@ public class Animation : Sprite
     private double totalTime;
     private int fps = 60;
 
-    private int x = 0;
-    private int y = 0;
+    protected int x = 0;
+    protected int y = 0;
 
     private bool isLooping = true;
     private bool isAnimating = false;
+
+    public int CurrentRow
+    {
+        get => y;
+        set => y = MathHelper.Clamp(value, 0, SpriteSheet.Rows - 1);
+    }
     
     public Animation(string name) : base(name)
     {
@@ -22,18 +28,21 @@ public class Animation : Sprite
         base.Start();
     }
 
+    public void Stop()
+    {
+        isAnimating = false;
+        x = 0; 
+    }
+
     public void Play(int fps = 60)
     {
         isAnimating = true;    
         this.fps = fps;
-        
-        Reset();
     }
 
     public void Reset()
     {
         x = 0;
-        y = 0;
         totalTime = 0;
     }
     
@@ -43,22 +52,15 @@ public class Animation : Sprite
         {
             totalTime = 0.0f;
             x++;
-            if (x == SpriteSheet.Columns)
+            if (x >= SpriteSheet.Columns)
             {
-                x = 0;
-                y++;
-                if (y == SpriteSheet.Rows)
+                if (isLooping)
                 {
-                    if (isLooping)
-                    {
-                        x = 0;
-                        y = 0;
-                    }
-                    else
-                    {
-                        x = SpriteSheet.Columns - 1;
-                        y = SpriteSheet.Rows - 1;
-                    }
+                    x = 0;
+                }
+                else
+                {
+                    x = SpriteSheet.Columns - 1;
                 }
             }
         }

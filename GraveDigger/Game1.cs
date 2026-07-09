@@ -56,7 +56,8 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         
-        SpriteManager.AddSprite("digger", "Images/Characters/keeper_front");
+        SpriteManager.AddSprite("digger", "Images/Characters/keeper_wasd2", columns: 4, rows: 4);
+            //SpriteManager.AddSprite("digger_idle", "Images/Characters/keeper_idle", columns: 4, rows: 1);
         SpriteManager.AddSprite("pixel", "Images/pixel");
         
         level = new Level();
