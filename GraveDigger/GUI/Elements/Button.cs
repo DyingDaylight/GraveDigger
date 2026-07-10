@@ -42,6 +42,12 @@ public class Button : UIElement
 
     public Button() : this(UiButtonMode.Color)
     {
+        SetSize(300, 80);
+        SetColors(GUIResources.ButtonNormalColor, 
+            GUIResources.ButtonHoverColor,
+            GUIResources.ButtonPressedColor);
+        SetFont(GUIResources.DefaultFont);
+        SetTextColor(Color.Black);
     }
     
     public Button(UiButtonMode mode)

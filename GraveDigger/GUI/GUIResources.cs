@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GUI;
@@ -7,6 +8,10 @@ public static class GUIResources
 {
     public static Texture2D ButtonDefaultTexture { get; private set; }
     public static SpriteFont DefaultFont { get; private set; }
+    
+    public static Color ButtonNormalColor => Color.White;
+    public static Color ButtonHoverColor => Color.DarkSeaGreen;
+    public static Color ButtonPressedColor => Color.ForestGreen;
     
     public static void LoadContent(ContentManager content)
     {

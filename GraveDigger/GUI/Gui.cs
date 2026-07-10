@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GraveDigger;
 using GraveDigger.GUI.Elements;
+using GraveDigger.GUI.Windows;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -13,6 +14,7 @@ namespace GUI;
 public class Gui: IUpdatable, IDrawable
 {
     public InteractionTooltip interactionTooltip;
+    public WindowManager WindowManager { get; }
     public MenuUI MenuUi;
     
     private bool started = false;
@@ -25,6 +27,7 @@ public class Gui: IUpdatable, IDrawable
     {
         this.gameContext = gameContext;
         
+        WindowManager = new WindowManager();
         interactionTooltip = new InteractionTooltip(gameContext.CoordinatesConverter);
         MenuUi = new MenuUI(gameContext.ScreenSize);
     }
@@ -50,6 +53,7 @@ public class Gui: IUpdatable, IDrawable
         started = true;
         
         MenuUi.Start();
+        WindowManager.Start();
         interactionTooltip.Start();
     }
 
@@ -59,11 +63,13 @@ public class Gui: IUpdatable, IDrawable
             MenuUi.Update(gameTime);
         
         interactionTooltip.Update(gameTime);
+        WindowManager.Update(gameTime);
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
         interactionTooltip.Draw(spriteBatch);
+        WindowManager.Draw(spriteBatch);
         if (gameState == Game1.GameState.Menu)
             MenuUi.Draw(spriteBatch);
     }

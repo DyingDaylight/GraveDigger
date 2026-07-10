@@ -1,5 +1,6 @@
 ﻿
 using System;
+using GraveDigger.Data;
 using Interfaces;
 using Microsoft.Xna.Framework;
 
@@ -7,7 +8,7 @@ namespace GraveDigger.Interactions;
 
 public abstract class Interaction
 {
-    private readonly IInteractionOwner parent;
+    protected readonly IInteractionOwner parent;
     
     public string Hint { get; protected set; }
     

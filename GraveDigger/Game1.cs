@@ -19,6 +19,7 @@ public class Game1 : Game
     
     private GameState currentGameState = GameState.Menu;
     private GameContext gameContext;
+    private GameplayCoordinator gameplayCoordinator;
     
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
@@ -53,7 +54,6 @@ public class Game1 : Game
 
         ScreenSize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         camera = new Camera(GraphicsDevice.Viewport);
-        
         gameContext = new GameContext(camera, ScreenSize);
         
         base.Initialize();
@@ -67,16 +67,19 @@ public class Game1 : Game
             //SpriteManager.AddSprite("digger_idle", "Images/Characters/keeper_idle", columns: 4, rows: 1);
         SpriteManager.AddSprite("pixel", "Images/pixel");
         
+        gui = new Gui(gameContext);
+        gui.LoadContent(Content);
+        gui.Start();
+        
+        gameplayCoordinator = new GameplayCoordinator(gui);
+        gameContext.GameplayCoordinator = gameplayCoordinator;
+        
         level = new Level(gameContext);
         level.LoadTextures();
         level.Start();
         
         player = new Player();
         player.Start();
-        
-        gui = new Gui(gameContext);
-        gui.LoadContent(Content);
-        gui.Start();
         
         gui.MenuUi.OnStartClicked += StartGame; 
         gui.MenuUi.OnSettingsClicked += OpenSettings; 
@@ -96,8 +99,9 @@ public class Game1 : Game
             if (gameStarted && currentKeyboardState.IsKeyDown(Keys.Escape) && previousKeyboardState.IsKeyUp(Keys.Escape))
                 SetGameState(GameState.Playing);
         } 
-        else if (currentGameState == GameState.Playing)
+        else if (currentGameState == GameState.Playing && !gui.WindowManager.IsModalWindow)
         {
+             
             level.Update(gameTime);
             player.Update(gameTime);
             

@@ -1,11 +1,13 @@
-﻿using Interfaces;
+﻿using System;
+using GUI;
+using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = Interfaces.IDrawable;
 
 namespace GraveDigger.GUI.Elements;
 
-public class Label : IUpdatable, IDrawable
+public class Label : UIElement
 {
     private Vector2 position;
     private string text = "";
@@ -19,15 +21,31 @@ public class Label : IUpdatable, IDrawable
 
     public SpriteFont Font { get; set; }
 
-    public void Start()
+    public Rectangle Bounds
     {
+        get
+        {
+            return new Rectangle((int)position.X, (int)position.Y, 
+                (int)Font.MeasureString(Text).X, (int)Font.MeasureString(Text).Y);
+        }
     }
 
-    public void Update(GameTime gameTime)
+    public Label()
     {
+        Font = GUIResources.DefaultFont;
+    }
+    
+    public override void Start()
+    {
+        base.Start();
     }
 
-    public void Draw(SpriteBatch spriteBatch)
+    public override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime);
+    }
+
+    public override void Draw(SpriteBatch spriteBatch)
     {
         if (Font == null || string.IsNullOrEmpty(Text))
             return;
@@ -49,5 +67,10 @@ public class Label : IUpdatable, IDrawable
     {
         position = new Vector2(bounds.X + bounds.Width * 0.5f, 
                                bounds.Y + bounds.Height * 0.5f);
+    }
+    
+    public override void SetPosition(int x, int y)
+    {
+        position = new Vector2(x, y);
     }
 }

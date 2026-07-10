@@ -37,7 +37,7 @@ public class UIElement : IUpdatable, IDrawable
             0f);
     }
     
-    public void SetPosition(int x, int y)
+    public virtual void SetPosition(int x, int y)
     {
         Bounds = new Rectangle(x, y, Bounds.Width, Bounds.Height);
     }

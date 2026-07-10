@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GraveDigger.Data;
 using GraveDigger.Interactions;
 using GraveDigger.Props;
 using Interfaces;
@@ -193,8 +194,12 @@ public class Level
     {
         Tombstone tomb = CreateProp(TombstoneFactory, name, position);
         tomb.Transform.Scale = new Vector2(0.8f, 0.8f);
-        tomb.Interaction = new TombstoneInteraction(tomb);
-        InteractionSystem.RegisterInteraction(tomb.Interaction);
+        TombstoneInteraction interaction = new TombstoneInteraction(tomb);
+        interaction.SetData(new TombstoneData("Eleanor Blackwood", "1847 - 1891",
+            "Dirt Rich", "Grumpy Old Hag", "Desolate"));
+        InteractionSystem.RegisterInteraction(interaction);
+        tomb.Interaction = interaction;
+        interaction.OnTombstoneRead += gameContext.GameplayCoordinator.TombstoneSubscriber;
     }
     
     private Prop PropFactory(string spriteName)
