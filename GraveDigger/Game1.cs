@@ -1,5 +1,5 @@
 ﻿using System;
-using GraveDigger.Interactions;
+using GUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -8,7 +8,7 @@ namespace GraveDigger;
 
 public class Game1 : Game
 {
-    enum GameState
+    public enum GameState
     {
         Menu,
         Playing
@@ -18,6 +18,7 @@ public class Game1 : Game
     public static readonly Vector2 WorldSize = new Vector2(2720, 2160);
     
     private GameState currentGameState = GameState.Menu;
+    private GameContext gameContext;
     
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
@@ -27,7 +28,7 @@ public class Game1 : Game
     private Player player;
     private Level level;
     
-    private GUI.GUI gui;
+    private Gui gui;
     
     private KeyboardState previousKeyboardState;
     
@@ -51,12 +52,9 @@ public class Game1 : Game
         _graphics.ApplyChanges();
 
         ScreenSize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-        
-        SetGameState(GameState.Menu);
-        
         camera = new Camera(GraphicsDevice.Viewport);
         
-        Console.WriteLine(GraphicsDevice.Viewport);
+        gameContext = new GameContext(camera, ScreenSize);
         
         base.Initialize();
     }
@@ -69,20 +67,24 @@ public class Game1 : Game
             //SpriteManager.AddSprite("digger_idle", "Images/Characters/keeper_idle", columns: 4, rows: 1);
         SpriteManager.AddSprite("pixel", "Images/pixel");
         
-        level = new Level(camera);
+        level = new Level(gameContext);
         level.LoadTextures();
         level.Start();
         
         player = new Player();
         player.Start();
         
-        gui = new GUI.GUI(ScreenSize);
+        gui = new Gui(gameContext);
         gui.LoadContent(Content);
         gui.Start();
         
-        gui.OnStartClicked += StartGame; 
-        gui.OnSettingsClicked += OpenSettings; 
-        gui.OnExitClicked += CloseGame;
+        gui.MenuUi.OnStartClicked += StartGame; 
+        gui.MenuUi.OnSettingsClicked += OpenSettings; 
+        gui.MenuUi.OnExitClicked += CloseGame;
+        
+        level.InteractionSystem.OnHoveredInteractionChanged += gui.interactionTooltip.HandleInteraction;
+        
+        SetGameState(GameState.Menu);
     }
 
     protected override void Update(GameTime gameTime)
@@ -91,8 +93,6 @@ public class Game1 : Game
         
         if (currentGameState == GameState.Menu)
         {
-            gui.Update(gameTime);
-            
             if (gameStarted && currentKeyboardState.IsKeyDown(Keys.Escape) && previousKeyboardState.IsKeyUp(Keys.Escape))
                 SetGameState(GameState.Playing);
         } 
@@ -105,6 +105,7 @@ public class Game1 : Game
                 SetGameState(GameState.Menu);
         }
         
+        gui.Update(gameTime);
         previousKeyboardState = currentKeyboardState;
         
         camera.SetTarget(player.Transform.Position);
@@ -126,12 +127,9 @@ public class Game1 : Game
         player.Draw(_spriteBatch);
         _spriteBatch.End();
 
-        if (currentGameState == GameState.Menu)
-        {
-            _spriteBatch.Begin();
-            gui.Draw(_spriteBatch);
-            _spriteBatch.End();
-        }
+        _spriteBatch.Begin();
+        gui.Draw(_spriteBatch);
+        _spriteBatch.End();
 
         base.Draw(gameTime);
     }
@@ -155,5 +153,6 @@ public class Game1 : Game
     private void SetGameState(GameState gameState)
     {
         currentGameState = gameState;
+        gui.SetGameState(currentGameState);
     }
 }

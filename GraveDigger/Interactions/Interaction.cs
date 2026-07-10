@@ -10,7 +10,6 @@ public abstract class Interaction
     private readonly IInteractionOwner parent;
     
     public string Hint { get; protected set; }
-
     
     
     public Interaction(IInteractionOwner parent)

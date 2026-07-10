@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -7,17 +8,20 @@ namespace GraveDigger.Interactions;
 
 public class InteractionSystem : IUpdatable
 {
-    private Interaction hoveredInteraction;
     private MouseState previousMouseState;
+    
+    private Interaction hoveredInteraction;
     private Interaction pressedInteraction;
     
     private List<Interaction> interactions = new List<Interaction>();
     
-    private Camera camera;
+    private CoordinatesConverter coordinatesConverter;
 
-    public InteractionSystem(Camera camera)
+    public event Action<Interaction> OnHoveredInteractionChanged;
+
+    public InteractionSystem(CoordinatesConverter coordinatesConverter)
     {
-        this.camera = camera;
+        this.coordinatesConverter = coordinatesConverter;
     }
     
     public void RegisterInteraction(Interaction interaction)
@@ -41,8 +45,7 @@ public class InteractionSystem : IUpdatable
     {
         MouseState currentMouseState = Mouse.GetState();
         Vector2 screenMouse = currentMouseState.Position.ToVector2();
-        Matrix inverseViewMatrix = Matrix.Invert(camera.TransformMatrix);
-        Vector2 mousePosition = Vector2.Transform(screenMouse, inverseViewMatrix);
+        Vector2 mousePosition = coordinatesConverter.ScreenToWorld(screenMouse);
         
         Interaction newHoveredInteraction = null;
         
@@ -61,6 +64,7 @@ public class InteractionSystem : IUpdatable
             hoveredInteraction?.OnHoverExit();
             hoveredInteraction = newHoveredInteraction;
             hoveredInteraction?.OnHoverEnter();
+            OnHoveredInteractionChanged?.Invoke(hoveredInteraction);
         }
         
         bool mouseJustPressed = currentMouseState.LeftButton == ButtonState.Pressed &&

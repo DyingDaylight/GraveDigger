@@ -33,18 +33,18 @@ public class Level
     private List<Collider> colliders = new();
     private List<Interaction> interactions = new();
 
-    private InteractionSystem interactionSystem;
+    public InteractionSystem InteractionSystem;
     
-    private Camera camera;
+    private GameContext gameContext;
 
-    public Level(Camera camera)
+    public Level(GameContext gameContext)
     {
-        this.camera = camera;
+        this.gameContext = gameContext;
     }
     
     public void Start()
     {
-        interactionSystem = new InteractionSystem(camera);
+        InteractionSystem = new InteractionSystem(gameContext.CoordinatesConverter);
         
         CreateMap();
         CreateProps();
@@ -61,7 +61,7 @@ public class Level
         foreach (Collider collider in colliders)
             collider.Update(gameTime);
         
-        interactionSystem.Update(gameTime);
+        InteractionSystem.Update(gameTime);
         
         //foreach (Interaction interaction in interactions)
         //    interaction.Update(gameTime);
@@ -190,7 +190,7 @@ public class Level
         Tombstone tomb = CreateProp(TombstoneFactory, name, position);
         tomb.Transform.Scale = new Vector2(0.8f, 0.8f);
         tomb.Interaction = new TombstoneInteraction(tomb);
-        interactionSystem.RegisterInteraction(tomb.Interaction);
+        InteractionSystem.RegisterInteraction(tomb.Interaction);
     }
     
     private Prop PropFactory(string spriteName)

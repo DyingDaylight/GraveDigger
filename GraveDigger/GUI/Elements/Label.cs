@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = Interfaces.IDrawable;
 
-namespace GUI;
+namespace GraveDigger.GUI.Elements;
 
 public class Label : IUpdatable, IDrawable
 {

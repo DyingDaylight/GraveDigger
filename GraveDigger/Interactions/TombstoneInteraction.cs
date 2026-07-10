@@ -4,10 +4,11 @@ namespace GraveDigger.Interactions;
 
 public class TombstoneInteraction : Interaction
 {
+
     public TombstoneInteraction(IInteractionOwner owner) : base(owner)
     {
+        Hint = "Read Tombstone";
     }
-    
     
     public override void Interact()
     {
