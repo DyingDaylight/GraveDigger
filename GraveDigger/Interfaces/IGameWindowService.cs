@@ -8,4 +8,5 @@ public interface IGameWindowService
     void OpenTombstoneWindow(Tombstone tombstoneData);
     void CloseCurrentWindow();
     bool IsModalWindowOpen();
+    void UpdateTombstoneWindow();
 }

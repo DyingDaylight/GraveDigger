@@ -12,7 +12,8 @@ public class Button : UIElement
     {
         Normal,
         Hover,
-        Pressed
+        Pressed,
+        Disabled
     }
     
     public enum UiButtonMode
@@ -26,10 +27,12 @@ public class Button : UIElement
     private Color normalColor = Color.White;
     private Color hoverColor = Color.LightGray;
     private Color pressedColor = Color.DarkGray;
+    private Color disabledColor = Color.Gray;
     
     private Texture2D normalTexture;
     private Texture2D hoverTexture;
     private Texture2D pressedTexture;
+    private Texture2D disabledTexture;
 
     private UiButtonState currentState;
     
@@ -40,12 +43,15 @@ public class Button : UIElement
     private ButtonState previousMouseButtonState;
     private bool wasPressedInside;
 
+    private bool isDisabled = false;
+    
     public Button() : this(UiButtonMode.Color)
     {
         SetSize(300, 80);
         SetColors(GUIResources.ButtonNormalColor, 
             GUIResources.ButtonHoverColor,
-            GUIResources.ButtonPressedColor);
+            GUIResources.ButtonPressedColor,
+            GUIResources.ButtonDisabledColor);
         SetFont(GUIResources.DefaultFont);
         SetTextColor(Color.Black);
     }
@@ -54,23 +60,30 @@ public class Button : UIElement
     {
         buttonMode = mode;
     }
-    
+
     public override void Start()
     {
         label.Start();
         base.Start();
     }
-    
+
     public override void Update(GameTime gameTime)
     {
         UpdateLabel(gameTime);
 
-        MouseState mouse = Mouse.GetState();
-        bool isHover = IsMouseOver(mouse);
+        if (!isDisabled)
+        {
+            MouseState mouse = Mouse.GetState();
+            bool isHover = IsMouseOver(mouse);
 
-        HandleClick(mouse, isHover);
+            HandleClick(mouse, isHover);
 
-        currentState = GetStateFromMouse(mouse, isHover);
+            currentState = GetStateFromMouse(mouse, isHover);
+        }
+        else
+        {
+            currentState = UiButtonState.Disabled;
+        }
 
         ApplyState();
     }
@@ -96,7 +109,7 @@ public class Button : UIElement
         label.Color = color;
     }
 
-    public void SetTextures(Texture2D normal, Texture2D hover, Texture2D pressed)
+    public void SetTextures(Texture2D normal, Texture2D hover, Texture2D pressed, Texture2D disabled = null)
     {
         if (buttonMode != UiButtonMode.Texture)
             return;
@@ -107,13 +120,14 @@ public class Button : UIElement
         normalTexture = normal;
         hoverTexture = hover;
         pressedTexture = pressed;
+        disabledTexture = disabled;
        
         Texture = normalTexture;
         Color = Color.White;
         SetSize(Texture.Width, Texture.Height);
     }
 
-    public void SetColors(Color normal, Color hover, Color pressed)
+    public void SetColors(Color normal, Color hover, Color pressed, Color disabled = default)
     {
         if (buttonMode != UiButtonMode.Color)
             return;
@@ -121,6 +135,10 @@ public class Button : UIElement
         normalColor = normal;
         hoverColor = hover;
         pressedColor = pressed;
+        if (disabled == default)
+            disabledColor = Color.Gray;
+        else
+            disabledColor = disabled;
         
         Texture = GUIResources.ButtonDefaultTexture;
         Color = normalColor;
@@ -195,6 +213,7 @@ public class Button : UIElement
             UiButtonState.Normal => normalTexture,
             UiButtonState.Hover => hoverTexture ?? normalTexture,
             UiButtonState.Pressed => pressedTexture ?? normalTexture,
+            UiButtonState.Disabled => disabledTexture ?? normalTexture,
             _ => normalTexture
         };
     }
@@ -206,7 +225,21 @@ public class Button : UIElement
             UiButtonState.Normal => normalColor,
             UiButtonState.Hover => hoverColor,
             UiButtonState.Pressed => pressedColor,
+            UiButtonState.Disabled => disabledColor,
             _ => normalColor
         };
+    }
+
+    public void SetDisabled(bool disabled)
+    {
+        isDisabled = disabled;
+        if (disabled)
+        {
+            currentState = UiButtonState.Disabled;
+        }
+        else
+        {
+            currentState = UiButtonState.Normal;
+        }
     }
 }

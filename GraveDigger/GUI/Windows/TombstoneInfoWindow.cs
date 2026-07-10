@@ -108,6 +108,17 @@ public class TombstoneInfoWindow : Window
         yearLabel.Text = tombstone.Data.Years;
         wealthLabel.Text = $"Wealth: {tombstone.Data.Wealth}";
         natureLabel.Text = $"Nature: {tombstone.Data.Nature}";
-        stateLabel.Text = $"State: {tombstone.Data.State}";
+        stateLabel.Text = $"State: {tombstone.State}";
+        
+        Console.WriteLine("Check Repair button");
+        if (tombstone.State != TombstoneState.Broken)
+            repairButton.SetDisabled(true);
+        else
+            repairButton.SetDisabled(false);
+    }
+
+    public void Update()
+    {
+        SetData(tombstone);
     }
 }

@@ -191,8 +191,9 @@ public class Level
         tomb.Transform.Scale = new Vector2(0.8f, 0.8f);
         TombstoneInteraction interaction = new TombstoneInteraction(tomb);
         tomb.SetData(new TombstoneData("Eleanor Blackwood", "1847 - 1891",
-            "Dirt Rich", "Grumpy Old Hag", "Desolate"));
+            "Dirt Rich", "Grumpy Old Hag"));
         InteractionSystem.RegisterInteraction(interaction);
+        tomb.State = TombstoneState.Broken;
         tomb.Interaction = interaction;
         interaction.OnTombstoneRead += OpenTombstone;
     }

@@ -49,4 +49,12 @@ public class WindowManager : IUpdatable, IDrawable
     {
         currentWindow = null;
     }
+
+    public void UpdateTombstoneWindow()
+    {
+        if (TombstoneInfoWindow != null && currentWindow == TombstoneInfoWindow)
+        {
+            TombstoneInfoWindow.Update();
+        }
+    }
 }

@@ -7,5 +7,5 @@ public interface IGameplayActions
 { 
     void OpenTombstone(Tombstone tombstoneData);
     void DigGrave(Tombstone tombstoneData);
-    void RepairGrave(Tombstone tombstoneData);
+    void RepairGrave(Tombstone tombstone);
 }

@@ -6,14 +6,12 @@ public class TombstoneData
     public string Years;
     public string Wealth;
     public string Nature;
-    public string State;
 
-    public TombstoneData(string name, string years, string wealth, string nature, string state)
+    public TombstoneData(string name, string years, string wealth, string nature)
     {   
         Name = name;
         Years = years;
         Wealth = wealth;
         Nature = nature;
-        State = state;
     }
 }

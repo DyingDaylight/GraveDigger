@@ -26,8 +26,14 @@ public class GameplayCoordinator : IGameplayActions
         Console.WriteLine("Digging Grave");
     }
 
-    public void RepairGrave(Tombstone tombstoneData)
+    public void RepairGrave(Tombstone tombstone)
     {
         Console.WriteLine("Repairing Grave");
+        // TODO: check if we have resources
+        bool repaired = tombstone.Repair();
+        if (repaired)
+        {
+            WindowService.UpdateTombstoneWindow();
+        }
     }
 }

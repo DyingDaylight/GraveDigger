@@ -95,4 +95,9 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
     {
         return WindowManager.IsModalWindow;
     }
+
+    public void UpdateTombstoneWindow()
+    {
+        WindowManager.UpdateTombstoneWindow();
+    }
 }

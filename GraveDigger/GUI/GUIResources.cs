@@ -12,6 +12,7 @@ public static class GUIResources
     public static Color ButtonNormalColor => Color.White;
     public static Color ButtonHoverColor => Color.DarkSeaGreen;
     public static Color ButtonPressedColor => Color.ForestGreen;
+    public static Color ButtonDisabledColor => Color.Gray;
     
     public static void LoadContent(ContentManager content)
     {
