@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using GraveDigger;
+using GraveDigger.GUI.Elements;
 using Interfaces;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = Interfaces.IDrawable;
 
 namespace GUI;
 
-public class GUI: IUpdatable, IDrawable
+public class MenuUI : IUpdatable, IDrawable
 {
     public event Action OnStartClicked;
     public event Action OnSettingsClicked;
@@ -17,45 +18,18 @@ public class GUI: IUpdatable, IDrawable
     private Button startButton = new Button(Button.UiButtonMode.Color);
     private Button settingsButton = new Button(Button.UiButtonMode.Texture);
     private Button closeButton = new Button(Button.UiButtonMode.Texture);
-
-    private SpriteFont font;
-    
-    private bool started = false;
-    
+ 
     private readonly List<Button> buttons = new List<Button>();
+    
     private readonly Vector2 screenSize;
 
-
-    public GUI(Vector2 screenSize)
+    public MenuUI(Vector2 screenSize)
     {
         this.screenSize = screenSize;
     }
     
-    public void LoadContent(ContentManager content)
-    {
-        GUIResources.LoadContent(content);
-        
-        font = content.Load<SpriteFont>("Fonts/File");
-        
-        settingsButton.SetTextures(
-            content.Load<Texture2D>($"Images/GUI/ButtonNormal"), 
-            content.Load<Texture2D>($"Images/GUI/ButtonHover"),
-            content.Load<Texture2D>($"Images/GUI/ButtonPressed"));
-        
-        closeButton.SetTextures(
-            content.Load<Texture2D>($"Images/GUI/CloseButtonNormal"),
-            content.Load<Texture2D>($"Images/GUI/CloseButtonHover"),
-            content.Load<Texture2D>($"Images/GUI/CloseButtonPressed"));
-    }
-    
     public void Start()
     {
-        // Prevent configuring and subscribing buttons more than once.
-        if (started)
-            throw new InvalidOperationException("GUI has already been started.");
-
-        started = true;
-        
         ConfigureButtons();
         SubscribeButtonEvents();
         LayoutButtons(screenSize);
@@ -81,7 +55,7 @@ public class GUI: IUpdatable, IDrawable
             button.Draw(spriteBatch);     
         }
     }
-
+    
     private void ConfigureButtons()
     {
         ConfigureStartButton();
@@ -115,7 +89,7 @@ public class GUI: IUpdatable, IDrawable
         x += settingsButton.Bounds.Width + ButtonPadding;
         closeButton.SetPosition(x, ButtonY);
     }
-
+    
     private void ConfigureStartButton()
     {
         startButton.SetSize(400, 100);
@@ -124,7 +98,7 @@ public class GUI: IUpdatable, IDrawable
             new Color(194, 123, 95), 
             new Color(148, 87, 63));
         
-        startButton.SetFont(font);
+        startButton.SetFont(GUIResources.DefaultFont);
         startButton.SetText("Start Game");
         startButton.SetTextColor(Color.Black);
         
@@ -133,7 +107,12 @@ public class GUI: IUpdatable, IDrawable
 
     private void ConfigureSettingsButton()
     {
-        settingsButton.SetFont(font);
+        settingsButton.SetTextures(
+            SpriteManager.GetSprite("ButtonNormal").Texture,
+            SpriteManager.GetSprite("ButtonHover").Texture,
+            SpriteManager.GetSprite("ButtonPressed").Texture);
+        
+        settingsButton.SetFont(GUIResources.DefaultFont);
         settingsButton.SetText("Settings");
         settingsButton.SetTextColor(Color.Black);
         
@@ -142,6 +121,11 @@ public class GUI: IUpdatable, IDrawable
 
     private void ConfigureCloseButton()
     {
+        closeButton.SetTextures(
+            SpriteManager.GetSprite("CloseButtonNormal").Texture,
+            SpriteManager.GetSprite("CloseButtonHover").Texture,
+            SpriteManager.GetSprite("CloseButtonPressed").Texture);
+        
         buttons.Add(closeButton);
     }
 }

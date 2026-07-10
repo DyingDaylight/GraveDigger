@@ -1,9 +1,10 @@
 ﻿using System;
+using GUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace GUI;
+namespace GraveDigger.GUI.Elements;
 
 public class Button : UIElement
 {

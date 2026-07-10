@@ -1,9 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GraveDigger.Interactions;
+using Interfaces;
+using Microsoft.Xna.Framework;
 
-namespace GraveDigger;
+namespace GraveDigger.Props;
 
 public class Prop : Sprite
 {
+    
     public Prop(string name) : base(name)
     {
     }

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = Interfaces.IDrawable;
 
-namespace GUI;
+namespace GraveDigger.GUI.Elements;
 
 // Base class for UI elements that can be updated and drawn.
 public class UIElement : IUpdatable, IDrawable

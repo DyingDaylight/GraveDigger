@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using GraveDigger.Interactions;
+using GraveDigger.Props;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -28,9 +31,21 @@ public class Level
     private List<IUpdatable> updatables = new();
     private List<IDrawable> drawables = new();
     private List<Collider> colliders = new();
+    private List<Interaction> interactions = new();
 
+    public InteractionSystem InteractionSystem;
+    
+    private GameContext gameContext;
+
+    public Level(GameContext gameContext)
+    {
+        this.gameContext = gameContext;
+    }
+    
     public void Start()
     {
+        InteractionSystem = new InteractionSystem(gameContext.CoordinatesConverter);
+        
         CreateMap();
         CreateProps();
         CreateLamps();
@@ -45,6 +60,11 @@ public class Level
         
         foreach (Collider collider in colliders)
             collider.Update(gameTime);
+        
+        InteractionSystem.Update(gameTime);
+        
+        //foreach (Interaction interaction in interactions)
+        //    interaction.Update(gameTime);
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -55,6 +75,9 @@ public class Level
         
         foreach (Collider collider in colliders)
             collider.Draw(spriteBatch);
+        
+        //foreach (Interaction interaction in interactions)
+        //    interaction.Draw(spriteBatch);
     }
     
     public void LoadTextures()
@@ -89,10 +112,20 @@ public class Level
         if (obj is IDrawable drawable)
             drawables.Add(drawable);
 
-        if (obj is IHasCollider hasCollider)
+        if (obj is IHasCollider hasCollider && hasCollider.Collider != null)
             colliders.Add(hasCollider.Collider);
+        
+        if (obj is ICanInteract interactable)
+            interactions.Add(interactable.Interaction);
 
         return obj;
+    }
+
+    private void Remove<T>(T obj)
+    {
+        // TODO: inmplement remove
+        // TODO: do not forget about unregestering Interactions
+        // TODO: do not forget about colliders
     }
     
     private void CreateMap()
@@ -103,17 +136,20 @@ public class Level
     
     private void CreateProps()
     {
-        CreateProp("crypt",  new Vector2(1300, 350));
-        CreateProp("angel",  new Vector2(1600, 250));
-        CreateProp("tree",  new Vector2(1600, 700));
-        CreateProp("tree",  new Vector2(800, 800));
-        CreateProp("dirt",  new Vector2(1300, 800));
-        CreateProp("spade",  new Vector2(1300, 820));
+        CreateProp(PropFactory,"crypt",  new Vector2(1300, 350));
+        CreateProp(PropFactory,"tree",  new Vector2(1600, 700));
+        CreateProp(PropFactory,"tree",  new Vector2(800, 800));
+        CreateProp(PropFactory,"dirt",  new Vector2(1300, 800));
+        CreateProp(PropFactory,"spade",  new Vector2(1300, 820));
+        
+        Prop angel = CreateProp(PropFactory,"angel",  new Vector2(1600, 250));
+        //angel.Interaction = new TraderInteraction(angel);
+        //interactionSystem.RegisterInteraction(angel.Interaction);
     }
 
-    private Prop CreateProp(string name, Vector2 position)
+    private T CreateProp<T>(Func<string, T> factory, string name, Vector2 position) where T : Prop
     {
-        Prop prop = new Prop(name);
+        T prop = factory(name);
         prop.Transform.Position = position;
         prop.Start();
         Add(prop);
@@ -131,7 +167,7 @@ public class Level
     
     private void CreateLamp(Vector2 position, bool flip)
     {
-        Prop lamp = CreateProp("lampost", position);
+        Prop lamp = CreateProp<Prop>(PropFactory,"lampost", position);
         lamp.SpriteEffect = flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
     }
     
@@ -155,7 +191,19 @@ public class Level
 
     private void CreateTombstone(string name, Vector2 position)
     {
-        Prop tomb = CreateProp(name, position);
+        Tombstone tomb = CreateProp(TombstoneFactory, name, position);
         tomb.Transform.Scale = new Vector2(0.8f, 0.8f);
+        tomb.Interaction = new TombstoneInteraction(tomb);
+        InteractionSystem.RegisterInteraction(tomb.Interaction);
+    }
+    
+    private Prop PropFactory(string spriteName)
+    {
+        return new Prop(spriteName);
+    }
+
+    private Tombstone TombstoneFactory(string spriteName)
+    {
+        return new Tombstone(spriteName);
     }
 }
