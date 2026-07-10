@@ -1,4 +1,5 @@
 ﻿using System;
+using GraveDigger.Interactions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -39,6 +40,7 @@ public class Game1 : Game
         _graphics = new GraphicsDeviceManager(this);
         _spriteManager = new SpriteManager(Content);
         Content.RootDirectory = "Content";
+        IsMouseVisible = true;
     }
 
     protected override void Initialize()
@@ -153,6 +155,5 @@ public class Game1 : Game
     private void SetGameState(GameState gameState)
     {
         currentGameState = gameState;
-        IsMouseVisible = gameState == GameState.Menu;
     }
 }

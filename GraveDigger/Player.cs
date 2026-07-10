@@ -19,7 +19,7 @@ public class Player : Animation
     
     public Player() : base("digger")
     {
-        Collider = SceneManager.Create<Collider>();
+        Collider = new Collider();
         Collider.Parent = this;  
         Collider.isTrigger = false;
     }

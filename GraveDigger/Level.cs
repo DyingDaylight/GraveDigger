@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GraveDigger.Interactions;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -28,9 +29,14 @@ public class Level
     private List<IUpdatable> updatables = new();
     private List<IDrawable> drawables = new();
     private List<Collider> colliders = new();
+    private List<Interaction> interactions = new();
 
+    private InteractionSystem interactionSystem;
+    
     public void Start()
     {
+        interactionSystem = new InteractionSystem();
+        
         CreateMap();
         CreateProps();
         CreateLamps();
@@ -45,6 +51,11 @@ public class Level
         
         foreach (Collider collider in colliders)
             collider.Update(gameTime);
+        
+        interactionSystem.Update(gameTime);
+        
+        //foreach (Interaction interaction in interactions)
+        //    interaction.Update(gameTime);
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -55,6 +66,9 @@ public class Level
         
         foreach (Collider collider in colliders)
             collider.Draw(spriteBatch);
+        
+        //foreach (Interaction interaction in interactions)
+        //    interaction.Draw(spriteBatch);
     }
     
     public void LoadTextures()
@@ -85,10 +99,20 @@ public class Level
         if (obj is IDrawable drawable)
             drawables.Add(drawable);
 
-        if (obj is IHasCollider hasCollider)
+        if (obj is IHasCollider hasCollider && hasCollider.Collider != null)
             colliders.Add(hasCollider.Collider);
+        
+        if (obj is ICanInteract interactable)
+            interactions.Add(interactable.Interaction);
 
         return obj;
+    }
+
+    private void Remove<T>(T obj)
+    {
+        // TODO: inmplement remove
+        // TODO: do not forget about unregestering Interactions
+        // TODO: do not forget about colliders
     }
     
     private void CreateMap()
@@ -100,11 +124,14 @@ public class Level
     private void CreateProps()
     {
         CreateProp("crypt",  new Vector2(1300, 350));
-        CreateProp("angel",  new Vector2(1600, 250));
         CreateProp("tree",  new Vector2(1600, 700));
         CreateProp("tree",  new Vector2(800, 800));
         CreateProp("dirt",  new Vector2(1300, 800));
         CreateProp("spade",  new Vector2(1300, 820));
+        
+        Prop angel = CreateProp("angel",  new Vector2(1600, 250));
+        angel.Interaction = new TraderInteraction(angel);
+        interactionSystem.RegisterInteraction(angel.Interaction);
     }
 
     private Prop CreateProp(string name, Vector2 position)
@@ -153,5 +180,7 @@ public class Level
     {
         Prop tomb = CreateProp(name, position);
         tomb.Transform.Scale = new Vector2(0.8f, 0.8f);
+        tomb.Interaction = new TombstoneInteraction(tomb);
+        interactionSystem.RegisterInteraction(tomb.Interaction);
     }
 }
