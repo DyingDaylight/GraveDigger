@@ -1,28 +1,22 @@
 ﻿using System;
 using GraveDigger.Data;
+using GraveDigger.Props;
 
 namespace GraveDigger.Interactions;
 
 public class TombstoneInteraction : Interaction
 {
-    private TombstoneData tombstoneData;
-    public event Action<TombstoneData> OnTombstoneRead;
+    private Tombstone owner;
+    public event Action<Tombstone> OnTombstoneRead;
 
-    public TombstoneInteraction(IInteractionOwner owner) : base(owner)
+    public TombstoneInteraction(Tombstone owner) : base(owner)
     {
         Hint = "Read Tombstone";
+        this.owner = owner;
     }
     
     public override void Interact()
     {
-        OnHoverExit();
-        OnTombstoneRead?.Invoke(tombstoneData);
+        OnTombstoneRead?.Invoke(owner);
     }
-    
-    public void SetData(TombstoneData tombstoneData)
-    {
-       this.tombstoneData = tombstoneData;
-    }
-    
-    
 }

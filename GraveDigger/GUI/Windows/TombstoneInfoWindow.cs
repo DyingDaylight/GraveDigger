@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GraveDigger.Data;
 using GraveDigger.GUI.Elements;
 using GraveDigger.GUI.Layouts;
+using GraveDigger.Props;
 using GUI;
 using GUI.Windows;
 using Microsoft.Xna.Framework;
@@ -12,7 +13,6 @@ namespace GraveDigger.GUI.Windows;
 
 public class TombstoneInfoWindow : Window
 {
-
     private Label nameLabel;
     private Label yearLabel;
     private Label wealthLabel;
@@ -26,8 +26,10 @@ public class TombstoneInfoWindow : Window
     private Button repairButton;
     private Button closeButton;
     
-    public event Action OnDigButton;
-    public event Action OnRepairButton;
+    private Tombstone tombstone;
+    
+    public event Action<Tombstone> OnDigButton;
+    public event Action<Tombstone> OnRepairButton;
     public event Action OnCloseButton;
     
     public TombstoneInfoWindow()
@@ -51,12 +53,12 @@ public class TombstoneInfoWindow : Window
         
         digButton = new Button();
         digButton.SetText("Dig");
-        digButton.OnClick += () => OnDigButton?.Invoke();
+        digButton.OnClick += DigGrave;
         elements.Add(digButton);
         
         repairButton = new Button();
         repairButton.SetText("Repair");
-        repairButton.OnClick += () => OnRepairButton?.Invoke();
+        repairButton.OnClick += RepairGrave;
         elements.Add(repairButton);
         
         closeButton = new Button();
@@ -83,18 +85,29 @@ public class TombstoneInfoWindow : Window
         verticalLayout.CountPositions();
     }
 
+    private void RepairGrave()
+    {
+        OnRepairButton?.Invoke(tombstone);
+    }
+
+    private void DigGrave()
+    {
+        OnDigButton?.Invoke(tombstone);
+    }
+
     public override void Update(GameTime gameTime)
     {
         verticalLayout.CountPositions();
         base.Update(gameTime);
     }
 
-    public void SetData(TombstoneData tombstoneData)
+    public void SetData(Tombstone tombstone)
     {
-        nameLabel.Text = tombstoneData.Name;
-        yearLabel.Text = tombstoneData.Years;
-        wealthLabel.Text = $"Wealth: {tombstoneData.Wealth}";
-        natureLabel.Text = $"Nature: {tombstoneData.Nature}";
-        stateLabel.Text = $"State: {tombstoneData.State}";
+        this.tombstone = tombstone;
+        nameLabel.Text = tombstone.Data.Name;
+        yearLabel.Text = tombstone.Data.Years;
+        wealthLabel.Text = $"Wealth: {tombstone.Data.Wealth}";
+        natureLabel.Text = $"Nature: {tombstone.Data.Nature}";
+        stateLabel.Text = $"State: {tombstone.Data.State}";
     }
 }

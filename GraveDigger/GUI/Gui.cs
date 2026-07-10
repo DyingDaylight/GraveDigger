@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using GraveDigger;
+using GraveDigger.Data;
 using GraveDigger.GUI.Elements;
 using GraveDigger.GUI.Windows;
+using GraveDigger.Props;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -11,10 +13,10 @@ using IDrawable = Interfaces.IDrawable;
 
 namespace GUI;
 
-public class Gui: IUpdatable, IDrawable
+public class Gui: IUpdatable, IDrawable, IGameWindowService
 {
     public InteractionTooltip interactionTooltip;
-    public WindowManager WindowManager { get; }
+    public WindowManager WindowManager { get; private set; }
     public MenuUI MenuUi;
     
     private bool started = false;
@@ -26,10 +28,6 @@ public class Gui: IUpdatable, IDrawable
     public Gui(GameContext gameContext)
     {
         this.gameContext = gameContext;
-        
-        WindowManager = new WindowManager();
-        interactionTooltip = new InteractionTooltip(gameContext.CoordinatesConverter);
-        MenuUi = new MenuUI(gameContext.ScreenSize);
     }
     
     public void LoadContent(ContentManager content)
@@ -51,7 +49,11 @@ public class Gui: IUpdatable, IDrawable
             throw new InvalidOperationException("GUI has already been started.");
 
         started = true;
-        
+
+        WindowManager = new WindowManager();
+        MenuUi = new MenuUI(gameContext.ScreenSize);
+        interactionTooltip = new InteractionTooltip(gameContext.CoordinatesConverter);
+
         MenuUi.Start();
         WindowManager.Start();
         interactionTooltip.Start();
@@ -77,5 +79,20 @@ public class Gui: IUpdatable, IDrawable
     public void SetGameState(Game1.GameState state)
     {
         gameState = state;
+    }
+
+    public void OpenTombstoneWindow(Tombstone tombstoneData)
+    {
+        WindowManager.OpenTombstoneInfoWindow(tombstoneData);
+    }
+
+    public void CloseCurrentWindow()
+    {
+        WindowManager.CloseCurrentWindow();
+    }
+
+    public bool IsModalWindowOpen()
+    {
+        return WindowManager.IsModalWindow;
     }
 }

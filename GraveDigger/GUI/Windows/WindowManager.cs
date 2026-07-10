@@ -1,5 +1,6 @@
 ﻿using System;
 using GraveDigger.Data;
+using GraveDigger.Props;
 using GUI.Windows;
 using Interfaces;
 using Microsoft.Xna.Framework;
@@ -9,16 +10,21 @@ using IDrawable = Interfaces.IDrawable;
 namespace GraveDigger.GUI.Windows;
 
 public class WindowManager : IUpdatable, IDrawable
-{
-    TombstoneInfoWindow tombstoneInfoWindow;
-    
+{ 
     private Window currentWindow;
     
+    public TombstoneInfoWindow TombstoneInfoWindow { get;  private set; }
     public bool IsModalWindow => currentWindow != null;
+
+    public WindowManager()
+    {
+        TombstoneInfoWindow = new TombstoneInfoWindow();
+        TombstoneInfoWindow.OnCloseButton += CloseCurrentWindow;
+    }
     
     public void Start()
     {
-        
+        TombstoneInfoWindow.Start();
     }
 
     public void Update(GameTime gameTime)
@@ -33,21 +39,14 @@ public class WindowManager : IUpdatable, IDrawable
             currentWindow.Draw(spriteBatch);
     }
     
-    public void OpenTombstoneInfoWindow(TombstoneData tombstoneData)
+    public void OpenTombstoneInfoWindow(Tombstone tombstone)
     {
-        if (tombstoneInfoWindow == null)
-            tombstoneInfoWindow = new TombstoneInfoWindow();
-        
-        tombstoneInfoWindow.SetData(tombstoneData);
-        tombstoneInfoWindow.OnDigButton += CloseTombstoneInfoWindow;
-        tombstoneInfoWindow.OnRepairButton += CloseTombstoneInfoWindow;
-        tombstoneInfoWindow.OnCloseButton += CloseTombstoneInfoWindow;
-        currentWindow = tombstoneInfoWindow;
+        TombstoneInfoWindow.SetData(tombstone);
+        currentWindow = TombstoneInfoWindow;
     }
 
-    public void CloseTombstoneInfoWindow()
+    public void CloseCurrentWindow()
     {
-        if (currentWindow == tombstoneInfoWindow)
-            currentWindow = null;
+        currentWindow = null;
     }
 }

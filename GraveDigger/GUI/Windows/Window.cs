@@ -36,7 +36,6 @@ public class Window : UIElement
     public override void Draw(SpriteBatch spriteBatch)
     {
         base.Draw(spriteBatch);
-        
         foreach (var element in elements)
         {
             element.Draw(spriteBatch);

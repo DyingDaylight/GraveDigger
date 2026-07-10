@@ -72,9 +72,8 @@ public class Game1 : Game
         gui.Start();
         
         gameplayCoordinator = new GameplayCoordinator(gui);
-        gameContext.GameplayCoordinator = gameplayCoordinator;
         
-        level = new Level(gameContext);
+        level = new Level(gameContext, gameplayCoordinator);
         level.LoadTextures();
         level.Start();
         
@@ -84,6 +83,9 @@ public class Game1 : Game
         gui.MenuUi.OnStartClicked += StartGame; 
         gui.MenuUi.OnSettingsClicked += OpenSettings; 
         gui.MenuUi.OnExitClicked += CloseGame;
+
+        gui.WindowManager.TombstoneInfoWindow.OnDigButton += gameplayCoordinator.DigGrave;
+        gui.WindowManager.TombstoneInfoWindow.OnRepairButton += gameplayCoordinator.RepairGrave;
         
         level.InteractionSystem.OnHoveredInteractionChanged += gui.interactionTooltip.HandleInteraction;
         
@@ -99,7 +101,7 @@ public class Game1 : Game
             if (gameStarted && currentKeyboardState.IsKeyDown(Keys.Escape) && previousKeyboardState.IsKeyUp(Keys.Escape))
                 SetGameState(GameState.Playing);
         } 
-        else if (currentGameState == GameState.Playing && !gui.WindowManager.IsModalWindow)
+        else if (currentGameState == GameState.Playing && !gui.IsModalWindowOpen())
         {
              
             level.Update(gameTime);

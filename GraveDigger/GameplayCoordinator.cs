@@ -1,25 +1,33 @@
 ﻿using System;
 using GraveDigger.Data;
+using GraveDigger.Props;
 using GUI;
+using Interfaces;
 
 namespace GraveDigger;
 
-public class GameplayCoordinator
+public class GameplayCoordinator : IGameplayActions
 {
-    public Gui Gui { get; }
+    public IGameWindowService WindowService { get; }
 
-    public GameplayCoordinator(Gui gui)
+    public GameplayCoordinator(IGameWindowService windowService)
     {
-        Gui = gui;
+        WindowService = windowService;
     }
 
-    public void TombstoneSubscriber(TombstoneData obj)
+    public void OpenTombstone(Tombstone tombstoneData)
     {
-        Gui.WindowManager.OpenTombstoneInfoWindow(obj);
-    }
-
-    public void TombstoneActions(object obj)
-    {
+        WindowService.OpenTombstoneWindow(tombstoneData);
         
+    }
+
+    public void DigGrave(Tombstone tombstoneData)
+    {   
+        Console.WriteLine("Digging Grave");
+    }
+
+    public void RepairGrave(Tombstone tombstoneData)
+    {
+        Console.WriteLine("Repairing Grave");
     }
 }

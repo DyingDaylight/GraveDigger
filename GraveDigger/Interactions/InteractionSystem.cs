@@ -88,4 +88,13 @@ public class InteractionSystem : IUpdatable
         
         previousMouseState = currentMouseState;
     }
+
+    public void ClearState()
+    {
+        if (hoveredInteraction != null) 
+            hoveredInteraction.OnHoverExit();
+        hoveredInteraction = null;
+        pressedInteraction = null;
+        OnHoveredInteractionChanged(null);
+    }
 }

@@ -32,15 +32,16 @@ public class Level
     private List<IUpdatable> updatables = new();
     private List<IDrawable> drawables = new();
     private List<Collider> colliders = new();
-    private List<Interaction> interactions = new();
 
-    public InteractionSystem InteractionSystem;
-    
+    public InteractionSystem InteractionSystem { get; private set; }
+
     private GameContext gameContext;
+    private IGameplayActions gameplayActions;
 
-    public Level(GameContext gameContext)
+    public Level(GameContext gameContext, IGameplayActions gameplayActions)
     {
         this.gameContext = gameContext;
+        this.gameplayActions = gameplayActions;
     }
     
     public void Start()
@@ -76,9 +77,6 @@ public class Level
         
         foreach (Collider collider in colliders)
             collider.Draw(spriteBatch);
-        
-        //foreach (Interaction interaction in interactions)
-        //    interaction.Draw(spriteBatch);
     }
     
     public void LoadTextures()
@@ -115,9 +113,6 @@ public class Level
 
         if (obj is IHasCollider hasCollider && hasCollider.Collider != null)
             colliders.Add(hasCollider.Collider);
-        
-        if (obj is ICanInteract interactable)
-            interactions.Add(interactable.Interaction);
 
         return obj;
     }
@@ -195,13 +190,19 @@ public class Level
         Tombstone tomb = CreateProp(TombstoneFactory, name, position);
         tomb.Transform.Scale = new Vector2(0.8f, 0.8f);
         TombstoneInteraction interaction = new TombstoneInteraction(tomb);
-        interaction.SetData(new TombstoneData("Eleanor Blackwood", "1847 - 1891",
+        tomb.SetData(new TombstoneData("Eleanor Blackwood", "1847 - 1891",
             "Dirt Rich", "Grumpy Old Hag", "Desolate"));
         InteractionSystem.RegisterInteraction(interaction);
         tomb.Interaction = interaction;
-        interaction.OnTombstoneRead += gameContext.GameplayCoordinator.TombstoneSubscriber;
+        interaction.OnTombstoneRead += OpenTombstone;
     }
-    
+
+    private void OpenTombstone(Tombstone obj)
+    {
+        InteractionSystem.ClearState();
+        gameplayActions.OpenTombstone(obj);
+    }
+
     private Prop PropFactory(string spriteName)
     {
         return new Prop(spriteName);
