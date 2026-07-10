@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GraveDigger.Interactions;
+using GraveDigger.Props;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -33,9 +35,16 @@ public class Level
 
     private InteractionSystem interactionSystem;
     
+    private Camera camera;
+
+    public Level(Camera camera)
+    {
+        this.camera = camera;
+    }
+    
     public void Start()
     {
-        interactionSystem = new InteractionSystem();
+        interactionSystem = new InteractionSystem(camera);
         
         CreateMap();
         CreateProps();
@@ -123,20 +132,20 @@ public class Level
     
     private void CreateProps()
     {
-        CreateProp("crypt",  new Vector2(1300, 350));
-        CreateProp("tree",  new Vector2(1600, 700));
-        CreateProp("tree",  new Vector2(800, 800));
-        CreateProp("dirt",  new Vector2(1300, 800));
-        CreateProp("spade",  new Vector2(1300, 820));
+        CreateProp(PropFactory,"crypt",  new Vector2(1300, 350));
+        CreateProp(PropFactory,"tree",  new Vector2(1600, 700));
+        CreateProp(PropFactory,"tree",  new Vector2(800, 800));
+        CreateProp(PropFactory,"dirt",  new Vector2(1300, 800));
+        CreateProp(PropFactory,"spade",  new Vector2(1300, 820));
         
-        Prop angel = CreateProp("angel",  new Vector2(1600, 250));
-        angel.Interaction = new TraderInteraction(angel);
-        interactionSystem.RegisterInteraction(angel.Interaction);
+        Prop angel = CreateProp(PropFactory,"angel",  new Vector2(1600, 250));
+        //angel.Interaction = new TraderInteraction(angel);
+        //interactionSystem.RegisterInteraction(angel.Interaction);
     }
 
-    private Prop CreateProp(string name, Vector2 position)
+    private T CreateProp<T>(Func<string, T> factory, string name, Vector2 position) where T : Prop
     {
-        Prop prop = new Prop(name);
+        T prop = factory(name);
         prop.Transform.Position = position;
         prop.Start();
         Add(prop);
@@ -154,7 +163,7 @@ public class Level
     
     private void CreateLamp(Vector2 position, bool flip)
     {
-        Prop lamp = CreateProp("lampost", position);
+        Prop lamp = CreateProp<Prop>(PropFactory,"lampost", position);
         lamp.SpriteEffect = flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
     }
     
@@ -178,9 +187,19 @@ public class Level
 
     private void CreateTombstone(string name, Vector2 position)
     {
-        Prop tomb = CreateProp(name, position);
+        Tombstone tomb = CreateProp(TombstoneFactory, name, position);
         tomb.Transform.Scale = new Vector2(0.8f, 0.8f);
         tomb.Interaction = new TombstoneInteraction(tomb);
         interactionSystem.RegisterInteraction(tomb.Interaction);
+    }
+    
+    private Prop PropFactory(string spriteName)
+    {
+        return new Prop(spriteName);
+    }
+
+    private Tombstone TombstoneFactory(string spriteName)
+    {
+        return new Tombstone(spriteName);
     }
 }

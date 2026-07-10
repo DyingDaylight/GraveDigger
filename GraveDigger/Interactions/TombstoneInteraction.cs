@@ -4,7 +4,7 @@ namespace GraveDigger.Interactions;
 
 public class TombstoneInteraction : Interaction
 {
-    public TombstoneInteraction(IInteractionOwner collider) : base(collider)
+    public TombstoneInteraction(IInteractionOwner owner) : base(owner)
     {
     }
     

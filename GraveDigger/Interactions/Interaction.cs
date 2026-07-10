@@ -11,6 +11,8 @@ public abstract class Interaction
     
     public string Hint { get; protected set; }
 
+    
+    
     public Interaction(IInteractionOwner parent)
     {
         this.parent = parent;
@@ -30,9 +32,6 @@ public abstract class Interaction
     
     public Rectangle GetArea()
     {
-        if (parent == null)
-            return new Rectangle();
-        
         return parent.InteractionArea;
     }
 }

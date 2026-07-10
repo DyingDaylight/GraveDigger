@@ -9,9 +9,16 @@ public class InteractionSystem : IUpdatable
 {
     private Interaction hoveredInteraction;
     private MouseState previousMouseState;
-    private bool wasPressedInside = false;
+    private Interaction pressedInteraction;
     
     private List<Interaction> interactions = new List<Interaction>();
+    
+    private Camera camera;
+
+    public InteractionSystem(Camera camera)
+    {
+        this.camera = camera;
+    }
     
     public void RegisterInteraction(Interaction interaction)
     {
@@ -33,17 +40,18 @@ public class InteractionSystem : IUpdatable
     public void Update(GameTime gameTime)
     {
         MouseState currentMouseState = Mouse.GetState();
-        Vector2 mousePosition = currentMouseState.Position.ToVector2();
+        Vector2 screenMouse = currentMouseState.Position.ToVector2();
+        Matrix inverseViewMatrix = Matrix.Invert(camera.TransformMatrix);
+        Vector2 mousePosition = Vector2.Transform(screenMouse, inverseViewMatrix);
         
         Interaction newHoveredInteraction = null;
-        bool isHovered = false;
         
         foreach (Interaction interaction in interactions)
         {
             if (interaction.GetArea().Contains(mousePosition))
             {
                 newHoveredInteraction = interaction;
-                isHovered = true;
+                // TODO: think about overlapping objects
                 break;
             }
         }
@@ -61,17 +69,17 @@ public class InteractionSystem : IUpdatable
         bool mouseJustReleased = currentMouseState.LeftButton == ButtonState.Released &&
                                  previousMouseState.LeftButton == ButtonState.Pressed;
         
-        if (isHovered && mouseJustPressed)
-            wasPressedInside = true;
+        if (newHoveredInteraction != null && mouseJustPressed)
+            pressedInteraction = newHoveredInteraction;
         
         if (mouseJustReleased)
         {
-            if (wasPressedInside && isHovered)
+            if (newHoveredInteraction != null && pressedInteraction == newHoveredInteraction)
             {
                 hoveredInteraction?.Interact();
             }
 
-            wasPressedInside = false;
+            pressedInteraction = null;
         }
         
         previousMouseState = currentMouseState;

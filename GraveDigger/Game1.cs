@@ -69,7 +69,7 @@ public class Game1 : Game
             //SpriteManager.AddSprite("digger_idle", "Images/Characters/keeper_idle", columns: 4, rows: 1);
         SpriteManager.AddSprite("pixel", "Images/pixel");
         
-        level = new Level();
+        level = new Level(camera);
         level.LoadTextures();
         level.Start();
         
