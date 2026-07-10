@@ -20,6 +20,7 @@ public class Game1 : Game
     private GameState currentGameState = GameState.Menu;
     private GameContext gameContext;
     private GameplayCoordinator gameplayCoordinator;
+    private ReputationsSystem reputationsSystem;
     
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
@@ -55,6 +56,7 @@ public class Game1 : Game
         ScreenSize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         camera = new Camera(GraphicsDevice.Viewport);
         gameContext = new GameContext(camera, ScreenSize);
+        reputationsSystem = new ReputationsSystem();
         
         base.Initialize();
     }
@@ -71,7 +73,7 @@ public class Game1 : Game
         gui.LoadContent(Content);
         gui.Start();
         
-        gameplayCoordinator = new GameplayCoordinator(gui);
+        gameplayCoordinator = new GameplayCoordinator(gui, reputationsSystem);
         
         level = new Level(gameContext, gameplayCoordinator);
         level.LoadTextures();
@@ -86,6 +88,8 @@ public class Game1 : Game
 
         gui.WindowManager.TombstoneInfoWindow.OnDigButton += gameplayCoordinator.DigGrave;
         gui.WindowManager.TombstoneInfoWindow.OnRepairButton += gameplayCoordinator.RepairGrave;
+
+        reputationsSystem.ReputationChanged += gui.hud.UpdateReputation;
         
         level.InteractionSystem.OnHoveredInteractionChanged += gui.interactionTooltip.HandleInteraction;
         

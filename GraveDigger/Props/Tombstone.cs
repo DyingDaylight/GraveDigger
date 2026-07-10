@@ -8,6 +8,7 @@ public class Tombstone : Prop, IInteractionOwner
 {
     public TombstoneData Data { get; private set; }
     public TombstoneState State { get; set; }
+    public int Value { get; set; }
     public Interaction Interaction { get; set; }
     
     public Rectangle InteractionArea => destRectangle;
@@ -15,6 +16,7 @@ public class Tombstone : Prop, IInteractionOwner
     public Tombstone(string name) : base(name)
     {
         State = TombstoneState.Perfect;
+        Value = 5;
     }
 
     public void SetData(TombstoneData data)

@@ -18,12 +18,12 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
     public InteractionTooltip interactionTooltip;
     public WindowManager WindowManager { get; private set; }
     public MenuUI MenuUi;
+    public HUD hud;
     
     private bool started = false;
     private Game1.GameState gameState;
 
     private GameContext gameContext;
-
 
     public Gui(GameContext gameContext)
     {
@@ -53,7 +53,9 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         WindowManager = new WindowManager();
         MenuUi = new MenuUI(gameContext.ScreenSize);
         interactionTooltip = new InteractionTooltip(gameContext.CoordinatesConverter);
+        hud = new HUD();
 
+        hud.Start();
         MenuUi.Start();
         WindowManager.Start();
         interactionTooltip.Start();

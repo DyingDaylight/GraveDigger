@@ -110,7 +110,6 @@ public class TombstoneInfoWindow : Window
         natureLabel.Text = $"Nature: {tombstone.Data.Nature}";
         stateLabel.Text = $"State: {tombstone.State}";
         
-        Console.WriteLine("Check Repair button");
         if (tombstone.State != TombstoneState.Broken)
             repairButton.SetDisabled(true);
         else

@@ -9,10 +9,13 @@ namespace GraveDigger;
 public class GameplayCoordinator : IGameplayActions
 {
     public IGameWindowService WindowService { get; }
+    
+    private ReputationsSystem ReputationsSystem { get; }
 
-    public GameplayCoordinator(IGameWindowService windowService)
+    public GameplayCoordinator(IGameWindowService windowService, ReputationsSystem reputationsSystem)
     {
         WindowService = windowService;
+        ReputationsSystem = reputationsSystem;
     }
 
     public void OpenTombstone(Tombstone tombstoneData)
@@ -28,11 +31,11 @@ public class GameplayCoordinator : IGameplayActions
 
     public void RepairGrave(Tombstone tombstone)
     {
-        Console.WriteLine("Repairing Grave");
         // TODO: check if we have resources
         bool repaired = tombstone.Repair();
         if (repaired)
         {
+            ReputationsSystem.AddReputation(tombstone.Value);
             WindowService.UpdateTombstoneWindow();
         }
     }
