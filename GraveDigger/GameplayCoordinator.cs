@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GraveDigger.Data;
+using GraveDigger.Enemies;
 using GraveDigger.Items;
 using GraveDigger.Props;
 using GraveDigger.Utils;
@@ -50,6 +51,18 @@ public class GameplayCoordinator : IGameplayActions
                 Console.WriteLine(item.ToString());
                 Inventory.Add(item);   
             }
+            
+            EnemyType enemyType = UndeadGenerator.Generate(tombstone.Data, RandomService);
+            if (enemyType == EnemyType.Ghost)
+            {
+                ReputationsSystem.RemoveReputation(1);
+                Console.WriteLine("Ghost appeared! Reputation reduced by 1!");
+            } 
+            else if (enemyType == EnemyType.Zombie)
+            {
+                Console.WriteLine("Zombie appeared! He will be eating you!");
+            }
+            
             ReputationsSystem.RemoveReputation(tombstone.Value);
             WindowService.CloseCurrentWindow();
         }
