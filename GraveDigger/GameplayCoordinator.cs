@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using GraveDigger.Data;
 using GraveDigger.Items;
 using GraveDigger.Props;
+using GraveDigger.Utils;
 using GUI;
 using Interfaces;
 
@@ -13,13 +15,17 @@ public class GameplayCoordinator : IGameplayActions
     
     private ReputationsSystem ReputationsSystem { get; }
     
+    private RandomService RandomService { get; }
+    
     private LootGenerator LootGenerator { get; }
     private Inventory Inventory { get; }
 
-    public GameplayCoordinator(IGameWindowService windowService, ReputationsSystem reputationsSystem)
+    public GameplayCoordinator(IGameWindowService windowService, ReputationsSystem reputationsSystem,
+        RandomService randomService)
     {
         WindowService = windowService;
         ReputationsSystem = reputationsSystem;
+        RandomService = randomService;
         
         LootGenerator = new LootGenerator();
         Inventory = new Inventory();
@@ -33,15 +39,20 @@ public class GameplayCoordinator : IGameplayActions
 
     public void DigGrave(Tombstone tombstone)
     {
+        Console.WriteLine("Digging Grave");
         bool dug = tombstone.Dig();
         if (dug)
         {
-            ItemData itemData = LootGenerator.Generate(tombstone.Data);
-            Inventory.Add(itemData);
+            List<ItemData> itemData = LootGenerator.Generate(tombstone.Data, RandomService);
+            Console.WriteLine("Looted " + itemData.Count + " items");
+            foreach (ItemData item in itemData)
+            {
+                Console.WriteLine(item.ToString());
+                Inventory.Add(item);   
+            }
             ReputationsSystem.RemoveReputation(tombstone.Value);
             WindowService.CloseCurrentWindow();
         }
-        Console.WriteLine("Digging Grave");
     }
 
     public void RepairGrave(Tombstone tombstone)

@@ -28,9 +28,10 @@ public class Inventory
     public override string ToString()
     {
         StringBuilder sb = new();
+        sb.AppendLine("Inventory: ");
         foreach (InventoryEntry entry in items.Values)
         {
-            sb.Append(entry.ToString() + "\n");
+            sb.AppendLine(entry.ToString());
         }
         return sb.ToString();
     }

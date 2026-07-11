@@ -11,6 +11,16 @@ public class ItemData
     public int Price { get; set; }
     public int MaxStackSize { get; set; }
 
+    public ItemData(string id, string name, string description, string spriteName, int price, int maxStackSize)
+    {
+        Id = id;
+        Name = name;
+        Description = description;
+        SpriteName = spriteName;
+        Price = price;
+        MaxStackSize = maxStackSize;
+    }
+    
     public override string ToString()
     {
         return Name;

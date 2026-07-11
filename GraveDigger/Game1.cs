@@ -57,7 +57,7 @@ public class Game1 : Game
 
         ScreenSize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         camera = new Camera(GraphicsDevice.Viewport);
-        randomService = new RandomService(1234);
+        randomService = new RandomService();
         gameContext = new GameContext(camera, ScreenSize, randomService);
         reputationsSystem = new ReputationsSystem();
         
@@ -76,7 +76,7 @@ public class Game1 : Game
         gui.LoadContent(Content);
         gui.Start();
         
-        gameplayCoordinator = new GameplayCoordinator(gui, reputationsSystem);
+        gameplayCoordinator = new GameplayCoordinator(gui, reputationsSystem, randomService);
         
         level = new Level(gameContext, gameplayCoordinator);
         level.LoadTextures();
@@ -111,14 +111,29 @@ public class Game1 : Game
         else if (currentGameState == GameState.Playing && !gui.IsModalWindowOpen())
         {
              
-            level.Update(gameTime);
-            player.Update(gameTime);
+            bool inventoryJustPressed =
+                currentKeyboardState.IsKeyDown(Keys.I) &&
+                previousKeyboardState.IsKeyUp(Keys.I);
 
-            if (currentKeyboardState.IsKeyDown(Keys.I) && previousKeyboardState.IsKeyUp(Keys.I))
-                gameplayCoordinator.ShowInventory();
-            
-            if (currentKeyboardState.IsKeyDown(Keys.Escape) && previousKeyboardState.IsKeyUp(Keys.Escape))
-                SetGameState(GameState.Menu);
+            if (inventoryJustPressed)
+            {
+                if (gui.IsInventoryOpen())
+                    gui.CloseCurrentWindow();
+                else if (!gui.IsModalWindowOpen())
+                    gameplayCoordinator.ShowInventory();
+            }
+
+            if (!gui.IsModalWindowOpen())
+            {
+                level.Update(gameTime);
+                player.Update(gameTime);
+
+                if (currentKeyboardState.IsKeyDown(Keys.Escape) &&
+                    previousKeyboardState.IsKeyUp(Keys.Escape))
+                {
+                    SetGameState(GameState.Menu);
+                }
+            }
         }
         
         gui.Update(gameTime);

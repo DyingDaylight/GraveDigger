@@ -102,4 +102,9 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
     {
         WindowManager.UpdateTombstoneWindow();
     }
+
+    public bool IsInventoryOpen()
+    {
+        return false;
+    }
 }

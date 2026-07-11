@@ -7,20 +7,11 @@ public class TombstoneData
     public TombWealth WealthState;
     public string WealthDescription;
     public TombPersonality Personality;
-    public string PersonalityDescription;
-    public string Epitaph;
+    public string Inscription;
 
     public TombstoneData()
     {
         
-    }
-    
-    public TombstoneData(string name, string years, TombWealth wealth, string personality)
-    {   
-        Name = name;
-        Years = years;
-        WealthState = wealth;
-        PersonalityDescription = personality;
     }
 
 }

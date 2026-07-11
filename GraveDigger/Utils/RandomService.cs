@@ -8,9 +8,12 @@ public class RandomService
 {
     private readonly Random random;
     
-    public RandomService(int seed)
+    public RandomService(int? seed = null)
     {
-        random = new Random(seed);
+        if (seed.HasValue)
+            random = new Random(seed.Value);
+        else
+            random = new Random();
     }
 
     public int Next(int minInclusive, int maxExclusive)

@@ -107,7 +107,7 @@ public class TombstoneInfoWindow : Window
         nameLabel.Text = tombstone.Data.Name;
         yearLabel.Text = tombstone.Data.Years;
         wealthLabel.Text = $"Wealth: {tombstone.Data.WealthDescription}";
-        natureLabel.Text = $"Nature: {tombstone.Data.PersonalityDescription}";
+        natureLabel.Text = $"Nature: {tombstone.Data.Inscription}";
         stateLabel.Text = $"State: {tombstone.State}";
         
         if (tombstone.State == TombstoneState.DugOut)

@@ -74,10 +74,10 @@ public class TombstoneGenerator
         "Mortimer"
     };
     
-    private static int minBirthYear = 1830;
-    private static int maxBirthYear = 1910;
+    private static readonly int MinBirthYear = 1830;
+    private static readonly int MaxBirthYear = 1910;
     
-    private static List<WeightedRange> ageRanges =
+    private static readonly List<WeightedRange> AgeRanges =
     [
         new(18, 30, 15),
         new(31, 50, 25),
@@ -85,35 +85,35 @@ public class TombstoneGenerator
         new(71, 90, 25)
     ];
     
-    private static string[] WealthDescriptors =
+    private static readonly string[] WealthDescriptors =
         {"", "Slightly", "Quite", "Very", "Extremely", "Ridiculously"};
 
-    private static string[] PeacfulDescriptors =
+    private static readonly string[] PeacfulDescriptors =
     {
         "Kind Soul", "Gentle Spirit", "Beloved Neighbor", "Warm Heart", "Compassionate Person"
     };
-    private static string[] RestlessDescriptors =
+    private static readonly string[] RestlessDescriptors =
     {
         "Never at Peace", "Wandering Spirit", "Troubled Soul", "Could Not Rest"
     };
-    private static string[] BitterDescriptors =
+    private static readonly string[] BitterDescriptors =
     {
         "Grumpy Old Soul", "Cantankerous Fellow", "Ill-Tempered Neighbor", "Sour Old Hermit"
     };
-    private static string[] GreedyDescriptors =
+    private static readonly string[] GreedyDescriptors =
     {
         "Miser", "Treasure Hoarder", "Gold Lover", "Fortune Hunter", "Avaricious Soul"
     };
-    private static string[] CruelDescriptors = 
+    private static readonly string[] CruelDescriptors = 
     { 
         "Cold-Hearted", "Merciless Master", "Feared Landowner", "Ruthless Soul" 
     };
-    private static string[] MysteriousDescriptors =
+    private static readonly string[] MysteriousDescriptors =
     {
         "Village Oddity", "Outsider", "Peculiar Soul", "Strange Dreamer"
     };
     
-    private static readonly Dictionary<TombPersonality, string[]> personalityDescriptions =
+    private static readonly Dictionary<TombPersonality, string[]> Inscriptions =
         new()
         {
             [TombPersonality.Peaceful] = PeacfulDescriptors,
@@ -132,17 +132,17 @@ public class TombstoneGenerator
         string lastName = randomService.Pick(LastNames);
         tombstoneData.Name = $"{firstName} {lastName}";
 
-        int birthYear = randomService.Next(minBirthYear, maxBirthYear);
-        int age = randomService.PickWeightedRange(ageRanges);
+        int birthYear = randomService.Next(MinBirthYear, MaxBirthYear);
+        int age = randomService.PickWeightedRange(AgeRanges);
         int deathYear = birthYear + age;
-        tombstoneData.Years = $"{deathYear} - {deathYear}";
+        tombstoneData.Years = $"{birthYear} - {deathYear}";
         
         tombstoneData.WealthState = randomService.RandomEnum<TombWealth>();
         string wealthDescriptor = randomService.Pick(WealthDescriptors);
         tombstoneData.WealthDescription = $"{wealthDescriptor} {tombstoneData.WealthState}";
         
         tombstoneData.Personality = randomService.RandomEnum<TombPersonality>();
-        tombstoneData.PersonalityDescription = randomService.Pick(personalityDescriptions[tombstoneData.Personality]);
+        tombstoneData.Inscription = randomService.Pick(Inscriptions[tombstoneData.Personality]);
         
         return tombstoneData;
     }
