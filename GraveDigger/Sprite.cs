@@ -132,11 +132,11 @@ public class Sprite : IDrawable, IUpdatable
     
     public Rectangle GetDestRectangle(Rectangle? source)
     {
-        if (sourceRectangle == null)
+        if (source == null)
             return new Rectangle();
         
-        int width = (int) (sourceRectangle.Value.Width * Transform.Scale.X);
-        int height = (int) (sourceRectangle.Value.Height * Transform.Scale.Y);
+        int width = (int) (source.Value.Width * Transform.Scale.X);
+        int height = (int) (source.Value.Height * Transform.Scale.Y);
 
         int x = (int) (Transform.Position.X - Origin.X * Transform.Scale.X);
         int y = (int) (Transform.Position.Y - Origin.Y * Transform.Scale.Y);

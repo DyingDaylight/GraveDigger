@@ -13,13 +13,11 @@ namespace GraveDigger;
 public class GameplayCoordinator : IGameplayActions
 {
     public IGameWindowService WindowService { get; }
-    
-    private ReputationsSystem ReputationsSystem { get; }
-    
-    private RandomService RandomService { get; }
-    
-    private LootGenerator LootGenerator { get; }
-    private Inventory Inventory { get; }
+
+    private readonly ReputationsSystem ReputationsSystem;
+    private readonly RandomService RandomService;
+    private readonly LootGenerator LootGenerator;
+    private readonly Inventory Inventory;
 
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
     

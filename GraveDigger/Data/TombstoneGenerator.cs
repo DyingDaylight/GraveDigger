@@ -132,7 +132,7 @@ public class TombstoneGenerator
         string lastName = randomService.Pick(LastNames);
         tombstoneData.Name = $"{firstName} {lastName}";
 
-        int birthYear = randomService.Next(MinBirthYear, MaxBirthYear);
+        int birthYear = randomService.Next(MinBirthYear, MaxBirthYear + 1);
         int age = randomService.PickWeightedRange(AgeRanges);
         int deathYear = birthYear + age;
         tombstoneData.Years = $"{birthYear} - {deathYear}";

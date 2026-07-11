@@ -15,7 +15,7 @@ namespace GraveDigger;
 
 public class Level
 {
-    private const int MapTilesAmount = 3;
+    private const int MapTileTypesCount = 3;
     private readonly int[,] tileMapSchema =
     {
         { 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2 },
@@ -88,7 +88,7 @@ public class Level
         {
             SpriteManager.AddSprite($"ground{i}", $"Images/Ground/ground{i}");
         }*/
-        for (int i = 0; i < MapTilesAmount; i++)
+        for (int i = 0; i < MapTileTypesCount; i++)
         {
             SpriteManager.AddSprite($"ground{i}", $"Images/Environment_New/earth_tile{i}");
         }
@@ -144,7 +144,6 @@ public class Level
         SpriteManager.AddSprite("Icon37", "Images/Loot/Icon37");
         SpriteManager.AddSprite("Icon38", "Images/Loot/Icon38");
         SpriteManager.AddSprite("Icon39", "Images/Loot/Icon39");
-        SpriteManager.AddSprite("Icon40", "Images/Loot/Icon40");
         SpriteManager.AddSprite("Icon41", "Images/Loot/Icon41");
         SpriteManager.AddSprite("Icon42", "Images/Loot/Icon42");
         SpriteManager.AddSprite("Icon43", "Images/Loot/Icon43");
@@ -324,6 +323,7 @@ public class Level
 
     private void RemoveProp(ItemPickUp pickable)
     {
+        InteractionSystem.UnregisterInteraction(pickable.Interaction);
         Remove(pickable);
         props.Remove(pickable);
     }

@@ -31,10 +31,7 @@ public class InteractionSystem : IUpdatable
 
     public void UnregisterInteraction(Interaction interaction)
     {
-        if (interactions.Contains(interaction))
-        {
-            interactions.Remove(interaction);
-        }
+        interactions.Remove(interaction);
     }
     
     public void Start()
@@ -95,6 +92,6 @@ public class InteractionSystem : IUpdatable
             hoveredInteraction.OnHoverExit();
         hoveredInteraction = null;
         pressedInteraction = null;
-        OnHoveredInteractionChanged(null);
+        OnHoveredInteractionChanged?.Invoke(null);
     }
 }

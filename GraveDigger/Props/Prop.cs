@@ -22,7 +22,7 @@ public class Prop : Sprite
     
     protected void UpdateSortingOrder()
     {
-        float depth = Bottom / Game1.ScreenSize.Y;
+        float depth = Bottom / Game1.WorldSize.Y;
         SortingOrder = 1f - MathHelper.Clamp(depth, 0f, 1f);
     }
 }
