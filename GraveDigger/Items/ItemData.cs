@@ -10,4 +10,9 @@ public class ItemData
     public string SpriteName { get; set; }
     public int Price { get; set; }
     public int MaxStackSize { get; set; }
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }

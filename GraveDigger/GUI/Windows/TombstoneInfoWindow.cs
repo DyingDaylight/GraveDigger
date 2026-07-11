@@ -106,10 +106,16 @@ public class TombstoneInfoWindow : Window
         this.tombstone = tombstone;
         nameLabel.Text = tombstone.Data.Name;
         yearLabel.Text = tombstone.Data.Years;
-        wealthLabel.Text = $"Wealth: {tombstone.Data.Wealth}";
-        natureLabel.Text = $"Nature: {tombstone.Data.Nature}";
+        wealthLabel.Text = $"Wealth: {tombstone.Data.WealthDescription}";
+        natureLabel.Text = $"Nature: {tombstone.Data.PersonalityDescription}";
         stateLabel.Text = $"State: {tombstone.State}";
         
+        if (tombstone.State == TombstoneState.DugOut)
+            digButton.SetDisabled(true);
+        else
+            digButton.SetDisabled(false);
+        
+        // TODO: think if we can fix a dug out grave
         if (tombstone.State != TombstoneState.Broken)
             repairButton.SetDisabled(true);
         else

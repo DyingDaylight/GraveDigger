@@ -39,6 +39,16 @@ public class Tombstone : Prop, IInteractionOwner
         return true;
     }
 
+    public bool Dig()
+    {
+        if (State == TombstoneState.DugOut) return false;
+        
+        State = TombstoneState.DugOut;
+        UpdateVisuals();
+        
+        return true;
+    }
+
     private void UpdateVisuals()
     {
         switch (State)

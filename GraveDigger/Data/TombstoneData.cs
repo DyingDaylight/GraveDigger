@@ -4,14 +4,23 @@ public class TombstoneData
 {
     public string Name;
     public string Years;
-    public string Wealth;
-    public string Nature;
+    public TombWealth WealthState;
+    public string WealthDescription;
+    public TombPersonality Personality;
+    public string PersonalityDescription;
+    public string Epitaph;
 
-    public TombstoneData(string name, string years, string wealth, string nature)
+    public TombstoneData()
+    {
+        
+    }
+    
+    public TombstoneData(string name, string years, TombWealth wealth, string personality)
     {   
         Name = name;
         Years = years;
-        Wealth = wealth;
-        Nature = nature;
+        WealthState = wealth;
+        PersonalityDescription = personality;
     }
+
 }

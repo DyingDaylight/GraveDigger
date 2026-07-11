@@ -187,15 +187,17 @@ public class Level
 
     private void CreateTombstone(string name, Vector2 position)
     {
+        TombstoneData tombstoneData = TombstoneGenerator.GenerateTombstoneData(gameContext.RandomService);
+        
         Tombstone tomb = CreateProp(TombstoneFactory, name, position);
         tomb.Transform.Scale = new Vector2(0.8f, 0.8f);
+        tomb.SetData(tombstoneData);
+        tomb.State = gameContext.RandomService.RandomEnum<TombstoneState>();
+        
         TombstoneInteraction interaction = new TombstoneInteraction(tomb);
-        tomb.SetData(new TombstoneData("Eleanor Blackwood", "1847 - 1891",
-            "Dirt Rich", "Grumpy Old Hag"));
-        InteractionSystem.RegisterInteraction(interaction);
-        tomb.State = TombstoneState.Broken;
-        tomb.Interaction = interaction;
         interaction.OnTombstoneRead += OpenTombstone;
+        tomb.Interaction = interaction;
+        InteractionSystem.RegisterInteraction(interaction);
     }
 
     private void OpenTombstone(Tombstone obj)

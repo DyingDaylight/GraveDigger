@@ -1,4 +1,5 @@
 ﻿using System;
+using GraveDigger.Utils;
 using GUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -21,6 +22,7 @@ public class Game1 : Game
     private GameContext gameContext;
     private GameplayCoordinator gameplayCoordinator;
     private ReputationsSystem reputationsSystem;
+    private RandomService randomService;
     
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
@@ -55,7 +57,8 @@ public class Game1 : Game
 
         ScreenSize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         camera = new Camera(GraphicsDevice.Viewport);
-        gameContext = new GameContext(camera, ScreenSize);
+        randomService = new RandomService(1234);
+        gameContext = new GameContext(camera, ScreenSize, randomService);
         reputationsSystem = new ReputationsSystem();
         
         base.Initialize();
@@ -110,6 +113,9 @@ public class Game1 : Game
              
             level.Update(gameTime);
             player.Update(gameTime);
+
+            if (currentKeyboardState.IsKeyDown(Keys.I) && previousKeyboardState.IsKeyUp(Keys.I))
+                gameplayCoordinator.ShowInventory();
             
             if (currentKeyboardState.IsKeyDown(Keys.Escape) && previousKeyboardState.IsKeyUp(Keys.Escape))
                 SetGameState(GameState.Menu);
