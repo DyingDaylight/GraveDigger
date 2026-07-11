@@ -21,6 +21,8 @@ public class GameplayCoordinator : IGameplayActions
     private LootGenerator LootGenerator { get; }
     private Inventory Inventory { get; }
 
+    public event Action<List<ItemData>, Tombstone> OnLootSpawn;
+    
     public GameplayCoordinator(IGameWindowService windowService, ReputationsSystem reputationsSystem,
         RandomService randomService)
     {
@@ -45,12 +47,7 @@ public class GameplayCoordinator : IGameplayActions
         if (dug)
         {
             List<ItemData> itemData = LootGenerator.Generate(tombstone.Data, RandomService);
-            Console.WriteLine("Looted " + itemData.Count + " items");
-            foreach (ItemData item in itemData)
-            {
-                Console.WriteLine(item.ToString());
-                Inventory.Add(item);   
-            }
+            OnLootSpawn?.Invoke(itemData, tombstone);
             
             EnemyType enemyType = UndeadGenerator.Generate(tombstone.Data, RandomService);
             if (enemyType == EnemyType.Ghost)
@@ -79,6 +76,11 @@ public class GameplayCoordinator : IGameplayActions
         }
     }
 
+    public void PickupItem(ItemData itemData)
+    {
+        Inventory.Add(itemData);
+    }
+    
     public void ShowInventory()
     {
         Console.WriteLine(Inventory.ToString());

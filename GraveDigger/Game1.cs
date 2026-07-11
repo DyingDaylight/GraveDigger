@@ -57,7 +57,7 @@ public class Game1 : Game
 
         ScreenSize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         camera = new Camera(GraphicsDevice.Viewport);
-        randomService = new RandomService();
+        randomService = new RandomService(1234);
         gameContext = new GameContext(camera, ScreenSize, randomService);
         reputationsSystem = new ReputationsSystem();
         
@@ -95,6 +95,8 @@ public class Game1 : Game
         reputationsSystem.ReputationChanged += gui.hud.UpdateReputation;
         
         level.InteractionSystem.OnHoveredInteractionChanged += gui.interactionTooltip.HandleInteraction;
+
+        gameplayCoordinator.OnLootSpawn += level.SpawnLoot;
         
         SetGameState(GameState.Menu);
     }

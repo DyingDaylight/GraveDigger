@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GraveDigger.Data;
 using GraveDigger.Interactions;
+using GraveDigger.Items;
 using GraveDigger.Props;
+using GraveDigger.Utils;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -101,6 +104,55 @@ public class Level
         SpriteManager.AddSprite("tombstone4", "Images/Props/Tombstone4");
         SpriteManager.AddSprite("tombstone5", "Images/Props/Tombstone5");
         SpriteManager.AddSprite("tombstone6", "Images/Props/Tombstone6");
+        
+        SpriteManager.AddSprite("Icon1",  "Images/Loot/Icon1");
+        SpriteManager.AddSprite("Icon2",  "Images/Loot/Icon2");
+        SpriteManager.AddSprite("Icon3",  "Images/Loot/Icon3");
+        SpriteManager.AddSprite("Icon4",  "Images/Loot/Icon4");
+        SpriteManager.AddSprite("Icon5",  "Images/Loot/Icon5");
+        SpriteManager.AddSprite("Icon6",  "Images/Loot/Icon6");
+        SpriteManager.AddSprite("Icon7",  "Images/Loot/Icon7");
+        SpriteManager.AddSprite("Icon8",  "Images/Loot/Icon8");
+        SpriteManager.AddSprite("Icon9",  "Images/Loot/Icon9");
+        SpriteManager.AddSprite("Icon10", "Images/Loot/Icon10");
+        SpriteManager.AddSprite("Icon11", "Images/Loot/Icon11");
+        SpriteManager.AddSprite("Icon12", "Images/Loot/Icon12");
+        SpriteManager.AddSprite("Icon13", "Images/Loot/Icon13");
+        SpriteManager.AddSprite("Icon14", "Images/Loot/Icon14");
+        SpriteManager.AddSprite("Icon15", "Images/Loot/Icon15");
+        SpriteManager.AddSprite("Icon16", "Images/Loot/Icon16");
+        SpriteManager.AddSprite("Icon17", "Images/Loot/Icon17");
+        SpriteManager.AddSprite("Icon18", "Images/Loot/Icon18");
+        SpriteManager.AddSprite("Icon19", "Images/Loot/Icon19");
+        SpriteManager.AddSprite("Icon20", "Images/Loot/Icon20");
+        SpriteManager.AddSprite("Icon21", "Images/Loot/Icon21");
+        SpriteManager.AddSprite("Icon22", "Images/Loot/Icon22");
+        SpriteManager.AddSprite("Icon23", "Images/Loot/Icon23");
+        SpriteManager.AddSprite("Icon24", "Images/Loot/Icon24");
+        SpriteManager.AddSprite("Icon25", "Images/Loot/Icon25");
+        SpriteManager.AddSprite("Icon26", "Images/Loot/Icon26");
+        SpriteManager.AddSprite("Icon27", "Images/Loot/Icon27");
+        SpriteManager.AddSprite("Icon28", "Images/Loot/Icon28");
+        SpriteManager.AddSprite("Icon29", "Images/Loot/Icon29");
+        SpriteManager.AddSprite("Icon30", "Images/Loot/Icon30");
+        SpriteManager.AddSprite("Icon31", "Images/Loot/Icon31");
+        SpriteManager.AddSprite("Icon32", "Images/Loot/Icon32");
+        SpriteManager.AddSprite("Icon33", "Images/Loot/Icon33");
+        SpriteManager.AddSprite("Icon34", "Images/Loot/Icon34");
+        SpriteManager.AddSprite("Icon35", "Images/Loot/Icon35");
+        SpriteManager.AddSprite("Icon36", "Images/Loot/Icon36");
+        SpriteManager.AddSprite("Icon37", "Images/Loot/Icon37");
+        SpriteManager.AddSprite("Icon38", "Images/Loot/Icon38");
+        SpriteManager.AddSprite("Icon39", "Images/Loot/Icon39");
+        SpriteManager.AddSprite("Icon40", "Images/Loot/Icon40");
+        SpriteManager.AddSprite("Icon41", "Images/Loot/Icon41");
+        SpriteManager.AddSprite("Icon42", "Images/Loot/Icon42");
+        SpriteManager.AddSprite("Icon43", "Images/Loot/Icon43");
+        SpriteManager.AddSprite("Icon44", "Images/Loot/Icon44");
+        SpriteManager.AddSprite("Icon45", "Images/Loot/Icon45");
+        SpriteManager.AddSprite("Icon46", "Images/Loot/Icon46");
+        SpriteManager.AddSprite("Icon47", "Images/Loot/Icon47");
+        SpriteManager.AddSprite("Icon48", "Images/Loot/Icon48");
     }
     
     private T Add<T>(T obj)
@@ -119,9 +171,14 @@ public class Level
 
     private void Remove<T>(T obj)
     {
-        // TODO: inmplement remove
-        // TODO: do not forget about unregestering Interactions
-        // TODO: do not forget about colliders
+        if (obj is IUpdatable updatable)
+            updatables.Remove(updatable);
+
+        if (obj is IDrawable drawable)
+            drawables.Remove(drawable);
+
+        if (obj is IHasCollider hasCollider && hasCollider.Collider != null)
+            colliders.Remove(hasCollider.Collider);
     }
     
     private void CreateMap()
@@ -214,5 +271,60 @@ public class Level
     private Tombstone TombstoneFactory(string spriteName)
     {
         return new Tombstone(spriteName);
+    }
+
+    private ItemPickUp LootFactory(string spriteName)
+    {
+        return new ItemPickUp(spriteName);
+    }
+
+    
+    public void SpawnLoot(List<ItemData> loot, Tombstone tombstone)
+    {
+        Console.WriteLine("Looted " + loot.Count + " items");
+        foreach (ItemData item in loot)
+        {
+            ItemPickUp itemPickUp = CreateProp(LootFactory, item.SpriteName, tombstone.Transform.Position);
+            itemPickUp.Transform.Scale = new Vector2(2.5f, 2.5f);
+            itemPickUp.SetData(item);
+            
+            PickUpInteraction interaction = new PickUpInteraction(itemPickUp);
+            interaction.OnItemPickedUp += PickUpItem;
+            itemPickUp.Interaction = interaction;
+            InteractionSystem.RegisterInteraction(interaction);
+            
+            Vector2 origin = new Vector2(tombstone.Left + tombstone.Width * 0.5f,
+                                        tombstone.Bottom);
+
+            Point itemSize = new(
+                itemPickUp.destRectangle.Width,
+                itemPickUp.destRectangle.Height
+            );
+
+            Vector2? position = LootPlacementService.FindFreePosition(
+                origin, itemSize,
+                props.Select(prop => prop.GetDestRectangle(prop.sourceRectangle)).ToArray()
+            );
+
+            if (position.HasValue)
+            {
+                itemPickUp.Transform.Position = position.Value;
+            }
+            
+            Console.WriteLine(item.ToString());
+        }
+    }
+
+    private void PickUpItem(ItemPickUp pickable)
+    {
+        Console.WriteLine("Picking up " + pickable.ItemData.Name);
+        gameplayActions.PickupItem(pickable.ItemData);
+        RemoveProp(pickable);
+    }
+
+    private void RemoveProp(ItemPickUp pickable)
+    {
+        Remove(pickable);
+        props.Remove(pickable);
     }
 }

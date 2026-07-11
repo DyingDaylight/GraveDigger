@@ -130,7 +130,7 @@ public class Sprite : IDrawable, IUpdatable
             SortingOrder + 0.001f);
     }
     
-    private Rectangle GetDestRectangle(Rectangle? source)
+    public Rectangle GetDestRectangle(Rectangle? source)
     {
         if (sourceRectangle == null)
             return new Rectangle();
