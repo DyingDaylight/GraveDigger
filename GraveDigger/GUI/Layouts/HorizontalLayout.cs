@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using GraveDigger.GUI.Elements;
 using Interfaces;
 using Microsoft.Xna.Framework;
 
@@ -8,29 +7,20 @@ namespace GraveDigger.GUI.Layouts;
 
 public class HorizontalLayout : Layout
 {
-    private List<IUISizable> elements = new();
-    
-    public int PositionY { get; set; }
-    public int Padding { get; set; }
-    
-    public Vector2 horizontalMargins { get; set; }
+    // X is the left margin, Y is the right margin.
+    public Vector2 HorizontalMargins { get; set; }
     
     public HorizontalLayout(Rectangle bounds) : base(bounds)
     {
     }
-
-    public void AddElement(IUISizable element)
-    {
-        if (element != null && !elements.Contains(element))
-            elements.Add(element);
-    }
     
     public override void SetPosition(int x, int y)
     {
-        PositionY = y;
+        base.SetPosition(x, y);
+        UpdateLayout();
     }
     
-    public void UpdateLayout()
+    public override void UpdateLayout()
     {
         if (elements.Count == 0)
             return;
@@ -40,18 +30,18 @@ public class HorizontalLayout : Layout
         
         // Calculate the total width of all visible elements
         // and count the spacers that will share the remaining space.
-        foreach (IUISizable element in elements)
+        foreach (ILayoutElement element in elements)
         {
-            if (element.IsSpacer)
+            if (element is ISpacer)
                 spacerCount++;
             else
                 contentWidth += (int) element.VisibleSize.X;
         }
 
         // Padding is added between every pair of layout elements.
-        contentWidth += Padding * (elements.Count - 1);
+        contentWidth += HorizontalPadding * (elements.Count - 1);
         
-        int marginsWidth = (int) (horizontalMargins.X + horizontalMargins.Y);
+        int marginsWidth = (int) (HorizontalMargins.X + HorizontalMargins.Y);
         
         // Calculate how much horizontal space remains after
         // subtracting the elements, padding, and margins.
@@ -65,27 +55,26 @@ public class HorizontalLayout : Layout
         
         // Center the complete layout inside the area between the margins.
         int x = (int) (bounds.X 
-                       + horizontalMargins.X
-                       + (bounds.Width - marginsWidth - totalWidth) * 0.5f 
-                       );
+                       + HorizontalMargins.X
+                       + (bounds.Width - marginsWidth - totalWidth) * 0.5f);
         
         for (int i = 0; i < elements.Count; i++)
         {
-            IUISizable element = elements[i];
+            ILayoutElement element = elements[i];
             
-            if (element.IsSpacer)
+            if (element is ISpacer)
             {
                 x += spacerSize;
             }
             else
             {
-                element.SetPosition(x, PositionY);
-                x += (int)element.VisibleSize.X;
+                element.SetPosition(x, bounds.Y);
+                x += (int) element.VisibleSize.X;
             }
             
             // Add padding after every element except the last one.
             if (i < elements.Count - 1)
-                x += Padding;
+                x += HorizontalPadding;
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using GraveDigger.Data;
-using GraveDigger.Items;
+﻿using GraveDigger.Items;
 using GraveDigger.Props;
 using GUI.Windows;
 using Interfaces;
@@ -12,11 +10,13 @@ namespace GraveDigger.GUI.Windows;
 
 public class WindowManager : IUpdatable, IDrawable
 { 
-    private Window currentWindow;
+    private Window? currentWindow;
     
-    public TombstoneInfoWindow TombstoneInfoWindow { get;  private set; }
-    public InventoryWindow InventoryWindow { get;  private set; }
+    public TombstoneInfoWindow TombstoneInfoWindow { get; }
+    public InventoryWindow InventoryWindow { get; }
+    
     public bool IsModalWindow => currentWindow != null;
+    public bool IsInventoryOpen => currentWindow == InventoryWindow;
 
     public WindowManager()
     {
@@ -35,14 +35,12 @@ public class WindowManager : IUpdatable, IDrawable
 
     public void Update(GameTime gameTime)
     {
-        if (currentWindow != null)
-            currentWindow.Update(gameTime);
+        currentWindow?.Update(gameTime);
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        if (currentWindow != null)
-            currentWindow.Draw(spriteBatch);
+        currentWindow?.Draw(spriteBatch);
     }
     
     public void OpenTombstoneInfoWindow(Tombstone tombstone)
@@ -62,11 +60,9 @@ public class WindowManager : IUpdatable, IDrawable
         currentWindow = null;
     }
 
-    public void UpdateTombstoneWindow()
+    public void RefreshTombstoneWindow()
     {
-        if (TombstoneInfoWindow != null && currentWindow == TombstoneInfoWindow)
-        {
-            TombstoneInfoWindow.Update();
-        }
+        if (currentWindow == TombstoneInfoWindow)
+            TombstoneInfoWindow?.Refresh();
     }
 }

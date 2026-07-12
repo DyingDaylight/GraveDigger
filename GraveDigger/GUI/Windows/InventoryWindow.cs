@@ -3,26 +3,27 @@ using System.Collections.Generic;
 using GraveDigger.GUI.Elements;
 using GraveDigger.GUI.Layouts;
 using GraveDigger.Items;
-using GUI;
 using GUI.Windows;
-using Interfaces;
 using Microsoft.Xna.Framework;
 
 namespace GraveDigger.GUI.Windows;
 
 public class InventoryWindow : Window
 {
-    private HorizontalLayout titleLayout;
-    private HorizontalLayout buttonsLayout;
-    private GridLayout gridLayout;
+    private const int Columns = 5;
+    private const int Rows = 5;
     
-    private Label nameLabel;
-    private Label moneyLabel;
-    private Image moneyIcon;
+    private readonly HorizontalLayout titleLayout;
+    private readonly HorizontalLayout buttonsLayout;
+    private readonly GridLayout gridLayout;
     
-    private Button closeButton;
+    private readonly Label nameLabel;
+    private readonly Label moneyLabel;
+    private readonly Image moneyIcon;
     
-    private List<InventorySlot> inventorySlots = new();
+    private readonly Button closeButton;
+    
+    private readonly List<InventorySlot> inventorySlots = new();
     
     public event Action OnCloseButton;
 
@@ -35,71 +36,96 @@ public class InventoryWindow : Window
 
         moneyIcon = CreateElement<Image>();
         moneyIcon.SetSize(50, 50);
+        moneyIcon.SetImage(SpriteManager.GetSprite("Coin").Texture);
 
         titleLayout = new HorizontalLayout(Bounds);
-        titleLayout.Padding = 20;
-        titleLayout.PositionY = Bounds.Y + 40;
-        titleLayout.horizontalMargins = new Vector2(25, 25);
+        titleLayout.HorizontalPadding = 20;
+        titleLayout.HorizontalMargins = new Vector2(25, 25);
+        titleLayout.SetPosition(Bounds.X, Bounds.Y + 40);
+        
         titleLayout.AddElement(nameLabel);
         titleLayout.AddElement(new Spacer());
         titleLayout.AddElement(moneyIcon);
         titleLayout.AddElement(moneyLabel);
-        titleLayout.UpdateLayout();
         
         closeButton = CreateElement<Button>();
         closeButton.SetText("Close");
-        closeButton.OnClick += () => OnCloseButton?.Invoke();
+        closeButton.OnClick += HandleCloseClick;
         
         buttonsLayout = new HorizontalLayout(Bounds);
-        buttonsLayout.Padding = 20;
-        buttonsLayout.PositionY = Bounds.Y + Bounds.Height - 120;
+        buttonsLayout.HorizontalPadding = 20;
+        buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - 120);
         buttonsLayout.AddElement(closeButton);
-        buttonsLayout.UpdateLayout();
 
-        int columns = 5;
-        int rows = 5;
-        gridLayout = new GridLayout(new Rectangle(Bounds.X, Bounds.Y + 70,
-            Bounds.Width, Bounds.Height - 200));
-        gridLayout.SetColumns(columns);
-        gridLayout.SetRows(rows);
-        gridLayout.SetPadding(new Vector2(5, 5));
+        Rectangle gridBounds = new Rectangle(Bounds.X, Bounds.Y + 70,
+            Bounds.Width, Bounds.Height - 200);
+        gridLayout = new GridLayout(gridBounds);
+        gridLayout.SetColumns(Columns);
+        gridLayout.SetRows(Rows);
+        gridLayout.SetPadding(5, 5);
 
-        for (int i = 0; i < columns * rows; i++)
-        {
-            InventorySlot inventorySlot = CreateElement<InventorySlot>();
-            inventorySlot.OnItemSelected += OnContextMenuRequested;
-            gridLayout.AddElement(inventorySlot);
-            inventorySlots.Add(inventorySlot);
-        }
-    }
-
-    private void OnContextMenuRequested(InventoryEntry obj)
-    {
-        Console.WriteLine("Context menu for " + obj.ToString());
+        CreateInventorySlots();
+        
+        RefreshLayout();
     }
 
     public void SetInventory(Inventory inventory)
     {
+        if (inventory == null)
+            return;
+        
         moneyLabel.Text = inventory.Money.ToString();
-        moneyIcon.SetImage(SpriteManager.GetSprite("Coin").Texture);
-        int i = 0;
-        foreach (InventoryEntry entry in inventory.items.Values)
-        {
-            if (i < inventorySlots.Count)
-            {
-                inventorySlots[i].SetData(entry);
-            }
 
-            i++;
+        ClearSlots();
+        
+        int index = 0;
+        foreach (InventoryEntry entry in inventory.Items.Values)
+        {
+            if (index >= inventorySlots.Count)
+                break;
+
+            inventorySlots[index].SetData(entry);
+            index++;
         }
-        Console.WriteLine(inventory.ToString());
-        Refresh();
+        
+        RefreshLayout();
     }
     
-    private void Refresh()
+    private void CreateInventorySlots()
+    {
+        int slotCount = Columns * Rows;
+        
+        for (int i = 0; i < slotCount; i++)
+        {
+            InventorySlot slots = CreateElement<InventorySlot>();
+            
+            slots.OnItemRightClicked += HandleContextMenuRequested;
+
+            inventorySlots.Add(slots);
+            gridLayout.AddElement(slots);
+        }
+    }
+
+    private void ClearSlots()
+    {
+        foreach (InventorySlot slot in inventorySlots)
+            slot.SetData(null);
+    }
+    
+    private void RefreshLayout()
     {
         titleLayout.UpdateLayout();
         gridLayout.UpdateLayout();
         buttonsLayout.UpdateLayout();
+    }
+
+    private void HandleContextMenuRequested(InventoryEntry entry)
+    {
+        Console.WriteLine("Context menu for " + entry);
+    }
+    
+    private void HandleCloseClick()
+    {
+        OnCloseButton?.Invoke();
     }
 }

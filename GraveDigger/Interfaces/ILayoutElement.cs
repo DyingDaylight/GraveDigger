@@ -3,10 +3,9 @@ using Microsoft.Xna.Framework;
 
 namespace Interfaces;
 
-public interface IUISizable
+public interface ILayoutElement
 {
     public Vector2 VisibleSize { get; }
-    public bool IsSpacer { get; }
     public void SetPosition(int x, int y);
 
 }

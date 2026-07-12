@@ -7,15 +7,13 @@ using IDrawable = Interfaces.IDrawable;
 namespace GraveDigger.GUI.Elements;
 
 // Base class for all visible UI elements.
-public abstract class UIElement : IUpdatable, IDrawable, IUISizable
+public abstract class UIElement : IUpdatable, IDrawable, ILayoutElement
 {
     public Texture2D? Texture { get; protected set; }
-    public virtual Rectangle Bounds { get; protected set; }
-    public Color Color { get; protected set; } = Color.White;
+    public Rectangle Bounds { get; protected set; }
+    public Color Color { get; set; } = Color.White;
     
     public virtual Vector2 VisibleSize =>  new(Bounds.Width, Bounds.Height);
-    
-    public bool IsSpacer => false;
 
     public virtual void Start()
     {

@@ -7,22 +7,25 @@ namespace GraveDigger.GUI.Elements;
 
 public class Tooltip : UIElement
 {
-    public Vector2 paddings = new Vector2(20, 20);
-    private Label label = new Label();
+    private readonly Vector2 padding = new(20, 20);
+    private readonly Label label = new();
     
     public override void Start()
     {
-        SetFont(GUIResources.DefaultFont);
+        base.Start();
+        
         Texture = SpriteManager.GetSprite("pixel").Texture;
         Color = Color.DimGray;
-        base.Start();
+
+        SetFont(GUIResources.DefaultFont);
     }
     
     public override void Update(GameTime gameTime)
     {
+        base.Update(gameTime);
+        
         label.CenterIn(Bounds);
         label.Update(gameTime);
-        base.Update(gameTime);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -31,16 +34,25 @@ public class Tooltip : UIElement
         label.Draw(spriteBatch);
     }
     
+    public override void SetPosition(int x, int y)
+    {
+        base.SetPosition(x, y);
+        label.CenterIn(Bounds);
+    }
+    
     public void SetTooltip(string tooltip)
     {
         label.Text = tooltip;
         
-        Vector2 size = label.Font.MeasureString(tooltip) + paddings;
-        SetSize((int) size.X, (int) size.Y);
+        SetSize((int) (label.VisibleSize.X + padding.X),
+            (int) (label.VisibleSize.Y + padding.Y));
+        
+        label.CenterIn(Bounds);
     }
     
     public void SetFont(SpriteFont font)
     {
         label.Font = font;
+        label.CenterIn(Bounds);
     }
 }

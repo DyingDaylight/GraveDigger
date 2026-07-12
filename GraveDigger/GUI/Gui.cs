@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using GraveDigger;
-using GraveDigger.Data;
-using GraveDigger.GUI.Elements;
+using GraveDigger.GUI.Components;
 using GraveDigger.GUI.Windows;
 using GraveDigger.Items;
 using GraveDigger.Props;
@@ -16,19 +14,21 @@ namespace GUI;
 
 public class Gui: IUpdatable, IDrawable, IGameWindowService
 {
-    public InteractionTooltip interactionTooltip;
-    public WindowManager WindowManager { get; private set; }
-    public MenuUI MenuUi;
-    public HUD hud;
+    private readonly GameContext gameContext;
     
-    private bool started = false;
+    private bool started;
     private Game1.GameState gameState;
 
-    private GameContext gameContext;
+    public InteractionTooltip InteractionTooltip { get; private set; }
+    public WindowManager WindowManager { get; private set; }
+    public MenuUI MenuUi { get; private set; }
+    public HUD Hud { get; private set; }
+    
 
     public Gui(GameContext gameContext)
     {
-        this.gameContext = gameContext;
+        this.gameContext = gameContext
+                           ?? throw new ArgumentNullException(nameof(gameContext));
     }
     
     public void LoadContent(ContentManager content)
@@ -41,6 +41,7 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         SpriteManager.AddSprite("CloseButtonNormal", "Images/GUI/CloseButtonNormal");
         SpriteManager.AddSprite("CloseButtonHover", "Images/GUI/CloseButtonHover");
         SpriteManager.AddSprite("CloseButtonPressed", "Images/GUI/CloseButtonPressed");
+        SpriteManager.AddSprite("Coin", "Images/Icons/Coin");
     }
     
     public void Start()
@@ -53,28 +54,34 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
 
         WindowManager = new WindowManager();
         MenuUi = new MenuUI(gameContext.ScreenSize);
-        interactionTooltip = new InteractionTooltip(gameContext.CoordinatesConverter);
-        hud = new HUD();
+        InteractionTooltip = new InteractionTooltip(gameContext.CoordinatesConverter);
+        Hud = new HUD();
 
-        hud.Start();
+        Hud.Start();
         MenuUi.Start();
         WindowManager.Start();
-        interactionTooltip.Start();
+        InteractionTooltip.Start();
     }
 
     public void Update(GameTime gameTime)
     {
         if (gameState == Game1.GameState.Menu)
+        {
             MenuUi.Update(gameTime);
-        
-        interactionTooltip.Update(gameTime);
+            return;
+        }
+
+        Hud.Update(gameTime);
+        InteractionTooltip.Update(gameTime);
         WindowManager.Update(gameTime);
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        interactionTooltip.Draw(spriteBatch);
+        Hud.Draw(spriteBatch);
+        InteractionTooltip.Draw(spriteBatch);
         WindowManager.Draw(spriteBatch);
+        
         if (gameState == Game1.GameState.Menu)
             MenuUi.Draw(spriteBatch);
     }
@@ -84,9 +91,9 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         gameState = state;
     }
 
-    public void OpenTombstoneWindow(Tombstone tombstoneData)
+    public void OpenTombstoneWindow(Tombstone tombstone)
     {
-        WindowManager.OpenTombstoneInfoWindow(tombstoneData);
+        WindowManager.OpenTombstoneInfoWindow(tombstone);
     }
 
     public void OpenInventoryWindow(Inventory inventory)
@@ -104,13 +111,13 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         return WindowManager.IsModalWindow;
     }
 
-    public void UpdateTombstoneWindow()
+    public void RefreshTombstoneWindow()
     {
-        WindowManager.UpdateTombstoneWindow();
+        WindowManager.RefreshTombstoneWindow();
     }
 
     public bool IsInventoryOpen()
     {
-        return false;
+        return WindowManager.IsInventoryOpen;
     }
 }

@@ -92,9 +92,9 @@ public class Game1 : Game
         gui.WindowManager.TombstoneInfoWindow.OnDigButton += gameplayCoordinator.DigGrave;
         gui.WindowManager.TombstoneInfoWindow.OnRepairButton += gameplayCoordinator.RepairGrave;
 
-        reputationsSystem.ReputationChanged += gui.hud.UpdateReputation;
+        reputationsSystem.ReputationChanged += gui.Hud.UpdateReputation;
         
-        level.InteractionSystem.OnHoveredInteractionChanged += gui.interactionTooltip.HandleInteraction;
+        level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
 
         gameplayCoordinator.OnLootSpawn += level.SpawnLoot;
         

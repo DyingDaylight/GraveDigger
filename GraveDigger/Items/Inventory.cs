@@ -9,22 +9,22 @@ public class Inventory
 {
     public int Money { get; private set; }
     // TODO: temporary public - Change it!!!!
-    public Dictionary<string, InventoryEntry> items = new();
+    public Dictionary<string, InventoryEntry> Items = new();
 
     public bool Add(ItemData item)
     {
         // TODO: implement Max Stack
         // TODO: think how to store several stacks of same item
-        if (items.ContainsKey(item.Id))
+        if (Items.ContainsKey(item.Id))
         {
-            items[item.Id].Quantity++;
+            Items[item.Id].Quantity++;
         }
         else
         {
             InventoryEntry entry = new();
             entry.ItemData = item;
             entry.Quantity = 1;
-            items[entry.ItemData.Id] = entry;
+            Items[entry.ItemData.Id] = entry;
         }
         return true;
     }
@@ -50,7 +50,7 @@ public class Inventory
     {
         StringBuilder sb = new();
         sb.AppendLine("Inventory: ");
-        foreach (InventoryEntry entry in items.Values)
+        foreach (InventoryEntry entry in Items.Values)
         {
             sb.AppendLine(entry.ToString());
         }

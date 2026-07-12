@@ -17,6 +17,9 @@ public class SpriteManager
 
     public static void AddSprite(string name, string fileName, int columns = 1, int rows = 1)
     {
+        if (_spriteSheets.ContainsKey(name))
+            return;
+        
         Texture2D texture = _content.Load<Texture2D>(fileName);
         _spriteSheets[name] = new SpriteSheet(texture, columns, rows);
     }
