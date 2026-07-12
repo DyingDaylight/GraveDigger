@@ -1,52 +1,46 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-using GraveDigger.GUI.Elements;
+﻿using System;
+using System.Collections.Generic;
 using Interfaces;
-using Microsoft.Xna.Framework;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace GraveDigger.GUI.Layouts;
 
 public class VerticalLayout : Layout
 {
-    private List<UIElement> elements = new();
-    
-    public override Vector2 VisibleSize => new(bounds.Width, bounds.Height);
-    public int Padding { get; set; }
 
     public VerticalLayout(Rectangle bounds) : base(bounds)
     {
     }
 
-    public void AddElement(UIElement element)
+    public void AddElement(ILayoutElement element)
     {
         if (element != null && !elements.Contains(element))
             elements.Add(element);
     }
-    
-    public void CountPositions()
-    {
-        float centerX = bounds.X + bounds.Width * 0.5f;
-        float centerY = bounds.Y + bounds.Height * 0.5f;
-        
-        int height = Padding * (elements.Count - 1);
-        foreach (UIElement element in elements)
-        {
-            height += element.Bounds.Height;
-        }
 
-        int Y = (int) (bounds.Y + bounds.Height * 0.5f - height * 0.5f);
-        foreach (UIElement element in elements)
+    public override void UpdateLayout()
+    {
+        if (elements.Count == 0)
+            return;
+        
+        int contentHeight = VerticalPadding * (elements.Count - 1);
+        foreach (ILayoutElement element in elements)
+            contentHeight += (int) element.VisibleSize.Y;
+        
+        int y = (int) (bounds.Y + (bounds.Height - contentHeight) * 0.5f);
+        
+        foreach (ILayoutElement element in elements)
         {
-            int X = (int) (centerX - element.VisibleSize.X * 0.5f);
-            element.SetPosition(X, Y);
-            Y += (int) element.VisibleSize.Y + Padding;
+            int x = (int) (bounds.Center.X - element.VisibleSize.X * 0.5f);
+            element.SetPosition(x, y);
+            
+            y += (int) element.VisibleSize.Y + VerticalPadding;
         }
     }
     
     public override void SetPosition(int x, int y)
     {
-        bounds.X = x;
-        bounds.Y = y;
+        base.SetPosition(x, y);
+        UpdateLayout();
     }
 }

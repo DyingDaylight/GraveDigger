@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GraveDigger.GUI.Elements;
 
-public class Button : ClickableUIElement, IUISizable
+public class Button : ClickableUIElement
 {
     public enum UiButtonState
     {
@@ -23,33 +23,34 @@ public class Button : ClickableUIElement, IUISizable
         Texture
     }
     
-    public event Action OnClick;
+    public event Action? OnClick;
     
     private Color normalColor = Color.White;
     private Color hoverColor = Color.LightGray;
     private Color pressedColor = Color.DarkGray;
     private Color disabledColor = Color.Gray;
     
-    private Texture2D normalTexture;
-    private Texture2D hoverTexture;
-    private Texture2D pressedTexture;
-    private Texture2D disabledTexture;
+    private Texture2D? normalTexture;
+    private Texture2D? hoverTexture;
+    private Texture2D? pressedTexture;
+    private Texture2D? disabledTexture;
 
     private UiButtonState currentState;
-    
     private readonly UiButtonMode buttonMode;
+    private readonly Label label = new();
     
-    private Label label = new Label();
-    
-    private bool isDisabled = false;
+    private bool isDisabled;
     
     public Button() : this(UiButtonMode.Color)
     {
         SetSize(300, 80);
-        SetColors(GUIResources.ButtonNormalColor, 
+        
+        SetColors(
+            GUIResources.ButtonNormalColor, 
             GUIResources.ButtonHoverColor,
             GUIResources.ButtonPressedColor,
             GUIResources.ButtonDisabledColor);
+        
         SetFont(GUIResources.DefaultFont);
         SetTextColor(Color.Black);
     }
@@ -62,15 +63,21 @@ public class Button : ClickableUIElement, IUISizable
 
     public override void Start()
     {
-        label.Start();
         base.Start();
+        label.Start();
     }
 
     public override void Update(GameTime gameTime)
     {
+        base.Update(gameTime);
+        
         UpdateLabel(gameTime);
 
-        if (!isDisabled)
+        if (isDisabled)
+        {
+            currentState = UiButtonState.Disabled;
+        }
+        else
         {
             UpdateInteraction();
 
@@ -79,10 +86,6 @@ public class Button : ClickableUIElement, IUISizable
                 : IsHovered
                     ? UiButtonState.Hover
                     : UiButtonState.Normal;
-        }
-        else
-        {
-            currentState = UiButtonState.Disabled;
         }
 
         ApplyState();
@@ -109,13 +112,16 @@ public class Button : ClickableUIElement, IUISizable
         label.Color = color;
     }
 
-    public void SetTextures(Texture2D normal, Texture2D hover, Texture2D pressed, Texture2D disabled = null)
+    public void SetTextures(Texture2D normal, 
+        Texture2D? hover = null, 
+        Texture2D? pressed = null, 
+        Texture2D? disabled = null)
     {
         if (buttonMode != UiButtonMode.Texture)
             return;
 
         if (normal == null)
-            throw new ArgumentNullException("Button normal state is not set");
+            return;
         
         normalTexture = normal;
         hoverTexture = hover;
@@ -124,10 +130,11 @@ public class Button : ClickableUIElement, IUISizable
        
         Texture = normalTexture;
         Color = Color.White;
+        
         SetSize(Texture.Width, Texture.Height);
     }
 
-    public void SetColors(Color normal, Color hover, Color pressed, Color disabled = default)
+    public void SetColors(Color normal, Color hover, Color pressed, Color? disabled = null)
     {
         if (buttonMode != UiButtonMode.Color)
             return;
@@ -135,13 +142,16 @@ public class Button : ClickableUIElement, IUISizable
         normalColor = normal;
         hoverColor = hover;
         pressedColor = pressed;
-        if (disabled == default)
-            disabledColor = Color.Gray;
-        else
-            disabledColor = disabled;
+        disabledColor = disabled ?? Color.Gray;
         
         Texture = GUIResources.ButtonDefaultTexture;
         Color = normalColor;
+    }
+    
+    public void SetDisabled(bool disabled)
+    {
+        isDisabled = disabled;
+        currentState = disabled? UiButtonState.Disabled : UiButtonState.Normal;
     }
     
     private void UpdateLabel(GameTime gameTime)
@@ -153,13 +163,9 @@ public class Button : ClickableUIElement, IUISizable
     private void ApplyState()
     {
         if (buttonMode == UiButtonMode.Texture)
-        {
             ApplyTextureState();
-        }
         else
-        {
             ApplyColorState();
-        }
     }
 
     private void ApplyTextureState()
@@ -186,22 +192,8 @@ public class Button : ClickableUIElement, IUISizable
         };
     }
 
-    public void SetDisabled(bool disabled)
-    {
-        isDisabled = disabled;
-        if (disabled)
-        {
-            currentState = UiButtonState.Disabled;
-        }
-        else
-        {
-            currentState = UiButtonState.Normal;
-        }
-    }
-
     private void HandleLeftClick()
     {
         OnClick?.Invoke();
     }
-
 }

@@ -1,30 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using GraveDigger.Data;
 using GraveDigger.GUI.Elements;
 using GraveDigger.GUI.Layouts;
 using GraveDigger.Props;
-using GUI;
 using GUI.Windows;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace GraveDigger.GUI.Windows;
 
 public class TombstoneInfoWindow : Window
 {
-    private Label nameLabel;
-    private Label yearLabel;
-    private Label wealthLabel;
-    private Label natureLabel;
-    private Label stateLabel;
+    private readonly Label nameLabel;
+    private readonly Label yearLabel;
+    private readonly Label wealthLabel;
+    private readonly Label natureLabel;
+    private readonly Label stateLabel;
 
-    private HorizontalLayout horizontalLayout;
-    private VerticalLayout verticalLayout;
+    private readonly Button digButton;
+    private readonly Button repairButton;
+    private readonly Button closeButton;
     
-    private Button digButton;
-    private Button repairButton;
-    private Button closeButton;
+    private readonly HorizontalLayout buttonsLayout;
+    private readonly VerticalLayout infoLayout;
     
     private Tombstone tombstone;
     
@@ -34,94 +30,94 @@ public class TombstoneInfoWindow : Window
     
     public TombstoneInfoWindow()
     {
-        nameLabel = new Label();
-        elements.Add(nameLabel);
+        nameLabel = CreateElement<Label>();
+        yearLabel = CreateElement<Label>();
+        wealthLabel = CreateElement<Label>();
+        natureLabel = CreateElement<Label>();
+        stateLabel = CreateElement<Label>();
         
-        yearLabel = new Label();
-        elements.Add(yearLabel);
-        
-        wealthLabel = new Label();
-        elements.Add(wealthLabel);
-        
-        natureLabel = new Label();
-        elements.Add(natureLabel);
-        
-        stateLabel = new Label();
-        elements.Add(stateLabel);
-        
-        digButton = new Button();
+        digButton = CreateElement<Button>();
         digButton.SetText("Dig");
-        digButton.OnClick += DigGrave;
-        elements.Add(digButton);
+        digButton.OnClick += HandleDigClick;
         
-        repairButton = new Button();
+        repairButton = CreateElement<Button>();
         repairButton.SetText("Repair");
-        repairButton.OnClick += RepairGrave;
-        elements.Add(repairButton);
+        repairButton.OnClick += HandleRepairClick;
         
-        closeButton = new Button();
+        closeButton = CreateElement<Button>();
         closeButton.SetText("Close");
-        closeButton.OnClick += () => OnCloseButton?.Invoke();
-        elements.Add(closeButton);
+        closeButton.OnClick += HandleCloseButton;
         
-        horizontalLayout = new HorizontalLayout(Bounds);
-        horizontalLayout.Padding = 20;
-        horizontalLayout.PositionY = Bounds.Y + Bounds.Height - 120;
-        horizontalLayout.AddElement(digButton);
-        horizontalLayout.AddElement(repairButton);
-        horizontalLayout.AddElement(closeButton);
-        horizontalLayout.UpdateLayout();
+        buttonsLayout = new HorizontalLayout(Bounds);
+        buttonsLayout.HorizontalPadding = 20;
+        buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - 120);
         
-        Rectangle bounds = new Rectangle(Bounds.X, Bounds.Y, Bounds.Width, Bounds.Height - 120);
-        verticalLayout = new VerticalLayout(bounds);
-        verticalLayout.Padding = 40;
-        verticalLayout.AddElement(nameLabel);
-        verticalLayout.AddElement(yearLabel);
-        verticalLayout.AddElement(wealthLabel);
-        verticalLayout.AddElement(natureLabel);
-        verticalLayout.AddElement(stateLabel);
-        verticalLayout.CountPositions();
-    }
-
-    private void RepairGrave()
-    {
-        OnRepairButton?.Invoke(tombstone);
-    }
-
-    private void DigGrave()
-    {
-        OnDigButton?.Invoke(tombstone);
-    }
-
-    public override void Update(GameTime gameTime)
-    {
-        verticalLayout.CountPositions();
-        base.Update(gameTime);
+        buttonsLayout.AddElement(digButton);
+        buttonsLayout.AddElement(repairButton);
+        buttonsLayout.AddElement(closeButton);
+        buttonsLayout.UpdateLayout();
+        
+        Rectangle contentBounds = new Rectangle(Bounds.X, Bounds.Y, Bounds.Width, Bounds.Height - 120);
+        infoLayout = new VerticalLayout(contentBounds);
+        infoLayout.VerticalPadding = 40;
+       
+        infoLayout.AddElement(nameLabel);
+        infoLayout.AddElement(yearLabel);
+        infoLayout.AddElement(wealthLabel);
+        infoLayout.AddElement(natureLabel);
+        infoLayout.AddElement(stateLabel);
+        infoLayout.UpdateLayout();
     }
 
     public void SetData(Tombstone tombstone)
     {
         this.tombstone = tombstone;
+        RefreshContent();
+    }
+
+    public void Refresh()
+    {
+        if (tombstone == null)
+            return;
+        
+        RefreshContent();
+    }
+
+    private void RefreshContent()
+    {
         nameLabel.Text = tombstone.Data.Name;
         yearLabel.Text = tombstone.Data.Years;
         wealthLabel.Text = $"Wealth: {tombstone.Data.WealthDescription}";
         natureLabel.Text = $"Nature: {tombstone.Data.Inscription}";
         stateLabel.Text = $"State: {tombstone.State}";
         
-        if (tombstone.State == TombstoneState.DugOut)
-            digButton.SetDisabled(true);
-        else
-            digButton.SetDisabled(false);
+        digButton.SetDisabled(tombstone.State == TombstoneState.DugOut);
         
-        // TODO: think if we can fix a dug out grave
-        if (tombstone.State != TombstoneState.Broken)
-            repairButton.SetDisabled(true);
-        else
-            repairButton.SetDisabled(false);
+        // TODO: Decide whether a dug-out grave can also be repaired.
+        repairButton.SetDisabled(tombstone.State != TombstoneState.Broken);
+        
+        infoLayout.UpdateLayout();
+    }
+    
+    private void HandleDigClick()
+    {
+        if (tombstone == null)
+            return;
+        
+        OnDigButton?.Invoke(tombstone);
+    }
+    
+    private void HandleRepairClick()
+    {
+        if (tombstone == null)
+            return;
+        
+        OnRepairButton?.Invoke(tombstone);
     }
 
-    public void Update()
+    private void HandleCloseButton()
     {
-        SetData(tombstone);
+        OnCloseButton?.Invoke();
     }
+    
 }

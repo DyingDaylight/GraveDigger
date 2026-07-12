@@ -9,51 +9,65 @@ namespace GraveDigger.GUI.Layouts;
 
 public class GridLayout : Layout
 {
-    private Vector2 paddings = Vector2.Zero;
     private int columns;
     private int rows;
-
-    private List<IUISizable> elements = new();
-
+    
     public GridLayout(Rectangle bounds) : base(bounds)
     {
     }
     
     public void SetColumns(int columns)
     {
+        if (columns <= 0)
+            throw new ArgumentOutOfRangeException(nameof(columns));
+        
         this.columns = columns;
+        UpdateLayout();
     }
 
     public void SetRows(int rows)
     {
+        if (rows <= 0)
+            throw new ArgumentOutOfRangeException(nameof(rows));
+        
         this.rows = rows;
+        UpdateLayout();
     }
 
-    public void SetPadding(Vector2 vector2)
+    public void SetPadding(int horizontalPadding, int verticalPadding)
     {
-        paddings = vector2;
+        HorizontalPadding = horizontalPadding;
+        VerticalPadding = verticalPadding;
+        UpdateLayout();
     }
 
-    public void AddElement(IUISizable element)
+    public void AddElement(ILayoutElement element)
     {
-        elements.Add(element);
-    }
-
-    public void UpdateLayout()
-    {
-        if (elements.Count == 0 || columns <= 0)
+        if (element == null || elements.Contains(element))
             return;
         
-        int slotWidth = (int) elements.Max(e => e.VisibleSize.X);
-        int slotHeight = (int) elements.Max(e => e.VisibleSize.Y);
+        elements.Add(element);
+        UpdateLayout();
+    }
+
+    public override void UpdateLayout()
+    {
+        if (elements.Count == 0 || columns <= 0 || rows <= 0)
+            return;
         
-        int horizontalPadding = (int) paddings.X;
-        int verticalPadding = (int) paddings.Y;
+        if (elements.Count > rows * columns)
+        {
+            throw new InvalidOperationException(
+                "The grid does not have enough cells for all elements.");
+        }
+        
+        int cellWidth = (int) elements.Max(e => e.VisibleSize.X);
+        int cellHeight = (int) elements.Max(e => e.VisibleSize.Y);
         
         // Calculate the total size of the grid,
         // including padding between cells.
-        int contentWidth = slotWidth * columns + horizontalPadding * (columns - 1);
-        int contentHeight =  slotHeight * rows + verticalPadding * (rows - 1);
+        int contentWidth = cellWidth * columns + HorizontalPadding * (columns - 1);
+        int contentHeight =  cellHeight * rows + VerticalPadding * (rows - 1);
 
         int startX = (int) (bounds.X + (bounds.Width - contentWidth) * 0.5f);
         int startY = (int) (bounds.Y + (bounds.Height - contentHeight) * 0.5f);
@@ -67,14 +81,14 @@ public class GridLayout : Layout
                 if (index >= elements.Count)
                     break;
                 
-                IUISizable element = elements[index];
+                ILayoutElement element = elements[index];
 
-                int cellX = startX + column * (slotWidth + horizontalPadding);
-                int cellY = startY + row * (slotHeight + verticalPadding);
+                int cellX = startX + column * (cellWidth + HorizontalPadding);
+                int cellY = startY + row * (cellHeight + VerticalPadding);
                 
                 // Center the element inside its grid cell.
-                int elementX = cellX + (int)((slotWidth - element.VisibleSize.X) * 0.5f);
-                int elementY = cellY + (int)((slotHeight - element.VisibleSize.Y) * 0.5f);
+                int elementX = cellX + (int)((cellWidth - element.VisibleSize.X) * 0.5f);
+                int elementY = cellY + (int)((cellHeight - element.VisibleSize.Y) * 0.5f);
                 
                 element.SetPosition(elementX, elementY);
             }

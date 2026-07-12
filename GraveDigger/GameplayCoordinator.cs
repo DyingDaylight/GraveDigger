@@ -69,7 +69,7 @@ public class GameplayCoordinator : IGameplayActions
         if (repaired)
         {
             ReputationsSystem.AddReputation(tombstone.Value);
-            WindowService.UpdateTombstoneWindow();
+            WindowService.RefreshTombstoneWindow();
         }
     }
 

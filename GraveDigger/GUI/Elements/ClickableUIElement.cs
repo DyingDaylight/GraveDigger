@@ -4,25 +4,18 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GraveDigger.GUI.Elements;
 
-public class ClickableUIElement : UIElement
+public abstract class ClickableUIElement : UIElement
 {
-    public enum MouseButton
-    {
-        Left,
-        Right,
-        Middle
-    }
-    
     private ButtonState previousLeftButtonState = ButtonState.Released;
     private ButtonState previousRightButtonState = ButtonState.Released;
     
     private bool leftPressedInside;
     private bool rightPressedInside;
+    private bool wasHovered;
     
-    public bool IsHovered { get; private set; }
-    
-    public bool IsLeftPressed { get; private set; }
-    public bool IsRightPressed { get; private set; }
+    protected bool IsHovered { get; private set; }
+    protected bool IsLeftPressed { get; private set; }
+    protected bool IsRightPressed { get; private set; }
     
     public event Action LeftClicked;
     public event Action RightClicked;
@@ -35,8 +28,6 @@ public class ClickableUIElement : UIElement
 
     public event Action RightPressed;
     public event Action RightReleased;
-    
-    private bool wasHovered;
     
     protected void UpdateInteraction()
     {
@@ -53,8 +44,7 @@ public class ClickableUIElement : UIElement
 
         if (IsHovered && !wasHovered)
             MouseEntered?.Invoke();
-
-        if (!IsHovered && wasHovered)
+        else if (!IsHovered && wasHovered)
             MouseExited?.Invoke();
 
         wasHovered = IsHovered;
@@ -72,20 +62,17 @@ public class ClickableUIElement : UIElement
             currentState == ButtonState.Released &&
             previousLeftButtonState == ButtonState.Pressed;
 
-        if (justPressed)
+        if (justPressed && IsHovered)
         {
-            if (IsHovered)
-            {
-                leftPressedInside = true;
-                LeftPressed?.Invoke();
-            }
+            leftPressedInside = true;
+            LeftPressed?.Invoke();
         }
 
-        if (justReleased)
+        if (justReleased && leftPressedInside)
         {
             LeftReleased?.Invoke();
 
-            if (leftPressedInside && IsHovered)
+            if (IsHovered)
                 LeftClicked?.Invoke();
 
             leftPressedInside = false;
@@ -111,20 +98,17 @@ public class ClickableUIElement : UIElement
             currentState == ButtonState.Released &&
             previousRightButtonState == ButtonState.Pressed;
 
-        if (justPressed)
+        if (justPressed && IsHovered)
         {
-            if (IsHovered)
-            {
-                rightPressedInside = true;
-                RightPressed?.Invoke();
-            }
+            rightPressedInside = true;
+            RightPressed?.Invoke();
         }
 
-        if (justReleased)
+        if (justReleased && rightPressedInside)
         {
             RightReleased?.Invoke();
 
-            if (rightPressedInside && IsHovered)
+            if (IsHovered)
                 RightClicked?.Invoke();
 
             rightPressedInside = false;
@@ -138,7 +122,7 @@ public class ClickableUIElement : UIElement
         previousRightButtonState = currentState;
     }
     
-    protected bool IsMouseOver(MouseState mouse)
+    private bool IsMouseOver(MouseState mouse)
     {
         var mousePos = new Point(mouse.X, mouse.Y);
         return Bounds.Contains(mousePos);

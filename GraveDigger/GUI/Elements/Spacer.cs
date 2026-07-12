@@ -3,13 +3,12 @@ using Microsoft.Xna.Framework;
 
 namespace GraveDigger.GUI.Elements;
 
-public class Spacer : IUISizable
+public class Spacer : ILayoutElement, ISpacer
 {
     public Vector2 VisibleSize { get; }
-    public bool IsSpacer => true;
 
+    // A spacer has no visual representation or position.
     public void SetPosition(int x, int y)
     {
-        throw new System.NotImplementedException();
     }
 }

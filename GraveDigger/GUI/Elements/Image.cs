@@ -5,11 +5,8 @@ namespace GraveDigger.GUI.Elements;
 
 public class Image : UIElement
 {
-    public void SetImage(Texture2D texture)
+    public void SetImage(Texture2D? texture)
     {
-        if (texture == null)
-            return;
-        
         Texture = texture;
     }
 

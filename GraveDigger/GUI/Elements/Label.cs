@@ -1,38 +1,40 @@
 ﻿using System;
 using GUI;
-using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using IDrawable = Interfaces.IDrawable;
 
 namespace GraveDigger.GUI.Elements;
 
 public class Label : UIElement
 {
-    private Vector2 position;
+    private Vector2 centerPosition;
     private string text = "";
-
+    private SpriteFont font;
+    
     public string Text
     {
         get => text;
-        set => text = value ?? "";
-    }
-    public Color Color { get; set; } = Color.White;
-
-    public SpriteFont Font { get; set; }
-
-    public override Rectangle Bounds
-    {
-        get
+        set
         {
-            return new Rectangle((int)position.X, (int)position.Y, 
-                (int)Font.MeasureString(Text).X, (int)Font.MeasureString(Text).Y);
+            text = value ?? "";
+            UpdateBounds();
+        }
+    }
+
+    public SpriteFont Font
+    {
+        get => font;
+        set
+        {
+            font = value;
+            UpdateBounds();
         }
     }
 
     public Label()
     {
         Font = GUIResources.DefaultFont;
+        UpdateBounds();
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -40,29 +42,46 @@ public class Label : UIElement
         if (Font == null || string.IsNullOrEmpty(Text))
             return;
         
+        Vector2 textSize = Font.MeasureString(Text);
+        
         spriteBatch.DrawString(
             Font,
             Text,
-            position, 
+            centerPosition,
             Color,
-            MathHelper.ToRadians(0),
-            Font.MeasureString(Text) * 0.5f,
-            1,
+            0f,
+            textSize  * 0.5f,
+            1f,
             SpriteEffects.None,
-            0);
+            0f);
     }
 
-    // Positions the label in the center of the given rectangle.
-    public void CenterIn(Rectangle bounds)
-    {
-        position = new Vector2(bounds.X + bounds.Width * 0.5f, 
-                               bounds.Y + bounds.Height * 0.5f);
-    }
-    
+    // Positions the top-left corner of the visible text.
     public override void SetPosition(int x, int y)
     {
-        CenterIn(new Rectangle(x, y, Bounds.Width, Bounds.Height));
+        centerPosition = new Vector2(
+            x + Bounds.Width * 0.5f,
+            y + Bounds.Height * 0.5f);
+        UpdateBounds();
     }
-    
-    public override Vector2 VisibleSize => new Vector2(Bounds.Width, Bounds.Height);
+
+    // Centers the label inside the given bounds.
+    public void CenterIn(Rectangle containerBounds)
+    {
+        centerPosition = new Vector2(
+            containerBounds.Center.X,
+            containerBounds.Center.Y);
+        UpdateBounds();
+    }
+
+    private void UpdateBounds()
+    {
+        Vector2 textSize = font?.MeasureString(text) ?? Vector2.Zero;
+        
+        Bounds = new Rectangle(
+            (int)(centerPosition.X - textSize.X * 0.5f),
+            (int)(centerPosition.Y - textSize.Y * 0.5f),
+            (int)textSize.X,
+            (int)textSize.Y);
+    }
 }
