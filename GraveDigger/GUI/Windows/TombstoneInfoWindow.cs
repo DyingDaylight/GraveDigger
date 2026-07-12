@@ -34,8 +34,6 @@ public class TombstoneInfoWindow : Window
     
     public TombstoneInfoWindow()
     {
-        Color = Color.DimGray;
-        
         nameLabel = new Label();
         elements.Add(nameLabel);
         
@@ -72,7 +70,7 @@ public class TombstoneInfoWindow : Window
         horizontalLayout.AddElement(digButton);
         horizontalLayout.AddElement(repairButton);
         horizontalLayout.AddElement(closeButton);
-        horizontalLayout.CountPositions();
+        horizontalLayout.UpdateLayout();
         
         Rectangle bounds = new Rectangle(Bounds.X, Bounds.Y, Bounds.Width, Bounds.Height - 120);
         verticalLayout = new VerticalLayout(bounds);

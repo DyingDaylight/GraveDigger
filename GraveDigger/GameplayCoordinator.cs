@@ -35,7 +35,6 @@ public class GameplayCoordinator : IGameplayActions
     public void OpenTombstone(Tombstone tombstoneData)
     {
         WindowService.OpenTombstoneWindow(tombstoneData);
-        
     }
 
     public void DigGrave(Tombstone tombstone)
@@ -81,6 +80,6 @@ public class GameplayCoordinator : IGameplayActions
     
     public void ShowInventory()
     {
-        Console.WriteLine(Inventory.ToString());
+        WindowService.OpenInventoryWindow(Inventory);
     }
 }

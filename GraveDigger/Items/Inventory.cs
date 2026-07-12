@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
+using GraveDigger.GUI.Windows;
 
 namespace GraveDigger.Items;
 
 public class Inventory
 {
-    private Dictionary<string, InventoryEntry> items = new();
+    public int Money { get; private set; }
+    // TODO: temporary public - Change it!!!!
+    public Dictionary<string, InventoryEntry> items = new();
 
     public bool Add(ItemData item)
     {
@@ -25,6 +29,23 @@ public class Inventory
         return true;
     }
 
+    public void AddMoney(int money)
+    {
+        if (money <= 0)
+            return;
+        
+        Money += money;
+    }
+
+    public void SpendMoney(int money)
+    {
+        if (money <= 0)
+            return;
+        
+        Money -= money;
+        Money = Math.Max(Money, 0);
+    }
+    
     public override string ToString()
     {
         StringBuilder sb = new();

@@ -16,6 +16,7 @@ public class Window : UIElement
     {
         SetSize(1000, 800);
         SetPosition(460, 140);
+        Color = Color.DimGray;
         Texture = SpriteManager.GetSprite("pixel").Texture;
     }
 
@@ -40,5 +41,12 @@ public class Window : UIElement
         {
             element.Draw(spriteBatch);
         }
+    }
+
+    protected T CreateElement<T>() where T : UIElement, new()
+    {
+        T element = new T();
+        elements.Add(element);
+        return element;
     }
 }

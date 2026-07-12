@@ -4,6 +4,7 @@ using GraveDigger;
 using GraveDigger.Data;
 using GraveDigger.GUI.Elements;
 using GraveDigger.GUI.Windows;
+using GraveDigger.Items;
 using GraveDigger.Props;
 using Interfaces;
 using Microsoft.Xna.Framework;
@@ -86,6 +87,11 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
     public void OpenTombstoneWindow(Tombstone tombstoneData)
     {
         WindowManager.OpenTombstoneInfoWindow(tombstoneData);
+    }
+
+    public void OpenInventoryWindow(Inventory inventory)
+    {
+        WindowManager.OpenInventoryWindow(inventory);
     }
 
     public void CloseCurrentWindow()

@@ -152,6 +152,8 @@ public class Level
         SpriteManager.AddSprite("Icon46", "Images/Loot/Icon46");
         SpriteManager.AddSprite("Icon47", "Images/Loot/Icon47");
         SpriteManager.AddSprite("Icon48", "Images/Loot/Icon48");
+        
+        SpriteManager.AddSprite("Coin", "Images/Icons/Coin");
     }
     
     private T Add<T>(T obj)

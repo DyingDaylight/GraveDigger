@@ -21,7 +21,7 @@ public class Label : UIElement
 
     public SpriteFont Font { get; set; }
 
-    public Rectangle Bounds
+    public override Rectangle Bounds
     {
         get
         {
@@ -61,6 +61,8 @@ public class Label : UIElement
     
     public override void SetPosition(int x, int y)
     {
-        position = new Vector2(x, y);
+        CenterIn(new Rectangle(x, y, Bounds.Width, Bounds.Height));
     }
+    
+    public override Vector2 VisibleSize => new Vector2(Bounds.Width, Bounds.Height);
 }

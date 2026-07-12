@@ -1,12 +1,13 @@
 ﻿using System;
 using GUI;
+using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace GraveDigger.GUI.Elements;
 
-public class Button : UIElement
+public class Button : ClickableUIElement, IUISizable
 {
     public enum UiButtonState
     {
@@ -40,9 +41,6 @@ public class Button : UIElement
     
     private Label label = new Label();
     
-    private ButtonState previousMouseButtonState;
-    private bool wasPressedInside;
-
     private bool isDisabled = false;
     
     public Button() : this(UiButtonMode.Color)
@@ -59,6 +57,7 @@ public class Button : UIElement
     public Button(UiButtonMode mode)
     {
         buttonMode = mode;
+        LeftClicked += HandleLeftClick;
     }
 
     public override void Start()
@@ -73,12 +72,13 @@ public class Button : UIElement
 
         if (!isDisabled)
         {
-            MouseState mouse = Mouse.GetState();
-            bool isHover = IsMouseOver(mouse);
+            UpdateInteraction();
 
-            HandleClick(mouse, isHover);
-
-            currentState = GetStateFromMouse(mouse, isHover);
+            currentState = IsLeftPressed
+                ? UiButtonState.Pressed
+                : IsHovered
+                    ? UiButtonState.Hover
+                    : UiButtonState.Normal;
         }
         else
         {
@@ -150,50 +150,6 @@ public class Button : UIElement
         label.Update(gameTime);
     }
     
-    private bool IsMouseOver(MouseState mouse)
-    {
-        var mousePos = new Point(mouse.X, mouse.Y);
-        return Bounds.Contains(mousePos);
-    }
-    
-    // A click is registered only if the mouse was pressed and released inside the button.
-    private void HandleClick(MouseState mouse, bool isHover)
-    {
-        bool mouseJustPressed = mouse.LeftButton == ButtonState.Pressed &&
-                                previousMouseButtonState == ButtonState.Released;
-
-        bool mouseJustReleased = mouse.LeftButton == ButtonState.Released &&
-                                 previousMouseButtonState == ButtonState.Pressed;
-
-        if (isHover && mouseJustPressed)
-        {
-            wasPressedInside = true;
-        }
-
-        if (mouseJustReleased)
-        {
-            if (wasPressedInside && isHover)
-            {
-                OnClick?.Invoke();
-            }
-
-            wasPressedInside = false;
-        }
-
-        previousMouseButtonState = mouse.LeftButton;
-    }
-    
-    private UiButtonState GetStateFromMouse(MouseState mouse, bool isHover)
-    {
-        if (isHover && mouse.LeftButton == ButtonState.Pressed)
-            return UiButtonState.Pressed;
-
-        if (isHover)
-            return UiButtonState.Hover;
-
-        return UiButtonState.Normal;
-    }
-    
     private void ApplyState()
     {
         if (buttonMode == UiButtonMode.Texture)
@@ -242,4 +198,10 @@ public class Button : UIElement
             currentState = UiButtonState.Normal;
         }
     }
+
+    private void HandleLeftClick()
+    {
+        OnClick?.Invoke();
+    }
+
 }
