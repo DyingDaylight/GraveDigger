@@ -31,7 +31,7 @@ public class Player : Animation
         Transform.Position = new Vector2(Game1.ScreenSize.X * 0.5f, Game1.ScreenSize.Y * 0.5f);
         previousPosition = Transform.Position;
         
-        Transform.Scale = new Vector2(0.15f, 0.15f);
+        Transform.Scale = new Vector2(0.21f, 0.21f);
         
         CurrentRow = 1; 
         Stop();

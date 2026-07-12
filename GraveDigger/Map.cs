@@ -9,7 +9,7 @@ namespace GraveDigger;
 
 public class Map : IDrawable, IUpdatable
 {
-    private readonly Point tileSize = new Point(894, 1390);
+    private readonly Point tileSize = new Point(1056, 1056);
     private Point mapSize = new Point();
     
     private List<Sprite> tileSprites = new List<Sprite>();
@@ -39,20 +39,21 @@ public class Map : IDrawable, IUpdatable
             throw new InvalidOperationException("Map has already been started.");
 
         started = true;
-        
+    
         // Create tile sprites from the tile map data.
         for (int i = 0; i < mapSize.Y; i++)
         {
             for (int j = 0; j < mapSize.X; j++)
             {
                 int tileIndex = tileMap[i, j];
-      
+  
                 Sprite tile = new Sprite($"ground{tileIndex}");
-                tile.Transform.Position = new Vector2(j * tileSize.X, i * tileSize.Y);
-                tile.sourceRectangle = new Rectangle(1, 1, tileSize.X + 1, tileSize.Y + 1);
+            
+                tile.Transform.Position = new Vector2(j * (tileSize.X - 1), i * (tileSize.Y - 5));
+            
+                tile.sourceRectangle = new Rectangle(0, 0, tileSize.X, tileSize.Y);
+            
                 tile.Pivot = new Vector2(0, 0);
-                //tile.Transform.Scale = new Vector2((float) tileSize.X / tile.Texture.Width, 
-                //                                   (float) tileSize.Y / tile.Texture.Height);
                 tile.SortingOrder = 1f;
                 tile.Start();
                 tileSprites.Add(tile);

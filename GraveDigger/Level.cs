@@ -92,7 +92,7 @@ public class Level
         {
             SpriteManager.AddSprite($"ground{i}", $"Images/Environment_New/earth_tile{i}");
         }
-        SpriteManager.AddSprite("tree", "Images/Props/Tree");
+        SpriteManager.AddSprite("tree", "Images/Props/Tombstone7");
         SpriteManager.AddSprite("crypt", "Images/Props/Crypt");
         SpriteManager.AddSprite("angel", "Images/Props/Angel");
         SpriteManager.AddSprite("dirt", "Images/Props/Dirt");
@@ -193,7 +193,7 @@ public class Level
         CreateProp(PropFactory,"crypt",  new Vector2(1300, 350));
         CreateProp(PropFactory,"tree",  new Vector2(1600, 700));
         CreateProp(PropFactory,"tree",  new Vector2(800, 800));
-        CreateProp(PropFactory,"dirt",  new Vector2(1300, 800));
+        CreateProp(PropFactory,"dirt",  new Vector2(500, 800));
         CreateProp(PropFactory,"spade",  new Vector2(1300, 820));
         
         Prop angel = CreateProp(PropFactory,"angel",  new Vector2(1600, 250));
@@ -205,6 +205,24 @@ public class Level
     {
         T prop = factory(name);
         prop.Transform.Position = position;
+        switch (name)
+        {
+            case "lampost":
+                prop.Transform.Scale = new Vector2(0.09f, 0.09f);
+                break;
+
+            case "dirt":
+                prop.Transform.Scale = new Vector2(0.05f, 0.05f);
+                break;
+            
+            case "crypt":
+                prop.Transform.Scale = new Vector2(0.18f, 0.18f);
+                break;
+
+            default:
+                prop.Transform.Scale = new Vector2(0.3f, 0.3f);
+                break;
+        }
         prop.Start();
         Add(prop);
         props.Add(prop);
@@ -248,7 +266,7 @@ public class Level
         TombstoneData tombstoneData = TombstoneGenerator.GenerateTombstoneData(gameContext.RandomService);
         
         Tombstone tomb = CreateProp(TombstoneFactory, name, position);
-        tomb.Transform.Scale = new Vector2(0.8f, 0.8f);
+        tomb.Transform.Scale = new Vector2(0.3f, 0.3f);
         tomb.SetData(tombstoneData);
         tomb.State = gameContext.RandomService.RandomEnum<TombstoneState>();
         
