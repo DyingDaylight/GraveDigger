@@ -18,6 +18,8 @@ public class GameplayCoordinator : IGameplayActions
     private readonly RandomService RandomService;
     private readonly LootGenerator LootGenerator;
     private readonly Inventory Inventory;
+    public event Action<Tombstone> OnGraveDug;
+    public event Action<Tombstone> OnGraveRepaired;
 
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
     
@@ -46,6 +48,8 @@ public class GameplayCoordinator : IGameplayActions
             List<ItemData> itemData = LootGenerator.Generate(tombstone.Data, RandomService);
             OnLootSpawn?.Invoke(itemData, tombstone);
             
+            OnGraveDug?.Invoke(tombstone);
+            
             EnemyType enemyType = UndeadGenerator.Generate(tombstone.Data, RandomService);
             if (enemyType == EnemyType.Ghost)
             {
@@ -68,6 +72,8 @@ public class GameplayCoordinator : IGameplayActions
         bool repaired = tombstone.Repair();
         if (repaired)
         {
+            OnGraveRepaired?.Invoke(tombstone);
+            
             ReputationsSystem.AddReputation(tombstone.Value);
             WindowService.RefreshTombstoneWindow();
         }

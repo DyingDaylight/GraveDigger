@@ -144,8 +144,13 @@ public class Sprite : IDrawable, IUpdatable
         return new Rectangle(x, y, width, height);
     }
     
-    protected void ChangeSprite(string spriteName)
+    public void ChangeSprite(string spriteName)
     {
         SpriteSheet = SpriteManager.GetSprite(spriteName);
+        
+        if (SpriteSheet != null)
+        {
+            sourceRectangle = SpriteSheet[0, 0];
+        }
     }
 }

@@ -94,7 +94,8 @@ public class TombstoneInfoWindow : Window
         digButton.SetDisabled(tombstone.State == TombstoneState.DugOut);
         
         // TODO: Decide whether a dug-out grave can also be repaired.
-        repairButton.SetDisabled(tombstone.State != TombstoneState.Broken);
+        repairButton.SetDisabled(tombstone.State == TombstoneState.Perfect);
+        //repairButton.SetDisabled(tombstone.State != TombstoneState.Broken);
         
         infoLayout.UpdateLayout();
     }

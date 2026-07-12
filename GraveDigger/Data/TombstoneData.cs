@@ -1,6 +1,7 @@
 ﻿namespace GraveDigger.Data;
 
-public class TombstoneData
+public class 
+    TombstoneData
 {
     public string Name;
     public string Years;

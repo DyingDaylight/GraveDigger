@@ -7,12 +7,26 @@ namespace GraveDigger.Props;
 public class Tombstone : Prop, IInteractionOwner
 {
     public TombstoneData Data { get; private set; }
-    public TombstoneState State { get; set; }
+    
+    public Prop GraveTile { get; set; }
+
+    private TombstoneState state;
+
+    public TombstoneState State
+    {
+        get => state;
+        set
+        {
+            state = value;
+            UpdateVisuals();
+        }
+    }
+
     public int Value { get; set; }
     public Interaction Interaction { get; set; }
-    
+
     public Rectangle InteractionArea => destRectangle;
-    
+
     public Tombstone(string name) : base(name)
     {
         State = TombstoneState.Perfect;
@@ -23,7 +37,7 @@ public class Tombstone : Prop, IInteractionOwner
     {
         Data = data;
     }
-    
+
     public void SetHighlighted(bool highlighted)
     {
         Highlighted = highlighted;
@@ -31,31 +45,38 @@ public class Tombstone : Prop, IInteractionOwner
 
     public bool Repair()
     {
-        if (State != TombstoneState.Broken) return false;
         
+        if (State == TombstoneState.Perfect) return false;
+    
         State = TombstoneState.Perfect;
-        UpdateVisuals();
-        
+    
         return true;
+        
+        /*if (State != TombstoneState.Broken) return false;
+
+        State = TombstoneState.Perfect;
+
+        return true;
+        
+        */
     }
 
     public bool Dig()
     {
         if (State == TombstoneState.DugOut) return false;
-        
+
         State = TombstoneState.DugOut;
-        UpdateVisuals();
-        
+
         return true;
     }
 
     private void UpdateVisuals()
     {
-        switch (State)
+        Transform.Scale = new Vector2(0.3f, 0.3f);
+
+        if (SpriteSheet != null)
         {
-            
+            sourceRectangle = SpriteSheet[0, 0];
         }
-        // TODO: change sprite
     }
-    
 }

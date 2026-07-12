@@ -51,6 +51,12 @@ public class Level
     {
         InteractionSystem = new InteractionSystem(gameContext.CoordinatesConverter);
         
+        if (gameplayActions is GameplayCoordinator coordinator)
+        {
+            coordinator.OnGraveDug += SpawnGraveDirt;
+            coordinator.OnGraveRepaired += RemoveGraveDirt;
+        }
+        
         CreateMap();
         CreateProps();
         CreateLamps();
@@ -104,6 +110,9 @@ public class Level
         SpriteManager.AddSprite("tombstone4", "Images/Props/Tombstone4");
         SpriteManager.AddSprite("tombstone5", "Images/Props/Tombstone5");
         SpriteManager.AddSprite("tombstone6", "Images/Props/Tombstone6");
+
+        SpriteManager.AddSprite("grave_earth", "Images/Environment_New/grave_earth");
+        SpriteManager.AddSprite("grave_digged", "Images/Environment_New/grave_digged");
         
         SpriteManager.AddSprite("Icon1",  "Images/Loot/Icon1");
         SpriteManager.AddSprite("Icon2",  "Images/Loot/Icon2");
@@ -214,9 +223,17 @@ public class Level
             case "dirt":
                 prop.Transform.Scale = new Vector2(0.05f, 0.05f);
                 break;
-            
+    
             case "crypt":
                 prop.Transform.Scale = new Vector2(0.18f, 0.18f);
+                break;
+    
+            case "grave_earth":
+                prop.Transform.Scale = new Vector2(0.08f, 0.08f);
+                break;
+    
+            case "grave_digged":
+                prop.Transform.Scale = new Vector2(0.08f, 0.08f);
                 break;
 
             default:
@@ -245,31 +262,36 @@ public class Level
     
     private void CreateTombstones()
     {
-        CreateTombstone("tombstone5", new Vector2(100, 350));
-        CreateTombstone("tombstone1", new Vector2(300, 350));
-        CreateTombstone("tombstone2", new Vector2(500, 350));
-        CreateTombstone("tombstone3", new Vector2(700, 350));
+        CreateTombstone("tombstone5", new Vector2(200, 1500));
+        CreateTombstone("tombstone1", new Vector2(550, 1500));
+        CreateTombstone("tombstone2", new Vector2(900, 1500));
         
-        CreateTombstone("tombstone1", new Vector2(100, 250));
-        CreateTombstone("tombstone4", new Vector2(300, 250));
-        CreateTombstone("tombstone5", new Vector2(500, 250));
-        CreateTombstone("tombstone6", new Vector2(700, 250));
+        CreateTombstone("tombstone1", new Vector2(200, 600));
+        CreateTombstone("tombstone4", new Vector2(550, 600));
+        CreateTombstone("tombstone5", new Vector2(900, 600));
         
-        CreateTombstone("tombstone2", new Vector2(100, 150));
-        CreateTombstone("tombstone6", new Vector2(300, 150));
-        CreateTombstone("tombstone1", new Vector2(500, 150));
-        CreateTombstone("tombstone3", new Vector2(700, 150));
+        CreateTombstone("tombstone6", new Vector2(200, 1000));
+        CreateTombstone("tombstone3", new Vector2(550, 1000));
+        
+        CreateTombstone("tombstone2", new Vector2(200, 350));
+        CreateTombstone("tombstone6", new Vector2(550, 350));
+        CreateTombstone("tombstone1", new Vector2(900, 350));
     }
 
     private void CreateTombstone(string name, Vector2 position)
     {
         TombstoneData tombstoneData = TombstoneGenerator.GenerateTombstoneData(gameContext.RandomService);
-        
-        Tombstone tomb = CreateProp(TombstoneFactory, name, position);
+    
+        Prop earth = CreateProp(PropFactory, "grave_earth", position);
+    
+        Vector2 tombstonePosition = new Vector2(position.X, position.Y - 190);
+        Tombstone tomb = CreateProp(TombstoneFactory, name, tombstonePosition);
         tomb.Transform.Scale = new Vector2(0.3f, 0.3f);
         tomb.SetData(tombstoneData);
         tomb.State = gameContext.RandomService.RandomEnum<TombstoneState>();
-        
+    
+        tomb.GraveTile = earth;
+    
         TombstoneInteraction interaction = new TombstoneInteraction(tomb);
         interaction.OnTombstoneRead += OpenTombstone;
         tomb.Interaction = interaction;
@@ -346,5 +368,39 @@ public class Level
         InteractionSystem.UnregisterInteraction(pickable.Interaction);
         Remove(pickable);
         props.Remove(pickable);
+    }
+    
+    private void SpawnGraveDirt(Tombstone tombstone)
+    {
+        if (tombstone.GraveTile != null)
+        {
+            tombstone.GraveTile.ChangeSprite("grave_digged");
+        }
+
+        if (tombstone.GraveTile != null)
+        {
+            Vector2 dirtPosition = new Vector2(tombstone.GraveTile.Transform.Position.X, tombstone.GraveTile.Transform.Position.Y + 140);
+            CreateProp(PropFactory, "dirt", dirtPosition);
+        }
+    }
+
+    private void RemoveGraveDirt(Tombstone tombstone)
+    {
+        if (tombstone.GraveTile != null)
+        {
+            tombstone.GraveTile.ChangeSprite("grave_earth");
+        }
+
+        if (tombstone.GraveTile != null)
+        {
+            Vector2 dirtPosition = new Vector2(tombstone.GraveTile.Transform.Position.X, tombstone.GraveTile.Transform.Position.Y + 140);
+            Prop dirtToRemove = props.FirstOrDefault(p => p.sourceRectangle != null && p.Transform.Position == dirtPosition);
+        
+            if (dirtToRemove != null)
+            {
+                Remove(dirtToRemove);
+                props.Remove(dirtToRemove);
+            }
+        }
     }
 }
