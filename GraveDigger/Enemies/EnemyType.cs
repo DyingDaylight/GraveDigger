@@ -5,4 +5,5 @@ public enum EnemyType
     None,
     Ghost,
     Zombie,
+    Skeleton
 }

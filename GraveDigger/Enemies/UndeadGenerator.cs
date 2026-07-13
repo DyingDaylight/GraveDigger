@@ -19,8 +19,15 @@ public class UndeadGenerator
     
     public static EnemyType Generate(TombstoneData tombstone, RandomService random)
     {
-        var chances = enemyRanges[tombstone.Personality];
+        if (tombstone.Personality == TombPersonality.Greedy)
+        {
+            if (random.Next(1, 101) <= 75)
+            {
+                return EnemyType.Skeleton;
+            }
+        }
 
+        var chances = enemyRanges[tombstone.Personality];
         int roll = random.Next(1, 101);
 
         if (roll <= chances.None)
