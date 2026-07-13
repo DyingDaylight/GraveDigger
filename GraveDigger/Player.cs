@@ -27,6 +27,8 @@ public class Player : Animation
     public override void Start()
     {
         base.Start();
+
+        Shadow = true;
         
         Transform.Position = new Vector2(Game1.ScreenSize.X * 0.5f, Game1.ScreenSize.Y * 0.5f);
         previousPosition = Transform.Position;

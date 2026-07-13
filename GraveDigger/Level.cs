@@ -141,6 +141,7 @@ public class Level : IUpdatable, IDrawable
     {
         T prop = factory(name);
         prop.Transform.Position = position;
+        prop.Shadow = true;
         switch (name)
         {
             case "lampost":
@@ -300,6 +301,7 @@ public class Level : IUpdatable, IDrawable
     
         tomb.GraveTile = earth;
         tomb.GraveTile.Mode = Prop.SortingMode.Ground;
+        tomb.GraveTile.Shadow = false;
     
         TombstoneInteraction interaction = new TombstoneInteraction(tomb);
         interaction.OnTombstoneRead += OpenTombstone;

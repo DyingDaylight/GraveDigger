@@ -35,6 +35,11 @@ public class Sprite : IDrawable, IUpdatable
     public Color HighlightColor { get; set; } = Color.Red;
     public int HighlightThickness { get; set; } = 7;
     
+    public bool Shadow { get; set; } = false;
+    public float ShadowIntensity { get; set; } = 0.33f;
+    public float ShadowScale { get; set; } = 0.15f;
+    
+    
     public SpriteSheet SpriteSheet;
     public Rectangle? sourceRectangle;
     public Rectangle destRectangle;
@@ -66,6 +71,9 @@ public class Sprite : IDrawable, IUpdatable
         if (Texture == null)
             return;
 
+        if (Shadow)
+            DrawShadow(spriteBatch);
+        
         if (Highlighted)
         {
             DrawHighlight(spriteBatch);
@@ -152,5 +160,26 @@ public class Sprite : IDrawable, IUpdatable
         {
             sourceRectangle = SpriteSheet[0, 0];
         }
+    }
+    
+    private void DrawShadow(SpriteBatch spriteBatch)
+    {
+        Vector2 shadowOffset = new Vector2(20, 25);
+
+        SpriteEffects shadowEffect =
+            SpriteEffect == SpriteEffects.FlipHorizontally
+                ? SpriteEffects.None
+                : SpriteEffects.FlipHorizontally;
+        
+        spriteBatch.Draw(
+            Texture,
+            new Vector2(Transform.Position.X, GetDestRectangle(sourceRectangle).Bottom),
+            sourceRectangle,
+            Color.Black * ShadowIntensity,
+            MathHelper.ToRadians(180),
+            Origin,
+            new Vector2(Transform.Scale.X, Transform.Scale.Y * ShadowScale),
+            shadowEffect,
+            SortingOrder - 0.0001f);
     }
 }
