@@ -101,6 +101,11 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         WindowManager.OpenInventoryWindow(inventory);
     }
 
+    public void OpenTradeWindow(Inventory inventory, Inventory inventory1)
+    {
+        WindowManager.OpenTradeWindow(inventory, inventory1);
+    }
+
     public void CloseCurrentWindow()
     {
         WindowManager.CloseCurrentWindow();

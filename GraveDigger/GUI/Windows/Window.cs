@@ -10,7 +10,11 @@ public abstract class Window : UIContainer
 {
     public Window()
     {
-        Bounds = new Rectangle(460, 140, 1000, 800);
+        int width = 1000;
+        int height = 800;
+        int x = (int) ((1920 - width) * 0.5f);
+        int y = (int) ((1080 - height) * 0.5f);
+        Bounds = new Rectangle(x, y, width, height);
         
         Color = Color.DimGray;
         Texture = SpriteManager.GetSprite("pixel").Texture;

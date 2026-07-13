@@ -116,6 +116,10 @@ public class Game1 : Game
             bool inventoryJustPressed =
                 currentKeyboardState.IsKeyDown(Keys.I) &&
                 previousKeyboardState.IsKeyUp(Keys.I);
+            
+            bool tradeJustPressed =
+                currentKeyboardState.IsKeyDown(Keys.T) &&
+                previousKeyboardState.IsKeyUp(Keys.T);
 
             if (inventoryJustPressed)
             {
@@ -123,6 +127,14 @@ public class Game1 : Game
                     gui.CloseCurrentWindow();
                 else if (!gui.IsModalWindowOpen())
                     gameplayCoordinator.ShowInventory();
+            }
+
+            if (tradeJustPressed)
+            {
+                if (gui.IsModalWindowOpen())
+                    gui.CloseCurrentWindow();
+                gameplayCoordinator.ShowMerchant();
+
             }
 
             if (!gui.IsModalWindowOpen())

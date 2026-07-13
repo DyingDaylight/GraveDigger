@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GraveDigger.Data;
 using GraveDigger.Enemies;
+using GraveDigger.GUI.Windows;
 using GraveDigger.Items;
 using GraveDigger.Props;
 using GraveDigger.Utils;
@@ -81,5 +82,19 @@ public class GameplayCoordinator : IGameplayActions
     public void ShowInventory()
     {
         WindowService.OpenInventoryWindow(Inventory);
+    }
+
+    public void ShowMerchant()
+    {
+        // TODO: make a real merchant
+        Inventory merchantInventory = new Inventory();
+        merchantInventory.AddMoney(100);
+        merchantInventory.Add(LootGenerator.GetRandomItem(RandomService));
+        merchantInventory.Add(LootGenerator.GetRandomItem(RandomService));
+        merchantInventory.Add(LootGenerator.GetRandomItem(RandomService));
+        merchantInventory.Add(LootGenerator.GetRandomItem(RandomService));
+        merchantInventory.Add(LootGenerator.GetRandomItem(RandomService));
+        merchantInventory.Add(LootGenerator.GetRandomItem(RandomService));
+        WindowService.OpenTradeWindow(Inventory, merchantInventory);
     }
 }

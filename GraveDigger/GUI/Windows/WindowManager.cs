@@ -14,6 +14,7 @@ public class WindowManager : IUpdatable, IDrawable
     
     public TombstoneInfoWindow TombstoneInfoWindow { get; }
     public InventoryWindow InventoryWindow { get; }
+    public TradeWindow TradeWindow { get; }
     
     public bool IsModalWindow => currentWindow != null;
     public bool IsInventoryOpen => currentWindow == InventoryWindow;
@@ -25,12 +26,16 @@ public class WindowManager : IUpdatable, IDrawable
         
         InventoryWindow = new InventoryWindow();
         InventoryWindow.OnCloseButton += CloseCurrentWindow;
+        
+        TradeWindow = new TradeWindow();
+        TradeWindow.OnCloseButton += CloseCurrentWindow;
     }
     
     public void Start()
     {
         TombstoneInfoWindow.Start();
         InventoryWindow.Start();
+        TradeWindow.Start();
     }
 
     public void Update(GameTime gameTime)
@@ -53,6 +58,12 @@ public class WindowManager : IUpdatable, IDrawable
     {
         InventoryWindow.SetInventory(inventory);
         currentWindow = InventoryWindow;
+    }
+    
+    public void OpenTradeWindow(Inventory inventory, Inventory inventory1)
+    {
+        TradeWindow.SetInventories(inventory, inventory1);
+        currentWindow = TradeWindow;
     }
 
     public void CloseCurrentWindow()

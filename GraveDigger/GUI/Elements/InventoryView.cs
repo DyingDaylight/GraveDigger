@@ -11,7 +11,7 @@ public class InventoryView : UIContainer
     private const int Columns = 5;
     private const int Rows = 5;
     
-    private readonly Label nameLabel;
+    private readonly Label titleLabel;
     private readonly Label moneyLabel;
     private readonly Image moneyIcon;
     
@@ -22,8 +22,8 @@ public class InventoryView : UIContainer
 
     public InventoryView()
     {
-        nameLabel = CreateElement<Label>();
-        nameLabel.Text = "Inventory";
+        titleLabel = CreateElement<Label>();
+        titleLabel.Text = "Inventory";
         
         moneyLabel = CreateElement<Label>();
 
@@ -35,7 +35,7 @@ public class InventoryView : UIContainer
         titleLayout.HorizontalPadding = 20;
         titleLayout.HorizontalMargins = new Vector2(25, 25);
         
-        titleLayout.AddElement(nameLabel);
+        titleLayout.AddElement(titleLabel);
         titleLayout.AddElement(new Spacer());
         titleLayout.AddElement(moneyIcon);
         titleLayout.AddElement(moneyLabel);
@@ -94,15 +94,14 @@ public class InventoryView : UIContainer
     protected override void RefreshLayout()
     {
         int titleWidth = Bounds.Width;
-        int titileHeight = 120;
+        int titleHeight = 120;
 
-        Rectangle titleBounds = new Rectangle(Bounds.X, Bounds.Y,
-            titleWidth, titileHeight);
+        Rectangle titleBounds = new Rectangle(Bounds.X, Bounds.Y + 40,
+            titleWidth, titleHeight);
         titleLayout.SetBounds(titleBounds);
-        titleLayout.SetPosition(Bounds.X, Bounds.Y + 40);
         titleLayout.UpdateLayout();
         
-        Rectangle gridBounds = new Rectangle(Bounds.X, Bounds.Y + titileHeight,
+        Rectangle gridBounds = new Rectangle(Bounds.X, Bounds.Y + titleHeight,
             Bounds.Width, Bounds.Height - 200);
         gridLayout.SetBounds(gridBounds);
         gridLayout.UpdateLayout();
@@ -111,5 +110,10 @@ public class InventoryView : UIContainer
     private void HandleContextMenuRequested(InventoryEntry entry)
     {
         Console.WriteLine("Context menu for " + entry);
+    }
+
+    public void SetTitle(string title)
+    {
+        titleLabel.Text = title;
     }
 }
