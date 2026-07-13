@@ -38,4 +38,10 @@ public class Prop : Sprite
         float depth = Bottom / Game1.WorldSize.Y;
         SortingOrder = 1f - MathHelper.Clamp(depth, 0f, 1f);
     }
+
+    public override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime);
+        UpdateSortingOrder();
+    }
 }
