@@ -6,18 +6,18 @@ namespace GraveDigger.Interactions;
 
 public class PickUpInteraction : Interaction
 {
-    private ItemPickUp owner;
+    private readonly ItemPickUp pickUpItem;
     
     public event Action<ItemPickUp> OnItemPickedUp;
     
-    public PickUpInteraction(ItemPickUp parent) : base(parent)
+    public PickUpInteraction(ItemPickUp pickUpItem) : base(pickUpItem)
     {
-        owner = parent;
-        Hint = $"Take {owner.ItemData.Name}";
+        this.pickUpItem = pickUpItem;
+        Hint = $"Take {this.pickUpItem.ItemData.Name}";
     }
 
     public override void Interact()
     {
-        OnItemPickedUp?.Invoke(owner);
+        OnItemPickedUp?.Invoke(pickUpItem);
     }
 }

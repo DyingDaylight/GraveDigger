@@ -4,7 +4,7 @@ namespace GraveDigger.Interactions;
 
 public class TraderInteraction : Interaction
 {
-    public TraderInteraction(IInteractionOwner parent) : base(parent)
+    public TraderInteraction(IInteractionOwner tombstone) : base(tombstone)
     {
     }
 

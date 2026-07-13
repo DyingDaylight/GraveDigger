@@ -14,9 +14,9 @@ public class InteractionSystem : IUpdatable
     private Interaction hoveredInteraction;
     private Interaction pressedInteraction;
     
-    private List<Interaction> interactions = new List<Interaction>();
+    private readonly List<Interaction> interactions = new();
     
-    private CoordinatesConverter coordinatesConverter;
+    private readonly CoordinatesConverter coordinatesConverter;
 
     public event Action<Interaction> OnHoveredInteractionChanged;
 
@@ -27,11 +27,26 @@ public class InteractionSystem : IUpdatable
     
     public void RegisterInteraction(Interaction interaction)
     {
+        if (interactions.Contains(interaction))
+            return;
+        
         interactions.Add(interaction);
     }
 
     public void UnregisterInteraction(Interaction interaction)
     {
+        if (interaction == hoveredInteraction)
+        {
+            hoveredInteraction?.OnHoverExit();
+            hoveredInteraction = null;
+            OnHoveredInteractionChanged?.Invoke(null);
+        }
+
+        if (interaction == pressedInteraction)
+        {
+            pressedInteraction = null;
+        }
+
         interactions.Remove(interaction);
     }
     
@@ -49,7 +64,7 @@ public class InteractionSystem : IUpdatable
         
         foreach (Interaction interaction in interactions)
         {
-            if (interaction.GetArea().Contains(mousePosition))
+            if (interaction.Area.Contains(mousePosition))
             {
                 newHoveredInteraction = interaction;
                 // TODO: think about overlapping objects

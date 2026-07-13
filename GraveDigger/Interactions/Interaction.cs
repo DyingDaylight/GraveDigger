@@ -8,30 +8,25 @@ namespace GraveDigger.Interactions;
 
 public abstract class Interaction
 {
-    protected readonly IInteractionOwner parent;
+    private readonly IInteractionOwner interactionOwner;
     
-    public string Hint { get; protected set; }
+    public string Hint { get; protected set; } = string.Empty;
+    public Rectangle Area => interactionOwner.InteractionArea;
     
-    
-    public Interaction(IInteractionOwner parent)
+    protected Interaction(IInteractionOwner interactionOwner)
     {
-        this.parent = parent;
+        this.interactionOwner = interactionOwner;
     }
     
     public abstract void Interact();
     
     public virtual void OnHoverEnter()
     {
-        parent.SetHighlighted(true);
+        interactionOwner.SetHighlighted(true);
     }
 
     public virtual void OnHoverExit()
     {
-        parent.SetHighlighted(false);
-    }
-    
-    public Rectangle GetArea()
-    {
-        return parent.InteractionArea;
+        interactionOwner.SetHighlighted(false);
     }
 }
