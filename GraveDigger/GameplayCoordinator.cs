@@ -1,41 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using GraveDigger.Data;
 using GraveDigger.Enemies;
-using GraveDigger.GUI.Windows;
 using GraveDigger.Items;
 using GraveDigger.Props;
 using GraveDigger.Utils;
-using GUI;
 using Interfaces;
 
 namespace GraveDigger;
 
 public class GameplayCoordinator : IGameplayActions
 {
-    public IGameWindowService WindowService { get; }
-
-    private readonly ReputationsSystem ReputationsSystem;
-    private readonly RandomService RandomService;
-    private readonly LootGenerator LootGenerator;
-    private readonly Inventory Inventory;
+    private readonly ReputationsSystem reputationsSystem;
+    private readonly IGameWindowService windowService;
+    private readonly RandomService randomService;
+    private readonly LootGenerator lootGenerator;
+    private readonly Inventory inventory;
 
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
     
     public GameplayCoordinator(IGameWindowService windowService, ReputationsSystem reputationsSystem,
         RandomService randomService)
     {
-        WindowService = windowService;
-        ReputationsSystem = reputationsSystem;
-        RandomService = randomService;
+        this.windowService = windowService;
+        this.reputationsSystem = reputationsSystem;
+        this.randomService = randomService;
         
-        LootGenerator = new LootGenerator();
-        Inventory = new Inventory();
+        lootGenerator = new LootGenerator();
+        inventory = new Inventory();
     }
 
-    public void OpenTombstone(Tombstone tombstoneData)
+    public void OpenTombstone(Tombstone tombstone)
     {
-        WindowService.OpenTombstoneWindow(tombstoneData);
+        windowService.OpenTombstoneWindow(tombstone);
     }
 
     public void DigGrave(Tombstone tombstone)
@@ -44,13 +40,13 @@ public class GameplayCoordinator : IGameplayActions
         bool dug = tombstone.Dig();
         if (dug)
         {
-            List<ItemData> itemData = LootGenerator.Generate(tombstone.Data, RandomService);
-            OnLootSpawn?.Invoke(itemData, tombstone);
+            List<ItemData> itemsData = lootGenerator.Generate(tombstone.Data, randomService);
+            OnLootSpawn?.Invoke(itemsData, tombstone);
             
-            EnemyType enemyType = UndeadGenerator.Generate(tombstone.Data, RandomService);
+            EnemyType enemyType = UndeadGenerator.Generate(tombstone.Data, randomService);
             if (enemyType == EnemyType.Ghost)
             {
-                ReputationsSystem.RemoveReputation(1);
+                reputationsSystem.RemoveReputation(1);
                 Console.WriteLine("Ghost appeared! Reputation reduced by 1!");
             } 
             else if (enemyType == EnemyType.Zombie)
@@ -58,8 +54,8 @@ public class GameplayCoordinator : IGameplayActions
                 Console.WriteLine("Zombie appeared! He will be eating you!");
             }
             
-            ReputationsSystem.RemoveReputation(tombstone.Value);
-            WindowService.CloseCurrentWindow();
+            reputationsSystem.RemoveReputation(tombstone.Value);
+            windowService.CloseCurrentWindow();
         }
     }
 
@@ -69,19 +65,19 @@ public class GameplayCoordinator : IGameplayActions
         bool repaired = tombstone.Repair();
         if (repaired)
         {
-            ReputationsSystem.AddReputation(tombstone.Value);
-            WindowService.RefreshTombstoneWindow();
+            reputationsSystem.AddReputation(tombstone.Value);
+            windowService.RefreshTombstoneWindow();
         }
     }
 
     public void PickupItem(ItemData itemData)
     {
-        Inventory.Add(itemData);
+        inventory.Add(itemData);
     }
     
     public void ShowInventory()
     {
-        WindowService.OpenInventoryWindow(Inventory);
+        windowService.OpenInventoryWindow(inventory);
     }
 
     public void ShowMerchant()
@@ -89,12 +85,12 @@ public class GameplayCoordinator : IGameplayActions
         // TODO: make a real merchant
         Inventory merchantInventory = new Inventory();
         merchantInventory.AddMoney(100);
-        merchantInventory.Add(LootGenerator.GetRandomItem(RandomService));
-        merchantInventory.Add(LootGenerator.GetRandomItem(RandomService));
-        merchantInventory.Add(LootGenerator.GetRandomItem(RandomService));
-        merchantInventory.Add(LootGenerator.GetRandomItem(RandomService));
-        merchantInventory.Add(LootGenerator.GetRandomItem(RandomService));
-        merchantInventory.Add(LootGenerator.GetRandomItem(RandomService));
-        WindowService.OpenTradeWindow(Inventory, merchantInventory);
+        merchantInventory.Add(lootGenerator.GetRandomItem(randomService));
+        merchantInventory.Add(lootGenerator.GetRandomItem(randomService));
+        merchantInventory.Add(lootGenerator.GetRandomItem(randomService));
+        merchantInventory.Add(lootGenerator.GetRandomItem(randomService));
+        merchantInventory.Add(lootGenerator.GetRandomItem(randomService));
+        merchantInventory.Add(lootGenerator.GetRandomItem(randomService));
+        windowService.OpenTradeWindow(inventory, merchantInventory);
     }
 }
