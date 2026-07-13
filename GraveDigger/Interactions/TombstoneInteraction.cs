@@ -6,17 +6,17 @@ namespace GraveDigger.Interactions;
 
 public class TombstoneInteraction : Interaction
 {
-    private readonly Tombstone tombstone;
+    private Tombstone owner;
     public event Action<Tombstone> OnTombstoneRead;
 
-    public TombstoneInteraction(Tombstone tombstone) : base(tombstone)
+    public TombstoneInteraction(Tombstone owner) : base(owner)
     {
         Hint = "Read Tombstone";
-        this.tombstone = tombstone;
+        this.owner = owner;
     }
     
     public override void Interact()
     {
-        OnTombstoneRead?.Invoke(tombstone);
+        OnTombstoneRead?.Invoke(owner);
     }
 }

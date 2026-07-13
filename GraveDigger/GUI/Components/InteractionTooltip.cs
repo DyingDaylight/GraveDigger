@@ -57,8 +57,10 @@ public class InteractionTooltip : IUpdatable, IDrawable
 
     private void UpdatePosition()
     {
+        Rectangle interactionArea = currentInteraction.GetArea();
+        
         Vector2 screenAnchor = coordinatesConverter.WorldToScreen(new Vector2(
-            currentInteraction.Area.Center.X, currentInteraction.Area.Top));
+            interactionArea.Center.X, interactionArea.Top));
         
         int x = (int)(screenAnchor.X - tooltip.Bounds.Width * 0.5f);
         int y = (int) (screenAnchor.Y - tooltip.Bounds.Height - 20);
