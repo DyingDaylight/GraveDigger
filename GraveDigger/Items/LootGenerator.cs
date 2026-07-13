@@ -11,32 +11,32 @@ public class LootGenerator
 
     private static readonly List<ItemData> pool = new()
 {
-    new ItemData("skull", "Human Skull", "Quite useless.", "Icon1", 1, 100),
-    new ItemData("bone", "Old Bone", "Dry and brittle.", "Icon2", 1, 60),
-    new ItemData("jawbone", "Jawbone", "Missing several teeth.", "Icon3", 1, 80),
-    new ItemData("femur", "Femur Bone", "A large human bone.", "Icon4", 1, 75),
-    new ItemData("hand", "Skeletal Hand", "Still strangely intact.", "Icon5", 1, 90),
-    new ItemData("broken_bone", "Broken Bone", "Snapped clean in two.", "Icon6", 0, 65),
-    new ItemData("ribcage", "Rib Cage", "The remains of a poor soul.", "Icon7", 1, 120),
-    new ItemData("teeth", "Teeth", "A handful of old teeth.", "Icon8", 2, 40),
+    new ItemData("helmet", "Knight helmet", "Quite useless", "Icon1", 1, 100),
+    new ItemData("map", "Treasure map", "The treasure is not for sale!", "Icon2", 1, 60),
+    new ItemData("quiver1", "Quiver", "From the Elves of Middle-earth", "Icon3", 1, 80),
+    new ItemData("vial1", "Vial of wild brew", "One more for the road?", "Icon4", 1, 75),
+    new ItemData("skull1", "Wild buffalo skull", "Scary, but it won't butt...", "Icon5", 1, 90),
+    new ItemData("crown", "Crown of the Last Silk King", "Smells like a ragdoll dragon", "Icon6", 0, 65),
+    new ItemData("necklace", "Knitted necklace", "Even Grandma knitted it", "Icon7", 1, 120),
+    new ItemData("ring1", "'My precious'", "Gorlum or Gollum?", "Icon8", 2, 40),
 
-    new ItemData("fang", "Beast Fang", "Taken from a wild predator.", "Icon9", 2, 90),
-    new ItemData("raven_skull", "Raven Skull", "An unsettling omen.", "Icon10", 3, 170),
-    new ItemData("cracked_animal_skull", "Cracked Animal Skull", "Split long ago by time or violence.", "Icon11", 2, 110),
-    new ItemData("heart", "Heart", "Still warm... somehow.", "Icon12", 3, 250),
-    new ItemData("eyes", "Pair of Eyes", "Better not ask.", "Icon13", 4, 180),
-    new ItemData("brain", "Brain", "Knowledge comes at a price.", "Icon14", 4, 220),
-    new ItemData("severed_arm", "Severed Arm", "Cold and lifeless.", "Icon15", 2, 160),
-    new ItemData("foot", "Severed Foot", "Not very useful anymore.", "Icon16", 2, 140),
+    new ItemData("ring2", "Magical woolen ring", "It radiates magic", "Icon9", 2, 90),
+    new ItemData("book", "Book of Edible Dishes", "Care for a bite, traveler?", "Icon10", 3, 170),
+    new ItemData("bag", "Bag of buttons", "Not enough for a life of luxury, but enough for a feast — why not?", "Icon11", 2, 110),
+    new ItemData("vial2", "Vial of glue", "Bottle of water? Not, glue..", "Icon12", 3, 250),
+    new ItemData("skein1", "Skein of burgundy yarn", "You've run me ragged!", "Icon13", 4, 180),
+    new ItemData("skein2", "Skein of royal yarn", "Remember my dress from the latest collection? That's the one!", "Icon14", 4, 220),
+    new ItemData("lamb", "Little Lamb \"Baa\"", "Very soft, but cursed", "Icon15", 2, 160),
+    new ItemData("bat", "Ancient bat", "They were knitted in the dark", "Icon16", 2, 140),
 
-    new ItemData("ringed_finger", "Ringed Finger", "The ring is worth far more than the finger.", "Icon17", 5, 450),
-    new ItemData("silver_ring", "Silver Ring", "Tarnished with age.", "Icon18", 6, 220),
-    new ItemData("ring", "Magic Ring", "A mysterious gemstone glows softly.", "Icon19", 7, 600),
-    new ItemData("crown", "Golden Crown", "Fit for forgotten royalty.", "Icon20", 10, 1000),
-    new ItemData("potion", "Potion", "A cloudy alchemical brew.", "Icon21", 6, 180),
-    new ItemData("moneybag", "Coin Pouch", "Contains a few old coins.", "Icon22", 4, 350),
-    new ItemData("stakes", "Wooden Stakes", "Sharpened stakes, ready to keep something buried.", "Icon23", 4, 80),
-    new ItemData("sealed_scroll", "Sealed Scroll", "A tightly rolled parchment sealed with wax.", "Icon24", 6, 350),
+    new ItemData("skull2", "Knit human skull", "Didn't come unraveled in the dirt", "Icon17", 5, 450),
+    new ItemData("gem", "Precious gem \"The Knitstone\"", "A couple of knitted gnomes gave their lives for it", "Icon18", 6, 220),
+    new ItemData("vial3", "Roll of multicolored fabric", "Simply tasteless..", "Icon19", 7, 600),
+    new ItemData("spider", "Little spider", "He is definitely spinning his little web", "Icon20", 10, 1000),
+    new ItemData("quiver2", "Elven quiver", "It never belonged to any Elf", "Icon21", 6, 180),
+    new ItemData("glove", "Duelist's glove", "Monsieur, I believe you dropped this accidentally", "Icon22", 4, 350),
+    new ItemData("pouch", "Knitting tool pouch", "Knit me if you can!", "Icon23", 4, 80),
+    /* new ItemData("sealed_scroll", "Sealed Scroll", "A tightly rolled parchment sealed with wax.", "Icon24", 6, 350),
 
     new ItemData("spellbook", "Spellbook", "Filled with forgotten rituals.", "Icon25", 9, 700),
     new ItemData("garlic_garland", "Garlic Garland", "The smell alone could repel the undead.", "Icon26", 3, 140),
@@ -63,6 +63,8 @@ public class LootGenerator
     new ItemData("boots", "Leather Boots", "Well worn but usable.", "Icon46", 7, 140),
     new ItemData("broken_arrow", "Broken Arrow", "Snapped in battle long ago.", "Icon47", 0, 50),
     new ItemData("deer_skull", "Deer Skull", "A woodland trophy.", "Icon48", 4, 180),
+    
+    */
 };
 
     private static readonly Dictionary<TombWealth, (int Min, int Max)> wealthRanges = new()

@@ -328,7 +328,7 @@ public class Level
         foreach (ItemData item in loot)
         {
             ItemPickUp itemPickUp = CreateProp(LootFactory, item.SpriteName, tombstone.Transform.Position);
-            itemPickUp.Transform.Scale = new Vector2(2.5f, 2.5f);
+            itemPickUp.Transform.Scale = new Vector2(0.3f, 0.3f);
             itemPickUp.SetData(item);
             
             PickUpInteraction interaction = new PickUpInteraction(itemPickUp);

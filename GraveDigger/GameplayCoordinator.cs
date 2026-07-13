@@ -15,6 +15,9 @@ public class GameplayCoordinator : IGameplayActions
     private readonly RandomService randomService;
     private readonly LootGenerator lootGenerator;
     private readonly Inventory inventory;
+    
+    public event Action<Tombstone> OnGraveDug;
+    public event Action<Tombstone> OnGraveRepaired;
 
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
     
