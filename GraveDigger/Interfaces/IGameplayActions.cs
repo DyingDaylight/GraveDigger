@@ -1,4 +1,5 @@
-﻿using GraveDigger.Data;
+﻿using System;
+using GraveDigger.Data;
 using GraveDigger.Items;
 using GraveDigger.Props;
 
@@ -10,4 +11,7 @@ public interface IGameplayActions
     void DigGrave(Tombstone tombstone);
     void RepairGrave(Tombstone tombstone);
     void PickupItem(ItemData itemData);
+    
+    public event Action<Tombstone> OnGraveDug;
+    public event Action<Tombstone> OnGraveRepaired;
 }

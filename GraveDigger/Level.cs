@@ -51,11 +51,13 @@ public class Level
     {
         InteractionSystem = new InteractionSystem(gameContext.CoordinatesConverter);
         
-        if (gameplayActions is GameplayCoordinator coordinator)
+        gameplayActions.OnGraveDug += SpawnGraveDirt;
+        gameplayActions.OnGraveRepaired += RemoveGraveDirt;
+        /*if (gameplayActions is GameplayCoordinator coordinator)
         {
             coordinator.OnGraveDug += SpawnGraveDirt;
             coordinator.OnGraveRepaired += RemoveGraveDirt;
-        }
+        }*/
         
         CreateMap();
         CreateProps();
