@@ -20,8 +20,7 @@ public class GameplayCoordinator : IGameplayActions
     public event Action<Tombstone> OnGraveRepaired;
 
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
-    public event Action<Tombstone> OnGraveDug;
-    public event Action<Tombstone> OnGraveRepaired;
+
     
     public GameplayCoordinator(IGameWindowService windowService, ReputationsSystem reputationsSystem,
         RandomService randomService)
