@@ -299,6 +299,7 @@ public class Level : IUpdatable, IDrawable
         tomb.State = gameContext.RandomService.RandomEnum<TombstoneState>();
     
         tomb.GraveTile = earth;
+        tomb.GraveTile.Mode = Prop.SortingMode.Ground;
     
         TombstoneInteraction interaction = new TombstoneInteraction(tomb);
         interaction.OnTombstoneRead += OpenTombstone;

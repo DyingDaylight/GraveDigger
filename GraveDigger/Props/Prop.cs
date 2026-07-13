@@ -6,7 +6,14 @@ namespace GraveDigger.Props;
 
 public class Prop : Sprite
 {
-    
+    public enum SortingMode
+    {
+        ByY,
+        Ground
+    }
+
+    public SortingMode Mode = SortingMode.ByY;
+
     public Prop(string name) : base(name)
     {
     }
@@ -22,6 +29,12 @@ public class Prop : Sprite
     
     protected void UpdateSortingOrder()
     {
+        if (Mode == SortingMode.Ground)
+        {
+            SortingOrder = 1;
+            return;
+        }
+        
         float depth = Bottom / Game1.WorldSize.Y;
         SortingOrder = 1f - MathHelper.Clamp(depth, 0f, 1f);
     }
