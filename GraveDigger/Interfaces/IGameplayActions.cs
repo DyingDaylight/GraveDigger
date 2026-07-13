@@ -7,7 +7,7 @@ namespace Interfaces;
 
 public interface IGameplayActions
 { 
-    void OpenTombstone(Tombstone tombstoneData);
+    void OpenTombstone(Tombstone tombstone);
     void DigGrave(Tombstone tombstone);
     void RepairGrave(Tombstone tombstone);
     void PickupItem(ItemData itemData);

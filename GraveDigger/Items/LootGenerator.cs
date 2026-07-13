@@ -130,4 +130,9 @@ public class LootGenerator
         
         return lootItems;
     }
+
+    public ItemData GetRandomItem(RandomService random)
+    {
+        return random.Pick(pool);
+    }
 }

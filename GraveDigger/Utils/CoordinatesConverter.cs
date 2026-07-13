@@ -1,7 +1,6 @@
-﻿using System.Runtime.InteropServices.ObjectiveC;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 
-namespace GraveDigger;
+namespace GraveDigger.Utils;
 
 public class CoordinatesConverter
 {

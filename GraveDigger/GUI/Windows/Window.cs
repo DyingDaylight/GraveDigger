@@ -6,48 +6,17 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GUI.Windows;
 
-public abstract class Window : UIElement
+public abstract class Window : UIContainer
 {
-    protected readonly List<UIElement> elements = new();
-    
     public Window()
     {
-        SetSize(1000, 800);
-        SetPosition(460, 140);
+        int width = 1000;
+        int height = 800;
+        int x = (int) ((1920 - width) * 0.5f);
+        int y = (int) ((1080 - height) * 0.5f);
+        Bounds = new Rectangle(x, y, width, height);
         
         Color = Color.DimGray;
         Texture = SpriteManager.GetSprite("pixel").Texture;
-    }
-
-    public override void Start()
-    {
-        base.Start();
-        
-        foreach (var element in elements) 
-            element.Start();
-    }
-
-    public override void Update(GameTime gameTime)
-    {
-        base.Update(gameTime);
-        
-        foreach (var element in elements)
-            element.Update(gameTime);
-    }
-
-    public override void Draw(SpriteBatch spriteBatch)
-    {
-        base.Draw(spriteBatch);
-        
-        foreach (var element in elements)
-            element.Draw(spriteBatch);
-    }
-
-    protected T CreateElement<T>() where T : UIElement, new()
-    {
-        T element = new T();
-        elements.Add(element);
-        
-        return element;
     }
 }
