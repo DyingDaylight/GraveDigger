@@ -31,7 +31,7 @@ public class Prop : Sprite
     {
         if (Mode == SortingMode.Ground)
         {
-            SortingOrder = 1;
+            SortingOrder = 0.99f;
             return;
         }
         
