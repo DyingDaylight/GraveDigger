@@ -13,7 +13,7 @@ public abstract class UIElement : IUpdatable, IDrawable, ILayoutElement
     public Rectangle Bounds { get; protected set; }
     public Color Color { get; set; } = Color.White;
     
-    public virtual Vector2 VisibleSize =>  new(Bounds.Width, Bounds.Height);
+    public virtual Vector2 VisibleSize => new(Bounds.Width, Bounds.Height);
 
     public virtual void Start()
     {
@@ -33,10 +33,16 @@ public abstract class UIElement : IUpdatable, IDrawable, ILayoutElement
     public virtual void SetPosition(int x, int y)
     {
         Bounds = new Rectangle(x, y, Bounds.Width, Bounds.Height);
+        RefreshLayout();
     }
 
     public virtual void SetSize(int width, int height)
     {
         Bounds = new Rectangle(Bounds.X, Bounds.Y, width, height);
+        RefreshLayout();
+    }
+
+    protected virtual void RefreshLayout()
+    {
     }
 }

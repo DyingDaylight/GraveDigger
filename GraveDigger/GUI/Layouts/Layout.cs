@@ -16,7 +16,7 @@ public abstract class Layout : ILayoutElement
     public virtual Vector2 VisibleSize => new(bounds.Width, bounds.Height);
 
 
-    public Layout(Rectangle bounds)
+    protected Layout(Rectangle bounds)
     {
         this.bounds = bounds;
     }
@@ -33,6 +33,11 @@ public abstract class Layout : ILayoutElement
     {
         bounds.X = x;
         bounds.Y = y;
+    }
+
+    public virtual void SetBounds(Rectangle bounds)
+    {
+        this.bounds = bounds;
     }
     
     public abstract void UpdateLayout();
