@@ -149,20 +149,20 @@ public class Game1 : Game
                     SetGameState(GameState.Menu);
                 }
             }
+            
+            camera.SetTarget(player.Transform.Position);
+            camera.Update(gameTime);
         }
         
         gui.Update(gameTime);
         previousKeyboardState = currentKeyboardState;
-        
-        camera.SetTarget(player.Transform.Position);
-        camera.Update(gameTime);
         
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.DarkRed);
+        GraphicsDevice.Clear(Color.Black);
 
         // BackToFront sorting uses sprite layer depth to draw objects in the correct order.
         _spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront,

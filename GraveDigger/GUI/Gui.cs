@@ -36,6 +36,9 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
     {
         GUIResources.LoadContent(content);
         
+        SpriteManager.AddSprite("MainMenuBackground", "Images/GUI/mainmenu");
+        SpriteManager.AddSprite("ButtonMainMenu", "Images/GUI/button_mainmenu");
+        
         SpriteManager.AddSprite("ButtonNormal", "Images/GUI/ButtonNormal");
         SpriteManager.AddSprite("ButtonHover", "Images/GUI/ButtonHover");
         SpriteManager.AddSprite("ButtonPressed", "Images/GUI/ButtonPressed");

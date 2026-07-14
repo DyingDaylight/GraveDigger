@@ -20,6 +20,13 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/File.spritefont
 
+#begin Fonts/LargeFile.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/LargeFile.spritefont
+
 #begin Images/Characters/keeper_back.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -884,6 +891,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Ground/Old/ground5.png;Images/Ground/Old/ground5
 
+#begin Images/GUI/button_mainmenu.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/button_mainmenu.png
+
 #begin Images/GUI/Button.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -967,6 +986,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/GUI/CloseButtonPressed.png
+
+#begin Images/GUI/mainmenu.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/mainmenu.png
 
 #begin Images/Icons/Coin.png
 /importer:TextureImporter
