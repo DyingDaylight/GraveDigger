@@ -1,5 +1,6 @@
 ﻿using System;
 using GraveDigger.Core;
+using GraveDigger.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -13,15 +14,16 @@ public class Player : Animation
     
     public Collider Collider;
 
-    public Vector2 previousPosition;
+    private GameContext gameContext;
+    private Vector2 previousPosition;
     
-    private int previousRow = -1;
+    private int previousAnimationRow = -1;
     private bool isColliding = false;
     
-    public Player() : base("digger")
+    public Player(GameContext gameContext) : base("digger")
     {
+        this.gameContext = gameContext;
         Collider = new Collider(this);
-        Collider.Parent = this;  
         Collider.IsTrigger = false;
     }
     
@@ -31,7 +33,7 @@ public class Player : Animation
 
         CastSHadow = true;
         
-        Transform.Position = new Vector2(Game1.ScreenSize.X * 0.5f, Game1.ScreenSize.Y * 0.5f);
+        Transform.Position = new Vector2(gameContext.ScreenSize.X * 0.5f, gameContext.ScreenSize.Y * 0.5f);
         previousPosition = Transform.Position;
         
         Transform.Scale = new Vector2(0.21f, 0.21f);
@@ -46,6 +48,7 @@ public class Player : Animation
     {
         base.Update(gameTime);
 
+        // Collisions are not working
         if (isColliding)
         {
             Transform.Position = previousPosition;
@@ -65,11 +68,18 @@ public class Player : Animation
         base.Draw(spriteBatch);
         Collider.Draw(spriteBatch);
     }
+    
+    public void OnTriggerEnter(Collider self, Collider other)
+    {
+    }
+    
+    public void OnCollisionEnter(Collider self, Collider other)
+    {
+    }
 
     private void UpdateSortingOrder()
     {
-        float depth = Bottom / Game1.WorldSize.Y;
-        SortingOrder = 1f - MathHelper.Clamp(depth, 0f, 1f);
+        SortingOrder = SortingUtility.CalculateByY(Bottom);
     }
     
     private void UpdateMovement(float dt)
@@ -109,10 +119,10 @@ public class Player : Animation
             if (direction != Vector2.Zero)
                 direction.Normalize();
 
-            if (CurrentRow != previousRow)
+            if (CurrentRow != previousAnimationRow)
             {
                 Reset();
-                previousRow = CurrentRow;
+                previousAnimationRow = CurrentRow;
             }
 
             Play(AnimationFps);
@@ -121,33 +131,22 @@ public class Player : Animation
         else
         {
             Stop();
-            previousRow = -1;
+            previousAnimationRow = -1;
         }
     
-        ClampToScreen();
+        ClampToWorld();
     }
     
-    private void ClampToScreen()
+    private void ClampToWorld()
     {
         Vector2 position = Transform.Position;
 
         float scaledOriginX = Origin.X * Transform.Scale.X;
         float scaledOriginY = Origin.Y * Transform.Scale.Y;
         
-        position.X = MathHelper.Clamp(position.X, scaledOriginX, Game1.WorldSize.X - Width + scaledOriginX);
-        position.Y = MathHelper.Clamp(position.Y, scaledOriginY, Game1.WorldSize.Y - Height + scaledOriginY);
+        position.X = MathHelper.Clamp(position.X, scaledOriginX, gameContext.WorldSize.X - Width + scaledOriginX);
+        position.Y = MathHelper.Clamp(position.Y, scaledOriginY, gameContext.WorldSize.Y - Height + scaledOriginY);
         
         Transform.Position = position;
-    }
-    
-    public void OnTriggerEnter(Collider self, Collider other)
-    {
-        Console.WriteLine("OnTriggerEnter " + self.Parent + " with " + other.Parent);
-    }
-    
-    public void OnCollisionEnter(Collider self, Collider other)
-    {
-        Console.WriteLine("OnCollisionEnter " + self.Parent + " with " + other.Parent);
-        isColliding = true;
     }
 }

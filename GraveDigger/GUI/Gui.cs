@@ -18,7 +18,7 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
     private readonly GameContext gameContext;
     
     private bool started;
-    private Game1.GameState gameState;
+    private GameState gameState;
 
     public InteractionTooltip InteractionTooltip { get; private set; }
     public WindowManager WindowManager { get; private set; }
@@ -69,7 +69,7 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
 
     public void Update(GameTime gameTime)
     {
-        if (gameState == Game1.GameState.Menu)
+        if (gameState == GameState.Menu)
         {
             MenuUi.Update(gameTime);
             return;
@@ -86,11 +86,11 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         InteractionTooltip.Draw(spriteBatch);
         WindowManager.Draw(spriteBatch);
         
-        if (gameState == Game1.GameState.Menu)
+        if (gameState == GameState.Menu)
             MenuUi.Draw(spriteBatch);
     }
 
-    public void SetGameState(Game1.GameState state)
+    public void SetGameState(GameState state)
     {
         gameState = state;
     }
