@@ -1011,6 +1011,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/GUI/CloseButtonPressed.png
 
+#begin Images/GUI/cursor.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/cursor.png
+
 #begin Images/GUI/mainmenu.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2150,4 +2162,10 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sound/Effects/steps.wav
+
+#begin Sound/Music/theme.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/Music/theme.ogg;Sound/Music/theme
 

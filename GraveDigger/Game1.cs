@@ -35,6 +35,8 @@ public class Game1 : Game
     
     private Gui gui;
     
+    private Texture2D cursorTexture;
+    
     private KeyboardState previousKeyboardState;
     
     // Indicates whether the game has been started.
@@ -46,7 +48,7 @@ public class Game1 : Game
         _graphics = new GraphicsDeviceManager(this);
         _spriteManager = new SpriteManager(Content);
         Content.RootDirectory = "Content";
-        IsMouseVisible = true;
+        IsMouseVisible = false; // to hide basic cursor
     }
 
     protected override void Initialize()
@@ -62,12 +64,16 @@ public class Game1 : Game
         gameContext = new GameContext(camera, ScreenSize, randomService);
         reputationsSystem = new ReputationsSystem();
         
+        
+        
         base.Initialize();
     }
+    
     
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        cursorTexture = Content.Load<Texture2D>("Images/GUI/cursor"); // custom cursor
         
         SpriteManager.AddSprite("digger", "Images/Characters/keeper_wasd2", columns: 4, rows: 4);
             //SpriteManager.AddSprite("digger_idle", "Images/Characters/keeper_idle", columns: 4, rows: 1);
@@ -181,6 +187,12 @@ public class Game1 : Game
         _spriteBatch.End();
 
         base.Draw(gameTime);
+        
+        _spriteBatch.Begin();
+        
+        MouseState mouseState = Mouse.GetState();
+        _spriteBatch.Draw(cursorTexture, new Vector2(mouseState.X, mouseState.Y), Color.White);
+        _spriteBatch.End();
     }
 
     private void StartGame()
@@ -203,5 +215,14 @@ public class Game1 : Game
     {
         currentGameState = gameState;
         gui.SetGameState(currentGameState);
+        
+        if (currentGameState == GameState.Menu)
+        {
+            GraveDigger.Systems.AudioManager.Instance.PlayMusic("theme", loop: true);
+        }
+        else
+        {
+            GraveDigger.Systems.AudioManager.Instance.StopMusic();
+        }
     }
 }

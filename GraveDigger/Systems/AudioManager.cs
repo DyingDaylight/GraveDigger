@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Content;
@@ -22,7 +23,7 @@ public sealed class AudioManager
     }
     
     // SFX
-    public void PlaySFX(string name, bool loop = false)
+    public void PlaySFX(string name, bool loop = false, float volume = 1.0f)
     {
         if (!sfxInstances.TryGetValue(name, out SoundEffectInstance instance))
         {
@@ -39,7 +40,8 @@ public sealed class AudioManager
                 return;
             }
         }
-        
+    
+        instance.Volume = MathHelper.Clamp(volume, 0f, 1f);
         instance.Play();
     }
 
@@ -56,12 +58,15 @@ public sealed class AudioManager
     }
 
     // MUSIC
-    public void PlayMusic(string name, bool loop = true)
+    public void PlayMusic(string name, bool loop = true, float volume = 0.2f)
     {
         try
         {
             Song song = content.Load<Song>($"Sound/Music/{name}");
             MediaPlayer.IsRepeating = loop;
+        
+            MediaPlayer.Volume = MathHelper.Clamp(volume, 0f, 1f);
+        
             MediaPlayer.Play(song);
         }
         catch (Exception ex)
@@ -73,5 +78,17 @@ public sealed class AudioManager
     public void StopMusic()
     {
         MediaPlayer.Stop();
+    }
+    
+    public void SetMusicVolume(float volume)
+    {
+        MediaPlayer.Volume = MathHelper.Clamp(volume, 0f, 1f);
+    }
+
+// Звуковые эффекты (диапазон от 0.0f до 1.0f)
+    public void SetSFXVolume(float volume)
+    {
+        float clampedVolume = MathHelper.Clamp(volume, 0f, 1f);
+        SoundEffect.MasterVolume = clampedVolume;
     }
 }
