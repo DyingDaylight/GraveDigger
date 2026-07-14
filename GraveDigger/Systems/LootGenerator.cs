@@ -23,7 +23,7 @@ public class LootGenerator
 
     new ItemData("ring2", "Magical woolen ring", "It radiates magic", "Icon9", 2, 90),
     new ItemData("book", "Book of Edible Dishes", "Care for a bite, traveler?", "Icon10", 3, 170),
-    new ItemData("bag", "Bag of buttons", "Not enough for a life of luxury, but enough for a feast - why not?", "Icon11", 2, 110),
+    new ItemData("bag", "Bag of buttons", "Not enough for a life of luxury, but enough for a feast — why not?", "Icon11", 2, 110),
     new ItemData("vial2", "Vial of glue", "Bottle of water? Not, glue..", "Icon12", 3, 250),
     new ItemData("skein1", "Skein of burgundy yarn", "You've run me ragged!", "Icon13", 4, 180),
     new ItemData("skein2", "Skein of royal yarn", "Remember my dress from the latest collection? That's the one!", "Icon14", 4, 220),

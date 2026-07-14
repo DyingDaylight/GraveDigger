@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using GraveDigger;
-using GraveDigger.Core;
 using GraveDigger.GUI.Elements;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

@@ -10,11 +10,10 @@ namespace GraveDigger;
 
 public class Map : IDrawable, IUpdatable
 {
-    private readonly Point tileSize = new(1056, 1056);
-    private readonly Point tileOverlap = new(1, 5);
-    private readonly List<Sprite> tileSprites = new();
+    private readonly Point tileSize = new Point(1056, 1056);
+    private Point mapSize = new Point();
     
-    private Point mapSize = Point.Zero;
+    private List<Sprite> tileSprites = new List<Sprite>();
     
     private bool started;
     
@@ -51,14 +50,13 @@ public class Map : IDrawable, IUpdatable
   
                 Sprite tile = new Sprite($"ground{tileIndex}");
             
-                tile.Transform.Position = new Vector2(j * (tileSize.X - tileOverlap.X), i * (tileSize.Y - tileOverlap.Y));
+                tile.Transform.Position = new Vector2(j * (tileSize.X - 1), i * (tileSize.Y - 5));
             
                 tile.SourceRectangle = new Rectangle(0, 0, tileSize.X, tileSize.Y);
             
                 tile.Pivot = new Vector2(0, 0);
                 tile.SortingOrder = 1f;
                 tile.Start();
-                
                 tileSprites.Add(tile);
             }
         }
@@ -67,12 +65,16 @@ public class Map : IDrawable, IUpdatable
     public void Update(GameTime gameTime)
     {
         foreach (Sprite sprite in tileSprites)
+        {
             sprite.Update(gameTime);
+        }
     }
     
     public void Draw(SpriteBatch spriteBatch)
     {
         foreach (Sprite sprite in tileSprites)
+        {
             sprite.Draw(spriteBatch);
+        }
     }
 }
