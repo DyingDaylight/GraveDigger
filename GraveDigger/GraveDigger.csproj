@@ -28,6 +28,5 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Content\Images\" />
-      <Folder Include="Systems\" />
     </ItemGroup>
 </Project>

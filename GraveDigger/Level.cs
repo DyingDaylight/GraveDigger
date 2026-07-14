@@ -217,6 +217,8 @@ public class Level : IUpdatable, IDrawable
     
     private void SpawnGraveDirt(Tombstone tombstone)
     {
+        // TODO: move dirt to Tombstone
+        // TODO: change sprites in Tombstone depending on state
         tombstone.GraveTile?.ChangeSprite("grave_digged");
 
         var graveTile = tombstone.GraveTile;
@@ -297,10 +299,10 @@ public class Level : IUpdatable, IDrawable
         Tombstone tomb = CreateLevelObject(TombstoneFactory, name, tombstonePosition);
         tomb.Transform.Scale = new Vector2(0.3f, 0.3f);
         tomb.SetData(graveSiteData);
-        tomb.State = gameContext.RandomService.RandomEnum<TombstoneState>();
+        tomb.State = gameContext.RandomService.RandomEnum<GraveSiteState>();
     
         tomb.GraveTile = earth;
-        tomb.GraveTile.Mode = Prop.SortingMode.Ground;
+        tomb.GraveTile.Mode = SortingMode.Fixed;
         tomb.GraveTile.Shadow = false;
     
         TombstoneInteraction interaction = new TombstoneInteraction(tomb);

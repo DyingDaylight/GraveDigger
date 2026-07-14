@@ -1,8 +1,8 @@
 ﻿namespace GraveDigger.Props;
 
-public enum TombstoneState
+public enum GraveSiteState
 {
-    Perfect,
+    Intact,
     Broken,
     DugOut
 }

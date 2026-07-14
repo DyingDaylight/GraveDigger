@@ -4,15 +4,18 @@ using Microsoft.Xna.Framework;
 
 namespace GraveDigger.Props;
 
+// TODO: Rename to GraveSite
 public class Tombstone : Prop, IInteractionOwner
 {
     public GraveSiteData Data { get; private set; }
+    public int ReputationValue { get; private set; }
     
+    // TODO: private set
     public Prop GraveTile { get; set; }
 
-    private TombstoneState state;
+    private GraveSiteState state;
 
-    public TombstoneState State
+    public GraveSiteState State
     {
         get => state;
         set
@@ -21,16 +24,15 @@ public class Tombstone : Prop, IInteractionOwner
             UpdateVisuals();
         }
     }
-
-    public int Value { get; set; }
+    
     public Interaction Interaction { get; set; }
 
     public Rectangle InteractionArea => destRectangle;
 
     public Tombstone(string name) : base(name)
     {
-        State = TombstoneState.Perfect;
-        Value = 5;
+        state = GraveSiteState.Intact;
+        ReputationValue = 5;
     }
 
     public void SetData(GraveSiteData data)
@@ -45,33 +47,25 @@ public class Tombstone : Prop, IInteractionOwner
 
     public bool Repair()
     {
-        
-        if (State == TombstoneState.Perfect) return false;
+        if (State == GraveSiteState.Intact) return false;
     
-        State = TombstoneState.Perfect;
+        State = GraveSiteState.Intact;
     
         return true;
-        
-        /*if (State != TombstoneState.Broken) return false;
-
-        State = TombstoneState.Perfect;
-
-        return true;
-        
-        */
     }
 
     public bool Dig()
     {
-        if (State == TombstoneState.DugOut) return false;
+        if (State == GraveSiteState.DugOut) return false;
 
-        State = TombstoneState.DugOut;
+        State = GraveSiteState.DugOut;
 
         return true;
     }
 
     private void UpdateVisuals()
     {
+        // TODO: change dirt pile and gave state here
         Transform.Scale = new Vector2(0.3f, 0.3f);
 
         if (SpriteSheet != null)

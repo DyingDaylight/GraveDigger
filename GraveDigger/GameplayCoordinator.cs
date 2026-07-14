@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using GraveDigger.Enemies;
 using GraveDigger.Items;
 using GraveDigger.Props;
-using GraveDigger.Sys;
+using GraveDigger.Systems;
 using GraveDigger.Utils;
 using Interfaces;
 
@@ -58,7 +58,7 @@ public class GameplayCoordinator : IGameplayActions
                 Console.WriteLine("Zombie appeared! He will be eating you!");
             }
             
-            reputationsSystem.RemoveReputation(tombstone.Value);
+            reputationsSystem.RemoveReputation(tombstone.ReputationValue);
             windowService.CloseCurrentWindow();
         }
     }
@@ -70,7 +70,7 @@ public class GameplayCoordinator : IGameplayActions
         if (repaired)
         {
             OnGraveRepaired?.Invoke(tombstone);
-            reputationsSystem.AddReputation(tombstone.Value);
+            reputationsSystem.AddReputation(tombstone.ReputationValue);
             windowService.RefreshTombstoneWindow();
         }
     }

@@ -5,7 +5,7 @@ using GraveDigger.Data;
 using GraveDigger.Items;
 using GraveDigger.Utils;
 
-namespace GraveDigger.Sys;
+namespace GraveDigger.Systems;
 
 public class LootGenerator
 {

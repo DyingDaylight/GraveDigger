@@ -91,10 +91,10 @@ public class TombstoneInfoWindow : Window
         natureLabel.Text = $"Nature: {tombstone.Data.Inscription}";
         stateLabel.Text = $"State: {tombstone.State}";
         
-        digButton.SetDisabled(tombstone.State == TombstoneState.DugOut);
+        digButton.SetDisabled(tombstone.State == GraveSiteState.DugOut);
         
         // TODO: Decide whether a dug-out grave can also be repaired.
-        repairButton.SetDisabled(tombstone.State == TombstoneState.Perfect);
+        repairButton.SetDisabled(tombstone.State == GraveSiteState.Intact);
         //repairButton.SetDisabled(tombstone.State != TombstoneState.Broken);
         
         infoLayout.UpdateLayout();
