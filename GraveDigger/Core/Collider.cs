@@ -14,7 +14,7 @@ public class Collider : IUpdatable, IDrawable
     public int Thickness { get; set; } = 1;
     
     public Rectangle Bounds { get; private set; }
-    public Sprite Parent { get; set; }
+    public Sprite Parent { get; private set; }
     
     public Action<Collider, Collider> onTrigger;
     public Action<Collider, Collider> onCollision;

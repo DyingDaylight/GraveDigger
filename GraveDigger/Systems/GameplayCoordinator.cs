@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using GraveDigger.Enemies;
 using GraveDigger.Items;
 using GraveDigger.Props;
-using GraveDigger.Systems;
 using GraveDigger.Utils;
 using Interfaces;
 
-namespace GraveDigger;
+namespace GraveDigger.Systems;
 
 public class GameplayCoordinator : IGameplayActions
 {
-    private readonly ReputationsSystem reputationsSystem;
+    private readonly ReputationSystem reputationSystem;
     private readonly IGameWindowService windowService;
     private readonly RandomService randomService;
     private readonly LootGenerator lootGenerator;
@@ -21,11 +20,11 @@ public class GameplayCoordinator : IGameplayActions
     public event Action<Tombstone> OnGraveDug;
     public event Action<Tombstone> OnGraveRepaired;
     
-    public GameplayCoordinator(IGameWindowService windowService, ReputationsSystem reputationsSystem,
+    public GameplayCoordinator(IGameWindowService windowService, ReputationSystem reputationSystem,
         RandomService randomService)
     {
         this.windowService = windowService;
-        this.reputationsSystem = reputationsSystem;
+        this.reputationSystem = reputationSystem;
         this.randomService = randomService;
         
         lootGenerator = new LootGenerator();
@@ -50,7 +49,7 @@ public class GameplayCoordinator : IGameplayActions
             EnemyType enemyType = UndeadGenerator.Generate(tombstone.Data, randomService);
             if (enemyType == EnemyType.Ghost)
             {
-                reputationsSystem.RemoveReputation(1);
+                reputationSystem.RemoveReputation(1);
                 Console.WriteLine("Ghost appeared! Reputation reduced by 1!");
             } 
             else if (enemyType == EnemyType.Zombie)
@@ -58,7 +57,7 @@ public class GameplayCoordinator : IGameplayActions
                 Console.WriteLine("Zombie appeared! He will be eating you!");
             }
             
-            reputationsSystem.RemoveReputation(tombstone.ReputationValue);
+            reputationSystem.RemoveReputation(tombstone.ReputationValue);
             windowService.CloseCurrentWindow();
         }
     }
@@ -70,7 +69,7 @@ public class GameplayCoordinator : IGameplayActions
         if (repaired)
         {
             OnGraveRepaired?.Invoke(tombstone);
-            reputationsSystem.AddReputation(tombstone.ReputationValue);
+            reputationSystem.AddReputation(tombstone.ReputationValue);
             windowService.RefreshTombstoneWindow();
         }
     }
