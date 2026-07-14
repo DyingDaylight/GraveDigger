@@ -344,6 +344,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Environment_New/grave_new.png
 
+#begin Images/Environment_New/house.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Environment_New/house.png
+
 #begin Images/Environment/Forbidden_Graveyard_2D_Platformer_Tileset_Environment - Bone.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2071,4 +2083,10 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Props/Tombstone9.png;Images/Props/Tombstone9
+
+#begin Sound/Effects/steps.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/Effects/steps.wav
 
