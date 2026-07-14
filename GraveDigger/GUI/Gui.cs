@@ -38,13 +38,14 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         
         SpriteManager.AddSprite("MainMenuBackground", "Images/GUI/mainmenu");
         SpriteManager.AddSprite("ButtonMainMenu", "Images/GUI/button_mainmenu");
-        
+        SpriteManager.AddSprite("ButtonHover", "Images/GUI/buttonhover_mainmenu");
+        SpriteManager.AddSprite("ButtonPressed", "Images/GUI/buttonpressed_mainmenu");
+        /* OLD BUTTONS
         SpriteManager.AddSprite("ButtonNormal", "Images/GUI/ButtonNormal");
-        SpriteManager.AddSprite("ButtonHover", "Images/GUI/ButtonHover");
-        SpriteManager.AddSprite("ButtonPressed", "Images/GUI/ButtonPressed");
         SpriteManager.AddSprite("CloseButtonNormal", "Images/GUI/CloseButtonNormal");
         SpriteManager.AddSprite("CloseButtonHover", "Images/GUI/CloseButtonHover");
         SpriteManager.AddSprite("CloseButtonPressed", "Images/GUI/CloseButtonPressed");
+        */
         SpriteManager.AddSprite("Coin", "Images/Icons/Coin");
     }
     

@@ -170,7 +170,8 @@ public class Button : ClickableUIElement
 
     private void ApplyTextureState()
     {
-        Texture = currentState switch
+        Texture2D newTexture = currentState switch
+        
         {
             UiButtonState.Normal => normalTexture,
             UiButtonState.Hover => hoverTexture ?? normalTexture,
@@ -178,6 +179,12 @@ public class Button : ClickableUIElement
             UiButtonState.Disabled => disabledTexture ?? normalTexture,
             _ => normalTexture
         };
+        
+        if (Texture != newTexture)
+        {
+            Texture = newTexture;
+            SetSize(Texture.Width, Texture.Height);
+        }
     }
     
     private void ApplyColorState()

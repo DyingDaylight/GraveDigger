@@ -915,6 +915,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/GUI/Button.png
 
+#begin Images/GUI/buttonhover_mainmenu.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/buttonhover_mainmenu.png;Images/GUI/buttonhover_mainmenu
+
 #begin Images/GUI/ButtonHover.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -938,6 +950,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/GUI/ButtonNormal.png
+
+#begin Images/GUI/buttonpressed_mainmenu.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/buttonpressed_mainmenu.png
 
 #begin Images/GUI/ButtonPressed.png
 /importer:TextureImporter
@@ -2114,6 +2138,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Props/Tombstone9.png;Images/Props/Tombstone9
+
+#begin Sound/Effects/scratch.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/Effects/scratch.wav
 
 #begin Sound/Effects/steps.wav
 /importer:WavImporter

@@ -108,8 +108,10 @@ public class MenuUI : IUpdatable, IDrawable
     private void ConfigureStartButton()
     {
         Texture2D mainmenuButtonTex = SpriteManager.GetSprite("ButtonMainMenu").Texture;
-        
-        startButton.SetTextures(mainmenuButtonTex, mainmenuButtonTex, mainmenuButtonTex);
+        Texture2D hoverTex = SpriteManager.GetSprite("ButtonHover").Texture;
+        Texture2D pressedTex = SpriteManager.GetSprite("ButtonPressed").Texture;
+
+        startButton.SetTextures(mainmenuButtonTex, hoverTex, pressedTex);
         startButton.SetFont(GUIResources.LargeFont);
         startButton.SetText("Play");
         startButton.SetTextColor(Color.Black);
@@ -120,7 +122,10 @@ public class MenuUI : IUpdatable, IDrawable
     private void ConfigureSettingsButton()
     {
         Texture2D mainmenuButtonTex = SpriteManager.GetSprite("ButtonMainMenu").Texture;
-        settingsButton.SetTextures(mainmenuButtonTex, mainmenuButtonTex, mainmenuButtonTex);
+        Texture2D hoverTex = SpriteManager.GetSprite("ButtonHover").Texture;
+        Texture2D pressedTex = SpriteManager.GetSprite("ButtonPressed").Texture;
+        
+        settingsButton.SetTextures(mainmenuButtonTex, hoverTex, pressedTex);
         settingsButton.SetFont(GUIResources.LargeFont);
         settingsButton.SetText("Settings");
         settingsButton.SetTextColor(Color.Black);
@@ -131,7 +136,10 @@ public class MenuUI : IUpdatable, IDrawable
     private void ConfigureCloseButton()
     {
         Texture2D mainmenuButtonTex = SpriteManager.GetSprite("ButtonMainMenu").Texture;
-        closeButton.SetTextures(mainmenuButtonTex, mainmenuButtonTex, mainmenuButtonTex);
+        Texture2D hoverTex = SpriteManager.GetSprite("ButtonHover").Texture;
+        Texture2D pressedTex = SpriteManager.GetSprite("ButtonPressed").Texture;
+
+        closeButton.SetTextures(mainmenuButtonTex, hoverTex, pressedTex);
         closeButton.SetFont(GUIResources.LargeFont);
         closeButton.SetText("Exit");
         closeButton.SetTextColor(Color.Black);
