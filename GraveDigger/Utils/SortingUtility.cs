@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace GraveDigger.Utils;
 
+// Calculates SpriteBatch layer depth based on the object's bottom Y position.
 public class SortingUtility
 {
     private static float worldHeight;

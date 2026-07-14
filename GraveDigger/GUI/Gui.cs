@@ -18,7 +18,7 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
     private readonly GameContext gameContext;
     
     private bool started;
-    private GraveDigger.GameState gameState;
+    private GameState gameState;
 
     public InteractionTooltip InteractionTooltip { get; private set; }
     public WindowManager WindowManager { get; private set; }

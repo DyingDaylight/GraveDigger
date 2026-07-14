@@ -11,7 +11,6 @@ namespace GraveDigger;
 
 public class Game1 : Game
 {
-    public static Vector2 ScreenSize = new Vector2(1920, 1080);
     private static readonly Vector2 WorldSize = new(4520, 3960);
     
     private GameContext gameContext;
@@ -57,7 +56,7 @@ public class Game1 : Game
         
         randomService = new RandomService(1234);
         
-        GraveDigger.Systems.AudioManager.Instance.Initialize(Content);
+        AudioManager.Instance.Initialize(Content);
         
         camera = new Camera(GraphicsDevice.Viewport, WorldSize);
         gameContext = new GameContext(camera, screenSize, WorldSize, randomService);
