@@ -6,7 +6,7 @@ namespace GraveDigger.Utils;
 
 public class LootPlacementService
 {
-    private static readonly Vector2[] offsets =
+    private static readonly Vector2[] Offsets =
     {
         new(0, 50),
         new(-45, 45),
@@ -21,7 +21,7 @@ public class LootPlacementService
     public static Vector2? FindFreePosition(Vector2 origin, Point itemSize, 
         IReadOnlyList<Rectangle> occupiedAreas, int padding = 10)
     {
-        foreach (Vector2 offset in offsets)
+        foreach (Vector2 offset in Offsets)
         {
             Vector2 position = origin + offset;
 
@@ -32,8 +32,7 @@ public class LootPlacementService
                 itemSize.Y + padding * 2
             );
 
-            bool isOccupied = occupiedAreas.Any(area =>
-                candidateBounds.Intersects(area) && candidateBounds != area);
+            bool isOccupied = occupiedAreas.Any(area => candidateBounds.Intersects(area));
 
             if (!isOccupied)
                 return position;

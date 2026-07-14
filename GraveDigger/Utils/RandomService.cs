@@ -28,17 +28,21 @@ public class RandomService
 
     public bool Chance(float probability)
     {
+        probability = Math.Clamp(probability, 0f, 1f);
         return NextFloat() < probability;
     }
 
     public T RandomEnum<T>() where T : struct, Enum
     {
         T[] values = Enum.GetValues<T>();
-        return values[Next(0, values.Length)];
+        return Pick(values);
     }
 
     public T Pick<T>(IReadOnlyList<T> items)
     {
+        if (items.Count == 0)
+            throw new ArgumentException("Collection cannot be empty.");
+        
         return items[Next(0, items.Count)];
     }
     

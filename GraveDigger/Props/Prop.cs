@@ -1,4 +1,5 @@
 ﻿using GraveDigger.Core;
+using GraveDigger.Utils;
 using Microsoft.Xna.Framework;
 
 namespace GraveDigger.Props;
@@ -34,9 +35,8 @@ public class Prop : Sprite
             SortingOrder = GroundSortingOrder;
             return;
         }
-        
-        float depth = Bottom / Game1.WorldSize.Y;
-        SortingOrder = 1f - MathHelper.Clamp(depth, 0f, 1f);
+
+        SortingOrder = SortingUtility.CalculateByY(Bottom);
     }
 }
 

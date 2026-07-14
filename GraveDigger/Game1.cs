@@ -1,5 +1,6 @@
 ﻿using System;
 using GraveDigger.Core;
+using GraveDigger.Systems;
 using GraveDigger.Utils;
 using GUI;
 using Microsoft.Xna.Framework;
@@ -10,24 +11,15 @@ namespace GraveDigger;
 
 public class Game1 : Game
 {
-    public enum GameState
-    {
-        Menu,
-        Playing
-    }
+    private static readonly Vector2 WorldSize = new(4520, 3960);
     
-    public static Vector2 ScreenSize = new Vector2(1920, 1080);
-    public static readonly Vector2 WorldSize = new Vector2(4520, 3960);
-    
-    private GameState currentGameState = GameState.Menu;
     private GameContext gameContext;
     private GameplayCoordinator gameplayCoordinator;
-    private ReputationsSystem reputationsSystem;
+    private ReputationSystem reputationSystem;
     private RandomService randomService;
     
-    private GraphicsDeviceManager _graphics;
-    private SpriteBatch _spriteBatch;
-    private SpriteManager _spriteManager;
+    private readonly GraphicsDeviceManager graphics;
+    private SpriteBatch spriteBatch;
 
     private Camera camera;
     private Player player;
@@ -36,6 +28,7 @@ public class Game1 : Game
     private Gui gui;
     
     private Texture2D cursorTexture;
+    private GameState currentGameState = GameState.Menu;
     
     private KeyboardState previousKeyboardState;
     
@@ -43,26 +36,32 @@ public class Game1 : Game
     // Used to prevent closing the initial menu with the Escape key.
     private bool gameStarted = false;
     
+    
     public Game1()
     {
-        _graphics = new GraphicsDeviceManager(this);
-        _spriteManager = new SpriteManager(Content);
+        graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = false; // to hide basic cursor
+        SpriteManager.Initialize(Content);
     }
 
     protected override void Initialize()
     {
         //_graphics.IsFullScreen = true;
-        _graphics.PreferredBackBufferWidth = 1920;
-        _graphics.PreferredBackBufferHeight = 1080;
-        _graphics.ApplyChanges();
-
-        ScreenSize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-        camera = new Camera(GraphicsDevice.Viewport);
+        graphics.PreferredBackBufferWidth = 1920;
+        graphics.PreferredBackBufferHeight = 1080;
+        graphics.ApplyChanges();
+        
+        SortingUtility.Initialize(WorldSize.Y);
+        
+        Vector2 screenSize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+        
         randomService = new RandomService(1234);
-        gameContext = new GameContext(camera, ScreenSize, randomService);
-        reputationsSystem = new ReputationsSystem();
+        
+        AudioManager.Instance.Initialize(Content);
+        
+        camera = new Camera(GraphicsDevice.Viewport, WorldSize);
+        gameContext = new GameContext(camera, screenSize, WorldSize, randomService);
         
         
         
@@ -72,40 +71,13 @@ public class Game1 : Game
     
     protected override void LoadContent()
     {
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
+        spriteBatch = new SpriteBatch(GraphicsDevice);
         cursorTexture = Content.Load<Texture2D>("Images/GUI/cursor"); // custom cursor
+        spriteBatch = new SpriteBatch(GraphicsDevice);
         
-        SpriteManager.AddSprite("digger", "Images/Characters/keeper_wasd2", columns: 4, rows: 4);
-            //SpriteManager.AddSprite("digger_idle", "Images/Characters/keeper_idle", columns: 4, rows: 1);
-        SpriteManager.AddSprite("pixel", "Images/pixel");
-        
-        gui = new Gui(gameContext);
-        gui.LoadContent(Content);
-        gui.Start();
-        
-        gameplayCoordinator = new GameplayCoordinator(gui, reputationsSystem, randomService);
-        
-        level = new Level(gameContext, gameplayCoordinator);
-        level.LoadTextures();
-        level.Start();
-        
-        player = new Player();
-        player.Start();
-        
-        gui.MenuUi.OnStartClicked += StartGame; 
-        gui.MenuUi.OnSettingsClicked += OpenSettings; 
-        gui.MenuUi.OnExitClicked += CloseGame;
-        
-        GraveDigger.Systems.AudioManager.Instance.Initialize(Content);
-
-        gui.WindowManager.TombstoneInfoWindow.OnDigButton += gameplayCoordinator.DigGrave;
-        gui.WindowManager.TombstoneInfoWindow.OnRepairButton += gameplayCoordinator.RepairGrave;
-
-        reputationsSystem.ReputationChanged += gui.Hud.UpdateReputation;
-        
-        level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
-
-        gameplayCoordinator.OnLootSpawn += level.SpawnLoot;
+        LoadCoreSprites();
+        CreateGameObjects();
+        SubscribeToEvents();
         
         SetGameState(GameState.Menu);
     }
@@ -114,85 +86,48 @@ public class Game1 : Game
     {
         KeyboardState currentKeyboardState = Keyboard.GetState();
         
-        if (currentGameState == GameState.Menu)
+        switch (currentGameState)
         {
-            if (gameStarted && currentKeyboardState.IsKeyDown(Keys.Escape) && previousKeyboardState.IsKeyUp(Keys.Escape))
-                SetGameState(GameState.Playing);
-        } 
-        else if (currentGameState == GameState.Playing && !gui.IsModalWindowOpen())
-        {
-             
-            bool inventoryJustPressed =
-                currentKeyboardState.IsKeyDown(Keys.I) &&
-                previousKeyboardState.IsKeyUp(Keys.I);
-            
-            bool tradeJustPressed =
-                currentKeyboardState.IsKeyDown(Keys.T) &&
-                previousKeyboardState.IsKeyUp(Keys.T);
-
-            if (inventoryJustPressed)
-            {
-                if (gui.IsInventoryOpen())
-                    gui.CloseCurrentWindow();
-                else if (!gui.IsModalWindowOpen())
-                    gameplayCoordinator.ShowInventory();
-            }
-
-            if (tradeJustPressed)
-            {
-                if (gui.IsModalWindowOpen())
-                    gui.CloseCurrentWindow();
-                gameplayCoordinator.ShowMerchant();
-
-            }
-
-            if (!gui.IsModalWindowOpen())
-            {
-                level.Update(gameTime);
-                player.Update(gameTime);
-
-                if (currentKeyboardState.IsKeyDown(Keys.Escape) &&
-                    previousKeyboardState.IsKeyUp(Keys.Escape))
-                {
-                    SetGameState(GameState.Menu);
-                }
-            }
-            
-            camera.SetTarget(player.Transform.Position);
-            camera.Update(gameTime);
+            case GameState.Menu:
+                UpdateMenu(currentKeyboardState);
+                break;
+        
+            case GameState.Playing:
+                UpdateGameplay(gameTime, currentKeyboardState);
+                break;
         }
         
         gui.Update(gameTime);
+        UpdateCamera(gameTime);
         previousKeyboardState = currentKeyboardState;
+
         
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.Black);
-
-        // BackToFront sorting uses sprite layer depth to draw objects in the correct order.
-        _spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront,
-            samplerState: SamplerState.PointClamp,
-            blendState: BlendState.AlphaBlend,
-            transformMatrix: camera.TransformMatrix);
-        level.Draw(_spriteBatch);
-        player.Draw(_spriteBatch);
+        GraphicsDevice.Clear(Color.Black); 
         
-        _spriteBatch.End();
-
-        _spriteBatch.Begin();
-        gui.Draw(_spriteBatch);
-        _spriteBatch.End();
-
-        base.Draw(gameTime);
+        if (currentGameState == GameState.Playing)
+        {
+            spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront, 
+                samplerState: SamplerState.PointClamp, 
+                transformMatrix: camera.TransformMatrix);
+            
+            level.Draw(spriteBatch);
+            player.Draw(spriteBatch);
+            
+            spriteBatch.End();
+        }
         
-        _spriteBatch.Begin();
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend); 
+        gui.Draw(spriteBatch);
         
         MouseState mouseState = Mouse.GetState();
-        _spriteBatch.Draw(cursorTexture, new Vector2(mouseState.X, mouseState.Y), Color.White);
-        _spriteBatch.End();
+        spriteBatch.Draw(cursorTexture, new Vector2(mouseState.X, mouseState.Y), Color.White);
+        spriteBatch.End();
+        
     }
 
     private void StartGame()
@@ -211,6 +146,45 @@ public class Game1 : Game
         Exit();
     }
     
+    private void LoadCoreSprites()
+    {
+        SpriteManager.AddSprite("digger", "Images/Characters/keeper_wasd2", columns: 4, rows: 4);
+        SpriteManager.AddSprite("pixel", "Images/pixel");
+    }
+
+    private void CreateGameObjects()
+    {
+        gui = new Gui(gameContext);
+        gui.LoadContent(Content);
+        gui.Start();
+        
+        reputationSystem = new ReputationSystem();
+        gameplayCoordinator = new GameplayCoordinator(gui, reputationSystem, randomService);
+        
+        level = new Level(gameContext, gameplayCoordinator);
+        level.LoadTextures();
+        level.Start();
+        
+        player = new Player(gameContext);
+        player.Start();
+    }
+
+private void SubscribeToEvents()
+{
+    gui.MenuUi.OnStartClicked += StartGame; 
+    gui.MenuUi.OnSettingsClicked += OpenSettings; 
+    gui.MenuUi.OnExitClicked += CloseGame;
+
+    gui.WindowManager.TombstoneInfoWindow.OnDigButton += gameplayCoordinator.DigGrave;
+    gui.WindowManager.TombstoneInfoWindow.OnRepairButton += gameplayCoordinator.RepairGrave;
+
+    reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
+        
+    level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
+
+    gameplayCoordinator.OnLootSpawn += level.SpawnLoot;
+}
+    
     private void SetGameState(GameState gameState)
     {
         currentGameState = gameState;
@@ -225,4 +199,56 @@ public class Game1 : Game
             GraveDigger.Systems.AudioManager.Instance.StopMusic();
         }
     }
-}
+    
+    private void UpdateCamera(GameTime gameTime)
+    {
+        camera.SetTarget(player.Transform.Position);
+        camera.Update(gameTime);
+    }
+    
+    private void UpdateMenu(KeyboardState keyboardState)
+    {
+        if (!gameStarted)
+            return;
+        
+        if (WasKeyJustPressed(keyboardState, Keys.Escape))
+            SetGameState(GameState.Playing);
+    }
+    
+    private void UpdateGameplay(GameTime gameTime, KeyboardState keyboardState)
+    {
+        HandleWindowInput(keyboardState);
+
+        if (gui.IsModalWindowOpen())
+            return;
+
+        level.Update(gameTime);
+        player.Update(gameTime);
+
+        if (WasKeyJustPressed(keyboardState, Keys.Escape))
+            SetGameState(GameState.Menu);
+    }
+    
+    private void HandleWindowInput(KeyboardState keyboardState)
+    {
+        if (WasKeyJustPressed(keyboardState, Keys.I))
+        {
+            if (gui.IsInventoryOpen())
+                gui.CloseCurrentWindow();
+            else if (!gui.IsModalWindowOpen())
+                gameplayCoordinator.ShowInventory();
+        }
+
+        if (WasKeyJustPressed(keyboardState, Keys.T))
+        {
+            if (!gui.IsModalWindowOpen())
+                gameplayCoordinator.ShowMerchant();
+        }
+    }
+    
+    private bool WasKeyJustPressed(KeyboardState currentKeyboardState, Keys key)
+    {
+        return currentKeyboardState.IsKeyDown(key) &&
+               previousKeyboardState.IsKeyUp(key);
+    }
+    }
