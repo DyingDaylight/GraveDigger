@@ -8,7 +8,7 @@ public class ItemPickUp : Prop, IInteractionOwner
 {
     public ItemData ItemData { get; private set; }
     public Interaction Interaction { get; set; }
-    public Rectangle InteractionArea => destRectangle;
+    public Rectangle InteractionArea => DestRectangle;
     
     public ItemPickUp(string name) : base(name)
     {

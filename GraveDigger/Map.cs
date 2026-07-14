@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GraveDigger.Core;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -51,7 +52,7 @@ public class Map : IDrawable, IUpdatable
             
                 tile.Transform.Position = new Vector2(j * (tileSize.X - 1), i * (tileSize.Y - 5));
             
-                tile.sourceRectangle = new Rectangle(0, 0, tileSize.X, tileSize.Y);
+                tile.SourceRectangle = new Rectangle(0, 0, tileSize.X, tileSize.Y);
             
                 tile.Pivot = new Vector2(0, 0);
                 tile.SortingOrder = 1f;

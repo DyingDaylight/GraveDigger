@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GraveDigger.Core;
+using Microsoft.Xna.Framework;
 
 namespace GraveDigger.Props;
 

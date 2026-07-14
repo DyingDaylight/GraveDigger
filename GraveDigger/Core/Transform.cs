@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace GraveDigger;
+namespace GraveDigger.Core;
 
 public class Transform
 {

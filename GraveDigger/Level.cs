@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraveDigger.Core;
 using GraveDigger.Data;
 using GraveDigger.Interactions;
 using GraveDigger.Items;
@@ -95,7 +96,7 @@ public class Level : IUpdatable, IDrawable
     
     public void SpawnLoot(List<ItemData> loot, Tombstone tombstone)
     {
-        List<Rectangle> occupiedAreas = props.Select(prop => prop.GetDestRectangle(prop.sourceRectangle)).ToList();
+        List<Rectangle> occupiedAreas = props.Select(prop => prop.GetDestRectangle(prop.SourceRectangle)).ToList();
 
         foreach (ItemData item in loot)
         {
@@ -141,7 +142,7 @@ public class Level : IUpdatable, IDrawable
     {
         T prop = factory(name);
         prop.Transform.Position = position;
-        prop.Shadow = true;
+        prop.CastSHadow = true;
         switch (name)
         {
             case "lampost":
@@ -182,8 +183,8 @@ public class Level : IUpdatable, IDrawable
         Vector2 origin = new Vector2(sourceProp.Left + sourceProp.Width * 0.5f, sourceProp.Bottom);
 
         Point itemSize = new(
-            itemPickUp.destRectangle.Width,
-            itemPickUp.destRectangle.Height
+            itemPickUp.DestRectangle.Width,
+            itemPickUp.DestRectangle.Height
         );
 
         Vector2? position = LootPlacementService.FindFreePosition(origin, itemSize, occupiedAreas);
@@ -191,7 +192,7 @@ public class Level : IUpdatable, IDrawable
         if (position.HasValue)
         {
             itemPickUp.Transform.Position = position.Value;
-            occupiedAreas.Add(itemPickUp.GetDestRectangle(itemPickUp.sourceRectangle));
+            occupiedAreas.Add(itemPickUp.GetDestRectangle(itemPickUp.SourceRectangle));
         }
         
         PickUpInteraction interaction = new PickUpInteraction(itemPickUp);
@@ -238,7 +239,7 @@ public class Level : IUpdatable, IDrawable
             return;
   
         Vector2 dirtPosition = new Vector2(graveTile.Transform.Position.X, graveTile.Transform.Position.Y + 140);
-        Prop dirtToRemove = props.FirstOrDefault(p => p.sourceRectangle != null && p.Transform.Position == dirtPosition);
+        Prop dirtToRemove = props.FirstOrDefault(p => p.SourceRectangle != null && p.Transform.Position == dirtPosition);
     
         if (dirtToRemove != null)
         {
@@ -303,7 +304,7 @@ public class Level : IUpdatable, IDrawable
     
         tomb.GraveTile = earth;
         tomb.GraveTile.Mode = SortingMode.Fixed;
-        tomb.GraveTile.Shadow = false;
+        tomb.GraveTile.CastSHadow = false;
     
         TombstoneInteraction interaction = new TombstoneInteraction(tomb);
         interaction.OnTombstoneRead += OpenTombstone;

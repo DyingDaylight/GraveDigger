@@ -1,14 +1,14 @@
 ﻿using GraveDigger.Utils;
 using Microsoft.Xna.Framework;
 
-namespace GraveDigger;
+namespace GraveDigger.Core;
 
 public class GameContext
 {
+    public Vector2 ScreenSize { get; }
+    
     public CoordinatesConverter CoordinatesConverter { get; }
     public RandomService RandomService { get; }
-    
-    public Vector2 ScreenSize { get; }
     
     public GameContext(Camera camera, Vector2 screenSize, RandomService randomService)
     {

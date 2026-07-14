@@ -1,49 +1,26 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace GraveDigger;
+namespace GraveDigger.Core;
 
 public class Animation : Sprite
 {
     private double totalTime;
     private int fps = 60;
 
-    protected int x = 0;
-    protected int y = 0;
+    protected int currentColumn = 0;
+    protected int currentRow = 0;
 
-    private bool isLooping = true;
+    public bool IsLooping { get; set; } = true;
     private bool isAnimating = false;
 
     public int CurrentRow
     {
-        get => y;
-        set => y = MathHelper.Clamp(value, 0, SpriteSheet.Rows - 1);
+        get => currentRow;
+        set => currentRow = MathHelper.Clamp(value, 0, SpriteSheet.Rows - 1);
     }
     
     public Animation(string name) : base(name)
     {
-    }
-
-    public override void Start()
-    {
-        base.Start();
-    }
-
-    public void Stop()
-    {
-        isAnimating = false;
-        x = 0; 
-    }
-
-    public void Play(int fps = 60)
-    {
-        isAnimating = true;    
-        this.fps = fps;
-    }
-
-    public void Reset()
-    {
-        x = 0;
-        totalTime = 0;
     }
     
     public override void Update(GameTime gameTime)
@@ -51,22 +28,41 @@ public class Animation : Sprite
         if (ShouldMoveToNextFrame(gameTime))
         {
             totalTime = 0.0f;
-            x++;
-            if (x >= SpriteSheet.Columns)
+            currentColumn++;
+            if (currentColumn >= SpriteSheet.Columns)
             {
-                if (isLooping)
+                if (IsLooping)
                 {
-                    x = 0;
+                    currentColumn = 0;
                 }
                 else
                 {
-                    x = SpriteSheet.Columns - 1;
+                    currentColumn = SpriteSheet.Columns - 1;
                 }
             }
         }
         
-        sourceRectangle = SpriteSheet[x, y];
+        SourceRectangle = SpriteSheet[currentColumn, currentRow];
         base.Update(gameTime);
+    }
+    
+    public void Play(int fps = 60)
+    {
+        isAnimating = true;    
+        this.fps = fps > 0 ? fps : 1;
+    }
+    
+    public void Stop()
+    {
+        isAnimating = false;
+        currentColumn = 0;
+        totalTime = 0;
+    }
+
+    public void Reset()
+    {
+        currentColumn = 0;
+        totalTime = 0;
     }
 
     private bool ShouldMoveToNextFrame(GameTime gameTime)

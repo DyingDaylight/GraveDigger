@@ -1,4 +1,5 @@
 ﻿using GraveDigger;
+using GraveDigger.Core;
 
 namespace Interfaces;
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using GraveDigger.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -19,16 +20,16 @@ public class Player : Animation
     
     public Player() : base("digger")
     {
-        Collider = new Collider();
+        Collider = new Collider(this);
         Collider.Parent = this;  
-        Collider.isTrigger = false;
+        Collider.IsTrigger = false;
     }
     
     public override void Start()
     {
         base.Start();
 
-        Shadow = true;
+        CastSHadow = true;
         
         Transform.Position = new Vector2(Game1.ScreenSize.X * 0.5f, Game1.ScreenSize.Y * 0.5f);
         previousPosition = Transform.Position;

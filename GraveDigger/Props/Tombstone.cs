@@ -27,7 +27,7 @@ public class Tombstone : Prop, IInteractionOwner
     
     public Interaction Interaction { get; set; }
 
-    public Rectangle InteractionArea => destRectangle;
+    public Rectangle InteractionArea => DestRectangle;
 
     public Tombstone(string name) : base(name)
     {
@@ -70,7 +70,7 @@ public class Tombstone : Prop, IInteractionOwner
 
         if (SpriteSheet != null)
         {
-            sourceRectangle = SpriteSheet[0, 0];
+            SourceRectangle = SpriteSheet[0, 0];
         }
     }
 }

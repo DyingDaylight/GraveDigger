@@ -1,5 +1,6 @@
 ﻿using System;
 using GraveDigger;
+using GraveDigger.Core;
 using GraveDigger.GUI.Components;
 using GraveDigger.GUI.Windows;
 using GraveDigger.Items;
