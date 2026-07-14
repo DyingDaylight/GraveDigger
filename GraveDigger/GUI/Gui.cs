@@ -18,7 +18,7 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
     private readonly GameContext gameContext;
     
     private bool started;
-    private GameState gameState;
+    private GraveDigger.GameState gameState;
 
     public InteractionTooltip InteractionTooltip { get; private set; }
     public WindowManager WindowManager { get; private set; }
@@ -86,14 +86,14 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         Hud.Draw(spriteBatch);
         InteractionTooltip.Draw(spriteBatch);
         WindowManager.Draw(spriteBatch);
-        
+
         if (gameState == GameState.Menu)
             MenuUi.Draw(spriteBatch);
     }
 
-    public void SetGameState(GameState state)
+    public void SetGameState(GraveDigger.GameState state) 
     {
-        gameState = state;
+        this.gameState = state; 
     }
 
     public void OpenTombstoneWindow(Tombstone tombstone)
