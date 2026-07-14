@@ -86,7 +86,7 @@ public class TombstoneInfoWindow : Window
     private void RefreshContent()
     {
         nameLabel.Text = tombstone.Data.Name;
-        yearLabel.Text = tombstone.Data.Years;
+        yearLabel.Text = tombstone.Data.LifeYears;
         wealthLabel.Text = $"Wealth: {tombstone.Data.WealthDescription}";
         natureLabel.Text = $"Nature: {tombstone.Data.Inscription}";
         stateLabel.Text = $"State: {tombstone.State}";

@@ -1,6 +1,6 @@
 ﻿namespace GraveDigger.Data;
 
-public enum TombPersonality
+public enum Personality
 {
     Peaceful,
     Restless,

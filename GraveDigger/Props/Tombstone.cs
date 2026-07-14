@@ -6,7 +6,7 @@ namespace GraveDigger.Props;
 
 public class Tombstone : Prop, IInteractionOwner
 {
-    public TombstoneData Data { get; private set; }
+    public GraveSiteData Data { get; private set; }
     
     public Prop GraveTile { get; set; }
 
@@ -33,7 +33,7 @@ public class Tombstone : Prop, IInteractionOwner
         Value = 5;
     }
 
-    public void SetData(TombstoneData data)
+    public void SetData(GraveSiteData data)
     {
         Data = data;
     }

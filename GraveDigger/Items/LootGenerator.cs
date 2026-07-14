@@ -67,29 +67,29 @@ public class LootGenerator
     */
 };
 
-    private static readonly Dictionary<TombWealth, (int Min, int Max)> wealthRanges = new()
+    private static readonly Dictionary<Wealth, (int Min, int Max)> wealthRanges = new()
     {
-        [TombWealth.Poor] = (0, 3),
-        [TombWealth.Average] = (2, 5),
-        [TombWealth.Rich] = (3, 8),
-        [TombWealth.Wealthy] = (6, 10)
+        [Wealth.Poor] = (0, 3),
+        [Wealth.Average] = (2, 5),
+        [Wealth.Rich] = (3, 8),
+        [Wealth.Wealthy] = (6, 10)
     };
     
-    private static readonly Dictionary<TombWealth, (int Min, int Max)> amountRanges = new()
+    private static readonly Dictionary<Wealth, (int Min, int Max)> amountRanges = new()
     {
-        [TombWealth.Poor] = (0, 1),
-        [TombWealth.Average] = (0, 2),
-        [TombWealth.Rich] = (1, 3),
-        [TombWealth.Wealthy] = (0, 3)
+        [Wealth.Poor] = (0, 1),
+        [Wealth.Average] = (0, 2),
+        [Wealth.Rich] = (1, 3),
+        [Wealth.Wealthy] = (0, 3)
     };
     
     
-    public List<ItemData> Generate(TombstoneData tombstone, RandomService random)
+    public List<ItemData> Generate(GraveSiteData graveSite, RandomService random)
     {
-        var wealthRange = wealthRanges[tombstone.WealthState];
+        var wealthRange = wealthRanges[graveSite.Wealth];
         int budget = random.Next(wealthRange.Min, wealthRange.Max + 1);
         
-        var amountRange = amountRanges[tombstone.WealthState];
+        var amountRange = amountRanges[graveSite.Wealth];
         int amount = random.Next(amountRange.Min, amountRange.Max + 1);
 
         List<ItemData> lootItems = new();

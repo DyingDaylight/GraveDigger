@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GraveDigger.Utils;
 
 namespace GraveDigger.Data;
 
-public class TombstoneGenerator
+public class GraveSiteGenerator
 {
     private static readonly string[] FirstNames =
     {
@@ -74,8 +73,8 @@ public class TombstoneGenerator
         "Mortimer"
     };
     
-    private static readonly int MinBirthYear = 1830;
-    private static readonly int MaxBirthYear = 1910;
+    private const int MinBirthYear = 1830;
+    private const int MaxBirthYear = 1910;
     
     private static readonly List<WeightedRange> AgeRanges =
     [
@@ -88,7 +87,7 @@ public class TombstoneGenerator
     private static readonly string[] WealthDescriptors =
         {"", "Slightly", "Quite", "Very", "Extremely", "Ridiculously"};
 
-    private static readonly string[] PeacfulDescriptors =
+    private static readonly string[] PeacefulDescriptors =
     {
         "Kind Soul", "Gentle Spirit", "Beloved Neighbor", "Warm Heart", "Compassionate Person"
     };
@@ -113,37 +112,39 @@ public class TombstoneGenerator
         "Village Oddity", "Outsider", "Peculiar Soul", "Strange Dreamer"
     };
     
-    private static readonly Dictionary<TombPersonality, string[]> Inscriptions =
+    private static readonly Dictionary<Personality, string[]> Inscriptions =
         new()
         {
-            [TombPersonality.Peaceful] = PeacfulDescriptors,
-            [TombPersonality.Restless] = RestlessDescriptors,
-            [TombPersonality.Bitter] = BitterDescriptors,
-            [TombPersonality.Greedy] = GreedyDescriptors,
-            [TombPersonality.Cruel] = CruelDescriptors,
-            [TombPersonality.Mysterious] = MysteriousDescriptors
+            [Personality.Peaceful] = PeacefulDescriptors,
+            [Personality.Restless] = RestlessDescriptors,
+            [Personality.Bitter] = BitterDescriptors,
+            [Personality.Greedy] = GreedyDescriptors,
+            [Personality.Cruel] = CruelDescriptors,
+            [Personality.Mysterious] = MysteriousDescriptors
         };
     
-    public static TombstoneData GenerateTombstoneData(RandomService randomService)
+    public static GraveSiteData Generate(RandomService randomService)
     {
-        TombstoneData tombstoneData = new TombstoneData();
+        GraveSiteData graveSiteData = new GraveSiteData();
         
         string firstName = randomService.Pick(FirstNames);
         string lastName = randomService.Pick(LastNames);
-        tombstoneData.Name = $"{firstName} {lastName}";
+        graveSiteData.Name = $"{firstName} {lastName}";
 
         int birthYear = randomService.Next(MinBirthYear, MaxBirthYear + 1);
         int age = randomService.PickWeightedRange(AgeRanges);
         int deathYear = birthYear + age;
-        tombstoneData.Years = $"{birthYear} - {deathYear}";
+        graveSiteData.LifeYears = $"{birthYear} - {deathYear}";
         
-        tombstoneData.WealthState = randomService.RandomEnum<TombWealth>();
+        graveSiteData.Wealth = randomService.RandomEnum<Wealth>();
         string wealthDescriptor = randomService.Pick(WealthDescriptors);
-        tombstoneData.WealthDescription = $"{wealthDescriptor} {tombstoneData.WealthState}";
+        graveSiteData.WealthDescription = string.IsNullOrWhiteSpace(wealthDescriptor)
+            ? graveSiteData.Wealth.ToString()
+            : $"{wealthDescriptor} {graveSiteData.Wealth}";
         
-        tombstoneData.Personality = randomService.RandomEnum<TombPersonality>();
-        tombstoneData.Inscription = randomService.Pick(Inscriptions[tombstoneData.Personality]);
+        graveSiteData.Personality = randomService.RandomEnum<Personality>();
+        graveSiteData.Inscription = randomService.Pick(Inscriptions[graveSiteData.Personality]);
         
-        return tombstoneData;
+        return graveSiteData;
     }
 }

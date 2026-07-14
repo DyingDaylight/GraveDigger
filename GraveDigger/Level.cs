@@ -289,14 +289,14 @@ public class Level : IUpdatable, IDrawable
 
     private void CreateTombstone(string name, Vector2 position)
     {
-        TombstoneData tombstoneData = TombstoneGenerator.GenerateTombstoneData(gameContext.RandomService);
+        GraveSiteData graveSiteData = GraveSiteGenerator.Generate(gameContext.RandomService);
     
         Prop earth = CreateLevelObject(PropFactory, "grave_earth", position);
     
         Vector2 tombstonePosition = new Vector2(position.X, position.Y - 190);
         Tombstone tomb = CreateLevelObject(TombstoneFactory, name, tombstonePosition);
         tomb.Transform.Scale = new Vector2(0.3f, 0.3f);
-        tomb.SetData(tombstoneData);
+        tomb.SetData(graveSiteData);
         tomb.State = gameContext.RandomService.RandomEnum<TombstoneState>();
     
         tomb.GraveTile = earth;

@@ -7,19 +7,19 @@ namespace GraveDigger.Enemies;
 
 public class UndeadGenerator
 {
-    private static readonly Dictionary<TombPersonality, (int None, int Ghost, int Zombie)> enemyRanges = new()
+    private static readonly Dictionary<Personality, (int None, int Ghost, int Zombie)> enemyRanges = new()
     {
-        [TombPersonality.Peaceful]   = (65, 20, 15),
-        [TombPersonality.Greedy]     = (25, 25, 50),
-        [TombPersonality.Bitter]     = (30, 30, 40),
-        [TombPersonality.Cruel]      = (10, 15, 75),
-        [TombPersonality.Mysterious] = (25, 45, 30),
-        [TombPersonality.Restless]   = (30, 45, 25),
+        [Personality.Peaceful]   = (65, 20, 15),
+        [Personality.Greedy]     = (25, 25, 50),
+        [Personality.Bitter]     = (30, 30, 40),
+        [Personality.Cruel]      = (10, 15, 75),
+        [Personality.Mysterious] = (25, 45, 30),
+        [Personality.Restless]   = (30, 45, 25),
     };
     
-    public static EnemyType Generate(TombstoneData tombstone, RandomService random)
+    public static EnemyType Generate(GraveSiteData graveSite, RandomService random)
     {
-        var chances = enemyRanges[tombstone.Personality];
+        var chances = enemyRanges[graveSite.Personality];
 
         int roll = random.Next(1, 101);
 

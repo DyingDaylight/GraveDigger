@@ -1,6 +1,6 @@
 ﻿namespace GraveDigger.Data;
 
-public enum TombWealth
+public enum Wealth
 {
     Poor,
     Average,
