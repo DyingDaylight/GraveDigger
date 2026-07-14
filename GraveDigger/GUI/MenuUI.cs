@@ -116,6 +116,8 @@ public class MenuUI : IUpdatable, IDrawable
         startButton.SetText("Play");
         startButton.SetTextColor(Color.Black);
         
+        startButton.MouseEntered += () => GraveDigger.Systems.AudioManager.Instance.PlaySFX("scratch");
+        
         buttons.Add(startButton);
     }
 
@@ -130,6 +132,8 @@ public class MenuUI : IUpdatable, IDrawable
         settingsButton.SetText("Settings");
         settingsButton.SetTextColor(Color.Black);
         
+        settingsButton.MouseEntered += () => GraveDigger.Systems.AudioManager.Instance.PlaySFX("scratch");
+        
         buttons.Add(settingsButton);
     }
 
@@ -143,6 +147,8 @@ public class MenuUI : IUpdatable, IDrawable
         closeButton.SetFont(GUIResources.LargeFont);
         closeButton.SetText("Exit");
         closeButton.SetTextColor(Color.Black);
+        
+        closeButton.MouseEntered += () => GraveDigger.Systems.AudioManager.Instance.PlaySFX("scratch");
         
         buttons.Add(closeButton);
     }

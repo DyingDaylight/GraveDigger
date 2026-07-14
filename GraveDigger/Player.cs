@@ -108,6 +108,8 @@ public class Player : Animation
         {
             if (direction != Vector2.Zero)
                 direction.Normalize();
+            
+            GraveDigger.Systems.AudioManager.Instance.PlaySFX("steps", loop: true);
 
             if (CurrentRow != previousRow)
             {
@@ -120,6 +122,7 @@ public class Player : Animation
         }
         else
         {
+            GraveDigger.Systems.AudioManager.Instance.PauseSFX("steps");
             Stop();
             previousRow = -1;
         }

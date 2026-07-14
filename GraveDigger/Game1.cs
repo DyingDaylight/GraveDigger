@@ -89,6 +89,8 @@ public class Game1 : Game
         gui.MenuUi.OnStartClicked += StartGame; 
         gui.MenuUi.OnSettingsClicked += OpenSettings; 
         gui.MenuUi.OnExitClicked += CloseGame;
+        
+        GraveDigger.Systems.AudioManager.Instance.Initialize(Content);
 
         gui.WindowManager.TombstoneInfoWindow.OnDigButton += gameplayCoordinator.DigGrave;
         gui.WindowManager.TombstoneInfoWindow.OnRepairButton += gameplayCoordinator.RepairGrave;
