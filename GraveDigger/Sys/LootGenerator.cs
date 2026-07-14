@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraveDigger.Data;
+using GraveDigger.Items;
 using GraveDigger.Utils;
 
-namespace GraveDigger.Items;
+namespace GraveDigger.Sys;
 
 public class LootGenerator
 {
@@ -67,7 +68,7 @@ public class LootGenerator
     */
 };
 
-    private static readonly Dictionary<Wealth, (int Min, int Max)> wealthRanges = new()
+    private static readonly Dictionary<Wealth, (int Min, int Max)> BudgetRangesByWealth = new()
     {
         [Wealth.Poor] = (0, 3),
         [Wealth.Average] = (2, 5),
@@ -75,7 +76,7 @@ public class LootGenerator
         [Wealth.Wealthy] = (6, 10)
     };
     
-    private static readonly Dictionary<Wealth, (int Min, int Max)> amountRanges = new()
+    private static readonly Dictionary<Wealth, (int Min, int Max)> AmountRangesByWealth = new()
     {
         [Wealth.Poor] = (0, 1),
         [Wealth.Average] = (0, 2),
@@ -86,10 +87,10 @@ public class LootGenerator
     
     public List<ItemData> Generate(GraveSiteData graveSite, RandomService random)
     {
-        var wealthRange = wealthRanges[graveSite.Wealth];
+        var wealthRange = BudgetRangesByWealth[graveSite.Wealth];
         int budget = random.Next(wealthRange.Min, wealthRange.Max + 1);
         
-        var amountRange = amountRanges[graveSite.Wealth];
+        var amountRange = AmountRangesByWealth[graveSite.Wealth];
         int amount = random.Next(amountRange.Min, amountRange.Max + 1);
 
         List<ItemData> lootItems = new();

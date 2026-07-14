@@ -1,24 +1,17 @@
 ﻿using GraveDigger.Interactions;
-using GraveDigger.Props;
+using GraveDigger.Items;
 using Microsoft.Xna.Framework;
 
-namespace GraveDigger.Items;
+namespace GraveDigger.Props;
 
 public class ItemPickUp : Prop, IInteractionOwner
 {
     public ItemData ItemData { get; private set; }
-
-    public Rectangle InteractionArea => destRectangle;
     public Interaction Interaction { get; set; }
+    public Rectangle InteractionArea => destRectangle;
     
     public ItemPickUp(string name) : base(name)
     {
-    }
-
-    public override void Update(GameTime gameTime)
-    {
-        base.Update(gameTime);
-        UpdateSortingOrder();
     }
 
     public void SetHighlighted(bool highlighted)

@@ -1,15 +1,13 @@
-﻿using GraveDigger.Props;
-
-namespace GraveDigger.Items;
+﻿namespace GraveDigger.Items;
 
 public class ItemData
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public string SpriteName { get; set; }
-    public int Price { get; set; }
-    public int MaxStackSize { get; set; }
+    public string Id { get; }
+    public string Name { get; }
+    public string Description { get; }
+    public string SpriteName { get; }
+    public int Price { get; }
+    public int MaxStackSize { get; }
 
     public ItemData(string id, string name, string description, string spriteName, int price, int maxStackSize)
     {

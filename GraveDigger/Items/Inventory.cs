@@ -1,49 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
-using GraveDigger.GUI.Windows;
 
 namespace GraveDigger.Items;
 
 public class Inventory
 {
+    private const int Capacity = 25;
     public int Money { get; private set; }
-    // TODO: temporary public - Change it!!!!
-    public Dictionary<string, InventoryEntry> Items = new();
+    
+    // TODO: consider adding an indexer for item lookup.
+    private readonly Dictionary<string, InventoryEntry> items = new();
+
+    public IReadOnlyDictionary<string, InventoryEntry> Items => items;
 
     public bool Add(ItemData item)
     {
+        if (item == null || string.IsNullOrWhiteSpace(item.Id))
+            return false;
+        
         // TODO: implement Max Stack
         // TODO: think how to store several stacks of same item
-        if (Items.ContainsKey(item.Id))
+        
+        if (items.TryGetValue(item.Id, out InventoryEntry entry))
         {
-            Items[item.Id].Quantity++;
+            entry.Quantity++;
         }
         else
         {
-            InventoryEntry entry = new();
+            if (items.Count >= Capacity)
+                return false;
+            
+            entry = new();
             entry.ItemData = item;
             entry.Quantity = 1;
-            Items[entry.ItemData.Id] = entry;
+
+            items.Add(item.Id, entry);
         }
+        
         return true;
     }
 
-    public void AddMoney(int money)
+    public void AddMoney(int amount)
     {
-        if (money <= 0)
+        if (amount <= 0)
             return;
         
-        Money += money;
+        Money += amount;
     }
 
-    public void SpendMoney(int money)
+    public bool SpendMoney(int amount)
     {
-        if (money <= 0)
-            return;
-        
-        Money -= money;
-        Money = Math.Max(Money, 0);
+        if (amount <= 0 || amount > Money)
+            return false;
+
+        Money -= amount;
+        return true;
     }
     
     public override string ToString()

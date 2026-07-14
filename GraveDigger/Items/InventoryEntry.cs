@@ -7,6 +7,6 @@ public class InventoryEntry
 
     public override string ToString()
     {
-        return $"{ItemData.ToString()} * {Quantity}";
+        return $"{ItemData} × {Quantity}";;
     }
 }
