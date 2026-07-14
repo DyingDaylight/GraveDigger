@@ -22,6 +22,29 @@ public sealed class AudioManager
         content = contentManager ?? throw new ArgumentNullException(nameof(contentManager));
     }
     
+    private List<string> musicPlaylist = new List<string> { "theme1", "theme2" };
+    private int currentTrackIndex = 0;
+
+    public void PlayNextMusic()
+    {
+        if (musicPlaylist.Count == 0) return;
+
+        currentTrackIndex = (currentTrackIndex + 1) % musicPlaylist.Count;
+    
+        PlayMusic(musicPlaylist[currentTrackIndex], loop: false); 
+    }
+    
+    public void Update(GameState currentState)
+    {
+        if (currentState == GameState.Menu)
+        {
+            if (MediaPlayer.State == MediaState.Stopped)
+            {
+                PlayNextMusic();
+            }
+        }
+    }
+    
     // SFX
     public void PlaySFX(string name, bool loop = false, float volume = 1.0f)
     {
@@ -58,20 +81,18 @@ public sealed class AudioManager
     }
 
     // MUSIC
-    public void PlayMusic(string name, bool loop = true, float volume = 0.2f)
+    public void PlayMusic(string name, bool loop = true, float volume = 0.1f)
     {
         try
         {
             Song song = content.Load<Song>($"Sound/Music/{name}");
-            MediaPlayer.IsRepeating = loop;
-        
+            MediaPlayer.IsRepeating = loop; 
             MediaPlayer.Volume = MathHelper.Clamp(volume, 0f, 1f);
-        
             MediaPlayer.Play(song);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[AudioManager] Error loading Music '{name}': {ex.Message}");
+            Console.WriteLine($"[AudioManager] Error: {ex.Message}");
         }
     }
 
@@ -85,10 +106,10 @@ public sealed class AudioManager
         MediaPlayer.Volume = MathHelper.Clamp(volume, 0f, 1f);
     }
 
-// Звуковые эффекты (диапазон от 0.0f до 1.0f)
     public void SetSFXVolume(float volume)
     {
         float clampedVolume = MathHelper.Clamp(volume, 0f, 1f);
         SoundEffect.MasterVolume = clampedVolume;
     }
+    
 }

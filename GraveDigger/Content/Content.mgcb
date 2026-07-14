@@ -2163,9 +2163,15 @@
 /processorParam:Quality=Best
 /build:Sound/Effects/steps.wav
 
-#begin Sound/Music/theme.ogg
+#begin Sound/Music/theme1.ogg
 /importer:OggImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:Sound/Music/theme.ogg;Sound/Music/theme
+/build:Sound/Music/theme1.ogg;Sound/Music/theme1
+
+#begin Sound/Music/theme2.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/Music/theme2.ogg;Sound/Music/theme2
 

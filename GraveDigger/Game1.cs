@@ -6,6 +6,7 @@ using GUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 
 namespace GraveDigger;
 
@@ -101,6 +102,10 @@ public class Game1 : Game
         UpdateCamera(gameTime);
         previousKeyboardState = currentKeyboardState;
 
+        if (MediaPlayer.State == MediaState.Stopped)
+        {
+            GraveDigger.Systems.AudioManager.Instance.PlayNextMusic();
+        }
         
         base.Update(gameTime);
     }
@@ -185,21 +190,25 @@ private void SubscribeToEvents()
     gameplayCoordinator.OnLootSpawn += level.SpawnLoot;
 }
     
-    private void SetGameState(GameState gameState)
+private void SetGameState(GameState gameState)
+{
+    currentGameState = gameState;
+    gui.SetGameState(currentGameState);
+    
+    if (currentGameState == GameState.Menu)
     {
-        currentGameState = gameState;
-        gui.SetGameState(currentGameState);
+        GraveDigger.Systems.AudioManager.Instance.SetMusicVolume(0.1f);
         
-        if (currentGameState == GameState.Menu)
+        if (MediaPlayer.State == MediaState.Stopped)
         {
-            GraveDigger.Systems.AudioManager.Instance.PlayMusic("theme", loop: true);
-        }
-        else
-        {
-            GraveDigger.Systems.AudioManager.Instance.StopMusic();
+            GraveDigger.Systems.AudioManager.Instance.PlayMusic("theme1", loop: false);
         }
     }
-    
+    else
+    {
+        GraveDigger.Systems.AudioManager.Instance.SetMusicVolume(0f);
+    }
+}
     private void UpdateCamera(GameTime gameTime)
     {
         camera.SetTarget(player.Transform.Position);
