@@ -14,6 +14,7 @@ public class GameplayCoordinator : IGameplayActions
     private readonly IGameWindowService windowService;
     private readonly RandomService randomService;
     private readonly LootGenerator lootGenerator;
+    private readonly MerchentProvider merchentProvider;
     private readonly Inventory inventory;
 
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
@@ -27,8 +28,11 @@ public class GameplayCoordinator : IGameplayActions
         this.reputationSystem = reputationSystem;
         this.randomService = randomService;
         
+        merchentProvider = new MerchentProvider();
         lootGenerator = new LootGenerator();
         inventory = new Inventory();
+        // TODO: food for testing purposes
+        inventory.Add(merchentProvider.GetRandomFood(randomService));
     }
 
     public void OpenTombstone(Tombstone tombstone)
@@ -89,12 +93,10 @@ public class GameplayCoordinator : IGameplayActions
         // TODO: make a real merchant
         Inventory merchantInventory = new Inventory();
         merchantInventory.AddMoney(100);
-        merchantInventory.Add(lootGenerator.GetRandomItem(randomService));
-        merchantInventory.Add(lootGenerator.GetRandomItem(randomService));
-        merchantInventory.Add(lootGenerator.GetRandomItem(randomService));
-        merchantInventory.Add(lootGenerator.GetRandomItem(randomService));
-        merchantInventory.Add(lootGenerator.GetRandomItem(randomService));
-        merchantInventory.Add(lootGenerator.GetRandomItem(randomService));
+        merchantInventory.Add(merchentProvider.GetRandomFood(randomService));
+        merchantInventory.Add(merchentProvider.GetRandomFood(randomService));
+        merchantInventory.Add(merchentProvider.GetRandomFood(randomService));
+        merchantInventory.Add(merchentProvider.GetRandomFood(randomService));
         windowService.OpenTradeWindow(inventory, merchantInventory);
     }
 }

@@ -64,8 +64,6 @@ public class Game1 : Game
         camera = new Camera(GraphicsDevice.Viewport, WorldSize);
         gameContext = new GameContext(camera, screenSize, WorldSize, randomService);
         
-        
-        
         base.Initialize();
     }
     

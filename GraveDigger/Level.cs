@@ -56,6 +56,7 @@ public class Level : IUpdatable, IDrawable
         LoadPropTextures();
         LoadTombstoneTextures();
         LoadLootTextures();
+        LoadFoodTextures();
     }
     
     public void Start()
@@ -372,6 +373,14 @@ public class Level : IUpdatable, IDrawable
                 continue;
             
             SpriteManager.AddSprite($"Icon{i}",  $"Images/Loot/Icon{i}");
+        }
+    }
+    
+    private void LoadFoodTextures()
+    {
+        for (int i = 1; i < 11; i++)
+        {
+            SpriteManager.AddSprite($"Food{i}",  $"Images/Food/Food{i}");
         }
     }
 }
