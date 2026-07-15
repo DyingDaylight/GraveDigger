@@ -44,7 +44,7 @@ public class ContextMenu : UIContainer
         previousMouseState = currentMouseState;
     }
 
-    public void Show(Vector2 position, ContextMenuAction[] actions)
+    public void Show(Vector2 position, List<ContextMenuAction> actions)
     {
         ClearOptions();
 

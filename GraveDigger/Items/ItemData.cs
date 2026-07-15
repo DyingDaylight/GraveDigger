@@ -1,6 +1,6 @@
 ﻿namespace GraveDigger.Items;
 
-public class ItemData
+public abstract class ItemData
 {
     public string Id { get; }
     public string Name { get; }

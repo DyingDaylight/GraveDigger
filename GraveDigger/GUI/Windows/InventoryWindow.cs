@@ -56,14 +56,13 @@ public class InventoryWindow : Window
 
     private void OpenContextMenu(Point position, InventoryEntry entry)
     {
-        ContextMenuAction[] actions =
-        {
-            new("Use", () => HandleAction(ContextActionType.Use, entry)),
-            new("Discard", () => HandleAction(ContextActionType.Discard, entry)),
-            new("Sell", () => HandleAction(ContextActionType.Sell, entry)),
-            new("Buy", () => HandleAction(ContextActionType.Buy, entry))
-        };
+        List<ContextMenuAction> actions = new();
         
+        if (entry.ItemData is FoodItemData)
+            actions.Add(new ContextMenuAction("Use", () => HandleAction(ContextActionType.Use, entry)));
+
+        actions.Add(new("Discard", () => HandleAction(ContextActionType.Discard, entry)));
+
         contextMenu.Show(new Vector2(position.X, position.Y), actions);
     }
     

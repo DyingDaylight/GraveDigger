@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GraveDigger.GUI.Elements;
 using GraveDigger.GUI.Layouts;
 using GraveDigger.Items;
@@ -50,8 +51,8 @@ public class TradeWindow : Window
         buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - buttonsHeight);
         buttonsLayout.AddElement(closeButton);
 
-        playerInventory.ContextMenuRequested += OpenContextMenu;
-        merchantInventory.ContextMenuRequested += OpenContextMenu;
+        playerInventory.ContextMenuRequested += OpenPlayerContextMenu;
+        merchantInventory.ContextMenuRequested += OpenMerchantContextMenu;
         
         RefreshLayout();
     }
@@ -77,15 +78,25 @@ public class TradeWindow : Window
         OnCloseButton?.Invoke();
     }
     
-    private void OpenContextMenu(Point position, InventoryEntry entry)
+    private void OpenPlayerContextMenu(Point position, InventoryEntry entry)
     {
-        ContextMenuAction[] actions =
-        {
-            new("Use", () => HandleAction(ContextActionType.Use, entry)),
-            new("Discard", () => HandleAction(ContextActionType.Discard, entry)),
-            new("Sell", () => HandleAction(ContextActionType.Sell, entry)),
-            new("Buy", () => HandleAction(ContextActionType.Buy, entry))
-        };
+        List<ContextMenuAction> actions = new();
+        
+        actions.Add(new("Sell", () => HandleAction(ContextActionType.Sell, entry)));
+        
+        if (entry.ItemData is FoodItemData)
+            actions.Add(new ContextMenuAction("Use", () => HandleAction(ContextActionType.Use, entry)));
+
+        actions.Add(new("Discard", () => HandleAction(ContextActionType.Discard, entry)));
+        
+        contextMenu.Show(new Vector2(position.X, position.Y), actions);
+    }
+    
+    private void OpenMerchantContextMenu(Point position, InventoryEntry entry)
+    {
+        List<ContextMenuAction> actions = new();
+        
+        actions.Add(new("Buy", () => HandleAction(ContextActionType.Buy, entry)));
         
         contextMenu.Show(new Vector2(position.X, position.Y), actions);
     }
