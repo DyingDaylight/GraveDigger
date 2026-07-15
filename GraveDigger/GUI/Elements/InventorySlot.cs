@@ -34,7 +34,7 @@ public class InventorySlot : ClickableUIElement
     
     private InventoryEntry inventoryEntry;
     
-    public event Action<InventoryEntry> OnItemRightClicked;
+    public event Action<Point, InventoryEntry> OnItemRightClicked;
     
     
     public InventorySlot()
@@ -202,9 +202,9 @@ public class InventorySlot : ClickableUIElement
         return inventoryEntry == null || inventoryEntry.ItemData == null;
     }
     
-    private void HandleRightClick()
+    private void HandleRightClick(Point position)
     {
         if (!IsEmpty())
-            OnItemRightClicked?.Invoke(inventoryEntry);
+            OnItemRightClicked?.Invoke(position, inventoryEntry);
     }
 }

@@ -43,4 +43,9 @@ public class VerticalLayout : Layout
         base.SetPosition(x, y);
         UpdateLayout();
     }
+
+    public void RemoveAll()
+    {
+        elements.Clear();
+    }
 }

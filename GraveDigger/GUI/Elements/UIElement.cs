@@ -13,6 +13,8 @@ public abstract class UIElement : IUpdatable, IDrawable, ILayoutElement
     public Rectangle Bounds { get; protected set; }
     public Color Color { get; set; } = Color.White;
     
+    public bool Visible { get; set; } = true;
+    
     public virtual Vector2 VisibleSize => new(Bounds.Width, Bounds.Height);
 
     public virtual void Start()

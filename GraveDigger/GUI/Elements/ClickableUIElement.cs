@@ -17,8 +17,8 @@ public abstract class ClickableUIElement : UIElement
     protected bool IsLeftPressed { get; private set; }
     protected bool IsRightPressed { get; private set; }
     
-    public event Action LeftClicked;
-    public event Action RightClicked;
+    public event Action<Point> LeftClicked;
+    public event Action<Point> RightClicked;
 
     public event Action MouseEntered;
     public event Action MouseExited;
@@ -73,7 +73,7 @@ public abstract class ClickableUIElement : UIElement
             LeftReleased?.Invoke();
 
             if (IsHovered)
-                LeftClicked?.Invoke();
+                LeftClicked?.Invoke(mouse.Position);
 
             leftPressedInside = false;
         }
@@ -89,7 +89,7 @@ public abstract class ClickableUIElement : UIElement
     private void UpdateRightButton(MouseState mouse)
     {
         ButtonState currentState = mouse.RightButton;
-
+        
         bool justPressed =
             currentState == ButtonState.Pressed &&
             previousRightButtonState == ButtonState.Released;
@@ -109,7 +109,7 @@ public abstract class ClickableUIElement : UIElement
             RightReleased?.Invoke();
 
             if (IsHovered)
-                RightClicked?.Invoke();
+                RightClicked?.Invoke(mouse.Position);
 
             rightPressedInside = false;
         }

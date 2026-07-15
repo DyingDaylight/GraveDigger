@@ -19,17 +19,23 @@ public abstract class UIContainer : UIElement
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
-        
+
         foreach (var element in elements)
-            element.Update(gameTime);
+        {
+            if (element.Visible)
+                element.Update(gameTime);
+        }
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
         base.Draw(spriteBatch);
-        
+
         foreach (var element in elements)
-            element.Draw(spriteBatch);
+        {
+            if (element.Visible)
+                element.Draw(spriteBatch);
+        }
     }
 
     protected T CreateElement<T>() where T : UIElement, new()
@@ -38,5 +44,10 @@ public abstract class UIContainer : UIElement
         elements.Add(element);
         
         return element;
+    }
+
+    protected void RemoveElement<T>(T element) where T : UIElement, new()
+    {
+        elements.Remove(element);
     }
 }

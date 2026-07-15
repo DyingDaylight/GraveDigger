@@ -199,7 +199,7 @@ public class Button : ClickableUIElement
         };
     }
 
-    private void HandleLeftClick()
+    private void HandleLeftClick(Point position)
     {
         OnClick?.Invoke();
     }

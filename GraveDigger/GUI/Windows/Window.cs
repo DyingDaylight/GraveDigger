@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using GraveDigger;
-using GraveDigger.Core;
+﻿using GraveDigger.Core;
 using GraveDigger.GUI.Elements;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,7 +7,10 @@ namespace GUI.Windows;
 
 public abstract class Window : UIContainer
 {
-    public Window()
+    
+    protected readonly ContextMenu contextMenu;
+    
+    protected Window()
     {
         int width = 1000;
         int height = 800;
@@ -19,5 +20,21 @@ public abstract class Window : UIContainer
         
         Color = Color.DimGray;
         Texture = SpriteManager.GetSprite("pixel").Texture;
+        
+        contextMenu = new ContextMenu();
+    }
+    
+    public override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime);
+        if (contextMenu.Visible)
+            contextMenu.Update(gameTime);
+    }
+
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        base.Draw(spriteBatch);
+        if (contextMenu.Visible)
+            contextMenu.Draw(spriteBatch);
     }
 }

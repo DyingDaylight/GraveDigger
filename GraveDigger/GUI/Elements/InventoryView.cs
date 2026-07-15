@@ -20,7 +20,9 @@ public class InventoryView : UIContainer
     private readonly GridLayout gridLayout;
     
     private readonly List<InventorySlot> inventorySlots = new();
-
+    
+    public event Action<Point, InventoryEntry> ContextMenuRequested;
+    
     public InventoryView()
     {
         titleLabel = CreateElement<Label>();
@@ -45,7 +47,7 @@ public class InventoryView : UIContainer
         gridLayout.SetColumns(Columns);
         gridLayout.SetRows(Rows);
         gridLayout.SetPadding(5, 5);
-
+        
         CreateInventorySlots();
     }
     
@@ -71,27 +73,11 @@ public class InventoryView : UIContainer
         RefreshLayout();
     }
     
-    private void CreateInventorySlots()
+    public void SetTitle(string title)
     {
-        int slotCount = Columns * Rows;
-        
-        for (int i = 0; i < slotCount; i++)
-        {
-            InventorySlot slots = CreateElement<InventorySlot>();
-            
-            slots.OnItemRightClicked += HandleContextMenuRequested;
-
-            inventorySlots.Add(slots);
-            gridLayout.AddElement(slots);
-        }
+        titleLabel.Text = title;
     }
 
-    private void ClearSlots()
-    {
-        foreach (InventorySlot slot in inventorySlots)
-            slot.SetData(null);
-    }
-    
     protected override void RefreshLayout()
     {
         int titleWidth = Bounds.Width;
@@ -107,14 +93,30 @@ public class InventoryView : UIContainer
         gridLayout.SetBounds(gridBounds);
         gridLayout.UpdateLayout();
     }
-    
-    private void HandleContextMenuRequested(InventoryEntry entry)
+
+    private void CreateInventorySlots()
     {
-        Console.WriteLine("Context menu for " + entry);
+        int slotCount = Columns * Rows;
+        
+        for (int i = 0; i < slotCount; i++)
+        {
+            InventorySlot slot = CreateElement<InventorySlot>();
+            
+            slot.OnItemRightClicked += HandleContextMenuRequested;
+
+            inventorySlots.Add(slot);
+            gridLayout.AddElement(slot);
+        }
     }
 
-    public void SetTitle(string title)
+    private void ClearSlots()
     {
-        titleLabel.Text = title;
+        foreach (InventorySlot slot in inventorySlots)
+            slot.SetData(null);
+    }
+    
+    private void HandleContextMenuRequested(Point position, InventoryEntry entry)
+    {
+        ContextMenuRequested?.Invoke(position, entry);
     }
 }

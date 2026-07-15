@@ -5,6 +5,7 @@ using GraveDigger.GUI.Layouts;
 using GraveDigger.Items;
 using GUI.Windows;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace GraveDigger.GUI.Windows;
 
@@ -32,6 +33,8 @@ public class InventoryWindow : Window
         buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - 120);
         buttonsLayout.AddElement(closeButton);
         
+        inventoryView.ContextMenuRequested += OpenContextMenu;
+        
         RefreshLayout();
     }
 
@@ -47,6 +50,26 @@ public class InventoryWindow : Window
     
     private void HandleCloseClick()
     {
+        contextMenu.Hide();
         OnCloseButton?.Invoke();
+    }
+
+    private void OpenContextMenu(Point position, InventoryEntry entry)
+    {
+        ContextMenuAction[] actions =
+        {
+            new("Use", () => HandleAction(ContextActionType.Use, entry)),
+            new("Discard", () => HandleAction(ContextActionType.Discard, entry)),
+            new("Sell", () => HandleAction(ContextActionType.Sell, entry)),
+            new("Buy", () => HandleAction(ContextActionType.Buy, entry))
+        };
+        
+        contextMenu.Show(new Vector2(position.X, position.Y), actions);
+    }
+    
+    private void HandleAction(ContextActionType action, InventoryEntry entry)
+    {
+        Console.WriteLine("Action " + action + " on "+ entry);
+        //OnContextActionRequested?.Invoke(action, entry);
     }
 }
