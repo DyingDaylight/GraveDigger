@@ -10,7 +10,9 @@ public class Label : UIElement
     private Vector2 centerPosition;
     private string text = "";
     private SpriteFont font;
-    
+
+    public float Scale { get; set; } = 1;
+
     public string Text
     {
         get => text;
@@ -51,7 +53,7 @@ public class Label : UIElement
             Color,
             0f,
             textSize  * 0.5f,
-            1f,
+            Scale,
             SpriteEffects.None,
             0f);
     }
@@ -76,7 +78,7 @@ public class Label : UIElement
 
     private void UpdateBounds()
     {
-        Vector2 textSize = font?.MeasureString(text) ?? Vector2.Zero;
+        Vector2 textSize = font?.MeasureString(text) * Scale ?? Vector2.Zero;
         
         Bounds = new Rectangle(
             (int)(centerPosition.X - textSize.X * 0.5f),

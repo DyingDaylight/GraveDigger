@@ -36,7 +36,7 @@ public class InventoryView : UIContainer
 
         titleLayout = new HorizontalLayout(Rectangle.Empty);
         titleLayout.HorizontalPadding = 20;
-        titleLayout.HorizontalMargins = new Vector2(25, 25);
+        titleLayout.Margins = new Vector2(25, 0);
         
         titleLayout.AddElement(titleLabel);
         titleLayout.AddElement(new Spacer());
@@ -78,6 +78,12 @@ public class InventoryView : UIContainer
         titleLabel.Text = title;
     }
 
+    public void ResetInteraction()
+    {
+        foreach (InventorySlot slot in inventorySlots)
+            slot.ResetInteraction();
+    }
+    
     protected override void RefreshLayout()
     {
         int titleWidth = Bounds.Width;

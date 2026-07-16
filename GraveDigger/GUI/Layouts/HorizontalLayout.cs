@@ -7,8 +7,6 @@ namespace GraveDigger.GUI.Layouts;
 
 public class HorizontalLayout : Layout
 {
-    // X is the left margin, Y is the right margin.
-    public Vector2 HorizontalMargins { get; set; }
     
     public HorizontalLayout(Rectangle bounds) : base(bounds)
     {
@@ -41,11 +39,11 @@ public class HorizontalLayout : Layout
         // Padding is added between every pair of layout elements.
         contentWidth += HorizontalPadding * (elements.Count - 1);
         
-        int marginsWidth = (int) (HorizontalMargins.X + HorizontalMargins.Y);
+        Rectangle contentBounds = GetContentBounds();
         
         // Calculate how much horizontal space remains after
         // subtracting the elements, padding, and margins.
-        int freeSpace = bounds.Width - marginsWidth - contentWidth;
+        int freeSpace = contentBounds.Width - contentWidth;
         
         // Prevent spacers from receiving a negative size
         // when the content is wider than the available area.
@@ -54,9 +52,8 @@ public class HorizontalLayout : Layout
         int totalWidth = contentWidth + spacerSize * spacerCount;
         
         // Center the complete layout inside the area between the margins.
-        int x = (int) (bounds.X 
-                       + HorizontalMargins.X
-                       + (bounds.Width - marginsWidth - totalWidth) * 0.5f);
+        int x = (int) (contentBounds.X 
+                       + (contentBounds.Width - totalWidth) * 0.5f);
         
         for (int i = 0; i < elements.Count; i++)
         {
@@ -68,7 +65,7 @@ public class HorizontalLayout : Layout
             }
             else
             {
-                element.SetPosition(x, bounds.Y);
+                element.SetPosition(x, contentBounds.Y);
                 x += (int) element.VisibleSize.X;
             }
             

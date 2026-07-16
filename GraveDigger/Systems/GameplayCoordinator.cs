@@ -18,6 +18,7 @@ public class GameplayCoordinator : IGameplayActions
     private readonly Inventory inventory;
 
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
+
     public event Action<Tombstone> OnGraveDug;
     public event Action<Tombstone> OnGraveRepaired;
     
@@ -32,7 +33,13 @@ public class GameplayCoordinator : IGameplayActions
         lootGenerator = new LootGenerator();
         inventory = new Inventory();
         // TODO: food for testing purposes
-        inventory.Add(merchentProvider.GetRandomFood(randomService));
+        ItemData food = merchentProvider.GetRandomFood(randomService);
+        inventory.Add(food);
+        inventory.Add(food);
+        inventory.Add(food);
+        inventory.Add(food);
+        inventory.Add(food);
+        inventory.Add(food);
     }
 
     public void OpenTombstone(Tombstone tombstone)
@@ -81,6 +88,26 @@ public class GameplayCoordinator : IGameplayActions
     public void PickupItem(ItemData itemData)
     {
         inventory.Add(itemData);
+    }
+
+    public void SellItem(ItemData itemData, int amount)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void BuyItem(ItemData itemData, int amount)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void UseItem(ItemData itemData, int amount)
+    {
+        throw new NotImplementedException();
+    }
+    
+    public void DiscardItem(ItemData itemData, int amount)
+    {
+        inventory.Remove(itemData, amount);
     }
 
     public void ShowInventory()

@@ -57,7 +57,7 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
 
         started = true;
 
-        WindowManager = new WindowManager();
+        WindowManager = new WindowManager(gameContext);
         MenuUi = new MenuUI(gameContext.ScreenSize);
         InteractionTooltip = new InteractionTooltip(gameContext.CoordinatesConverter);
         Hud = new HUD();

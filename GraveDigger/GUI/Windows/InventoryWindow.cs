@@ -15,10 +15,15 @@ public class InventoryWindow : Window
     private readonly HorizontalLayout buttonsLayout;
     
     private readonly Button closeButton;
+
+    private ItemData selectedItem;
+    private Action<ItemData, int> selectedAction;
     
+    public event Action<ItemData, int> DiscardRequested;
+    public event Action<ItemData, int> UseRequested;
     public event Action OnCloseButton;
 
-    public InventoryWindow()
+    public InventoryWindow(Rectangle parentBounds) : base(parentBounds)
     {
         inventoryView = CreateElement<InventoryView>();
         inventoryView.SetPosition(Bounds.X, Bounds.Y);
@@ -47,10 +52,26 @@ public class InventoryWindow : Window
     {
         inventoryView.SetInventory(inventory);
     }
-    
+
+    protected override void HandleQuantityConfirmed(int amount)
+    {
+        if (selectedItem == null || selectedAction == null)
+            return;
+        
+        selectedAction?.Invoke(selectedItem, amount);
+        
+        selectedItem = null;
+        selectedAction = null;
+    }
+
     private void HandleCloseClick()
     {
         contextMenu.Hide();
+        quantitySelector.Hide();
+        
+        selectedItem = null;
+        selectedAction = null;
+        
         OnCloseButton?.Invoke();
     }
 
@@ -59,16 +80,31 @@ public class InventoryWindow : Window
         List<ContextMenuAction> actions = new();
         
         if (entry.ItemData is FoodItemData)
-            actions.Add(new ContextMenuAction("Use", () => HandleAction(ContextActionType.Use, entry)));
+            actions.Add(new ContextMenuAction("Use", () => Use(entry)));
 
-        actions.Add(new("Discard", () => HandleAction(ContextActionType.Discard, entry)));
+        actions.Add(new("Discard", () => Discard(entry)));
 
         contextMenu.Show(new Vector2(position.X, position.Y), actions);
     }
     
-    private void HandleAction(ContextActionType action, InventoryEntry entry)
+    private void Use(InventoryEntry entry)
     {
-        Console.WriteLine("Action " + action + " on "+ entry);
-        //OnContextActionRequested?.Invoke(action, entry);
+        RequestQuantity($"Use {entry.ItemData.Name}", entry, UseRequested);
+    }
+    
+    private void Discard(InventoryEntry entry)
+    {
+        RequestQuantity($"Discard {entry.ItemData.Name}", entry, DiscardRequested);
+    }
+    
+    private void RequestQuantity(string title, InventoryEntry entry, Action<ItemData, int> action)
+    {
+        contextMenu.Hide();
+        inventoryView.ResetInteraction();
+
+        selectedItem = entry.ItemData;
+        selectedAction = action;
+        
+        quantitySelector.Show(title, 1, entry.Quantity);
     }
 }

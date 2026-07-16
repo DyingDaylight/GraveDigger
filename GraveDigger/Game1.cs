@@ -180,6 +180,14 @@ private void SubscribeToEvents()
 
     gui.WindowManager.TombstoneInfoWindow.OnDigButton += gameplayCoordinator.DigGrave;
     gui.WindowManager.TombstoneInfoWindow.OnRepairButton += gameplayCoordinator.RepairGrave;
+    
+    gui.WindowManager.InventoryWindow.UseRequested += gameplayCoordinator.UseItem;
+    gui.WindowManager.InventoryWindow.DiscardRequested += gameplayCoordinator.DiscardItem;
+
+    gui.WindowManager.TradeWindow.SellRequested += gameplayCoordinator.SellItem;
+    gui.WindowManager.TradeWindow.BuyRequested += gameplayCoordinator.BuyItem;
+    gui.WindowManager.TradeWindow.UseRequested += gameplayCoordinator.UseItem;
+    gui.WindowManager.TradeWindow.DiscardRequested += gameplayCoordinator.DiscardItem;
 
     reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
         

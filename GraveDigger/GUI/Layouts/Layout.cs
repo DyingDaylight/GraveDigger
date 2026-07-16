@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Interfaces;
 using Microsoft.Xna.Framework;
 
@@ -9,7 +10,8 @@ public abstract class Layout : ILayoutElement
     protected readonly List<ILayoutElement> elements = new();
     
     protected Rectangle bounds;
-    
+
+    public Vector2 Margins { get; set; }
     public int HorizontalPadding { get; set; }
     public int VerticalPadding { get; set; }
     
@@ -41,4 +43,13 @@ public abstract class Layout : ILayoutElement
     }
     
     public abstract void UpdateLayout();
+    
+    protected Rectangle GetContentBounds()
+    {
+        return new Rectangle(
+            bounds.X + (int)Margins.X,
+            bounds.Y + (int)Margins.Y,
+            Math.Max(0, bounds.Width - (int)Margins.X * 2),
+            Math.Max(0, bounds.Height - (int)Margins.Y * 2));
+    }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Interfaces;
+﻿using Interfaces;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace GraveDigger.GUI.Layouts;
@@ -26,12 +24,14 @@ public class VerticalLayout : Layout
         int contentHeight = VerticalPadding * (elements.Count - 1);
         foreach (ILayoutElement element in elements)
             contentHeight += (int) element.VisibleSize.Y;
+
+        Rectangle contentBounds = GetContentBounds();
         
-        int y = (int) (bounds.Y + (bounds.Height - contentHeight) * 0.5f);
+        int y = (int) (contentBounds.Y + (contentBounds.Height - contentHeight) * 0.5f);
         
         foreach (ILayoutElement element in elements)
         {
-            int x = (int) (bounds.Center.X - element.VisibleSize.X * 0.5f);
+            int x = (int) (contentBounds.Center.X - element.VisibleSize.X * 0.5f);
             element.SetPosition(x, y);
             
             y += (int) element.VisibleSize.Y + VerticalPadding;

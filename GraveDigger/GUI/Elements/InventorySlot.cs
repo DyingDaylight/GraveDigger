@@ -133,6 +133,15 @@ public class InventorySlot : ClickableUIElement
         base.SetPosition(x, y);
         UpdateElementPositions();
     }
+    
+    public override void ResetInteraction()
+    {
+        base.ResetInteraction();
+
+        currentState = IsEmpty()
+            ? State.Disabled
+            : State.Normal;
+    }
 
     private T Create<T>() where T : UIElement, new()
     {

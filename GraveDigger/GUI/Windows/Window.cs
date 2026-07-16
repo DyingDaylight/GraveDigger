@@ -7,26 +7,35 @@ namespace GUI.Windows;
 
 public abstract class Window : UIContainer
 {
-    
+    protected readonly QuantitySelector quantitySelector;
     protected readonly ContextMenu contextMenu;
     
-    protected Window()
+    protected Window(Rectangle parentBounds)
     {
         int width = 1000;
         int height = 800;
-        int x = (int) ((1920 - width) * 0.5f);
-        int y = (int) ((1080 - height) * 0.5f);
+        int x = (int) (parentBounds.X + (parentBounds.Width - width) * 0.5f);
+        int y = (int) (parentBounds.Y + (parentBounds.Height - height) * 0.5f);
         Bounds = new Rectangle(x, y, width, height);
         
         Color = Color.DimGray;
         Texture = SpriteManager.GetSprite("pixel").Texture;
         
         contextMenu = new ContextMenu();
+        quantitySelector = new QuantitySelector(Bounds);
+        quantitySelector.ConfirmRequested += HandleQuantityConfirmed;
     }
-    
+
     public override void Update(GameTime gameTime)
     {
+        if (quantitySelector.Visible)
+        {
+            quantitySelector.Update(gameTime);
+            return;
+        }
+
         base.Update(gameTime);
+
         if (contextMenu.Visible)
             contextMenu.Update(gameTime);
     }
@@ -36,5 +45,12 @@ public abstract class Window : UIContainer
         base.Draw(spriteBatch);
         if (contextMenu.Visible)
             contextMenu.Draw(spriteBatch);
+        if (quantitySelector.Visible)
+            quantitySelector.Draw(spriteBatch);
+    }
+
+    protected virtual void HandleQuantityConfirmed(int amount)
+    {
+        
     }
 }

@@ -29,6 +29,21 @@ public abstract class ClickableUIElement : UIElement
     public event Action RightPressed;
     public event Action RightReleased;
     
+    public virtual void ResetInteraction()
+    {
+        IsHovered = false;
+        IsLeftPressed = false;
+        IsRightPressed = false;
+
+        leftPressedInside = false;
+        rightPressedInside = false;
+        wasHovered = false;
+
+        MouseState mouse = Mouse.GetState();
+        previousLeftButtonState = mouse.LeftButton;
+        previousRightButtonState = mouse.RightButton;
+    }
+    
     protected void UpdateInteraction()
     {
         MouseState mouse = Mouse.GetState();

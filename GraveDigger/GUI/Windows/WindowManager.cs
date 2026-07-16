@@ -1,4 +1,5 @@
-﻿using GraveDigger.Items;
+﻿using GraveDigger.Core;
+using GraveDigger.Items;
 using GraveDigger.Props;
 using GUI.Windows;
 using Interfaces;
@@ -19,15 +20,17 @@ public class WindowManager : IUpdatable, IDrawable
     public bool IsModalWindow => currentWindow != null;
     public bool IsInventoryOpen => currentWindow == InventoryWindow;
 
-    public WindowManager()
+    public WindowManager(GameContext gameContext)
     {
-        TombstoneInfoWindow = new TombstoneInfoWindow();
+        Rectangle bounds = new Rectangle(0, 0, (int)gameContext.ScreenSize.X, (int) gameContext.ScreenSize.Y);
+        
+        TombstoneInfoWindow = new TombstoneInfoWindow(bounds);
         TombstoneInfoWindow.OnCloseButton += CloseCurrentWindow;
         
-        InventoryWindow = new InventoryWindow();
+        InventoryWindow = new InventoryWindow(bounds);
         InventoryWindow.OnCloseButton += CloseCurrentWindow;
         
-        TradeWindow = new TradeWindow();
+        TradeWindow = new TradeWindow(bounds);
         TradeWindow.OnCloseButton += CloseCurrentWindow;
     }
     

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace GraveDigger.Items;
@@ -38,6 +39,11 @@ public class Inventory
         }
         
         return true;
+    }
+    
+    public void Remove(ItemData itemData, int amount)
+    {
+        Console.WriteLine("Removing item " + itemData.Name);
     }
 
     public void AddMoney(int amount)

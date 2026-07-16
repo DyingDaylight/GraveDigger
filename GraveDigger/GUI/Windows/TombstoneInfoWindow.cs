@@ -28,7 +28,7 @@ public class TombstoneInfoWindow : Window
     public event Action<Tombstone> OnRepairButton;
     public event Action OnCloseButton;
     
-    public TombstoneInfoWindow()
+    public TombstoneInfoWindow(Rectangle parentBounds) : base(parentBounds)
     {
         nameLabel = CreateElement<Label>();
         yearLabel = CreateElement<Label>();

@@ -69,8 +69,10 @@ public class GridLayout : Layout
         int contentWidth = cellWidth * columns + HorizontalPadding * (columns - 1);
         int contentHeight =  cellHeight * rows + VerticalPadding * (rows - 1);
 
-        int startX = (int) (bounds.X + (bounds.Width - contentWidth) * 0.5f);
-        int startY = (int) (bounds.Y + (bounds.Height - contentHeight) * 0.5f);
+        Rectangle contentBounds = GetContentBounds();
+        
+        int startX = (int) (contentBounds.X + (contentBounds.Width - contentWidth) * 0.5f);
+        int startY = (int) (contentBounds.Y + (contentBounds.Height - contentHeight) * 0.5f);
         
         for (int row = 0; row < rows; row++)
         {

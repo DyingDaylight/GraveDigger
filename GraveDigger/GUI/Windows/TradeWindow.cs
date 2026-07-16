@@ -17,14 +17,21 @@ public class TradeWindow : Window
     
     private readonly Button closeButton;
     
+    private ItemData selectedItem;
+    private Action<ItemData, int> selectedAction;
+    
+    public event Action<ItemData, int> DiscardRequested;
+    public event Action<ItemData, int> UseRequested;
+    public event Action<ItemData, int> SellRequested;
+    public event Action<ItemData, int> BuyRequested;
     public event Action OnCloseButton;
 
-    public TradeWindow()
+    public TradeWindow(Rectangle parentBounds) : base(parentBounds)
     {
         int width = 1200;
         int height = 800;
-        int x = (int) ((1920 - width) * 0.5f);
-        int y = (int) ((1080 - height) * 0.5f);
+        int x = parentBounds.X + (parentBounds.Width - width) / 2;
+        int y = parentBounds.Y + (parentBounds.Height - height) / 2;
         Bounds = new Rectangle(x, y, width, height);
         
         int halfWidth = (int) (Bounds.Width * 0.5f);
@@ -72,9 +79,21 @@ public class TradeWindow : Window
         this.merchantInventory.SetInventory(merchantInventory);
     }
     
+    protected override void HandleQuantityConfirmed(int amount)
+    {
+        if (selectedItem == null || selectedAction == null)
+            return;
+        
+        selectedAction?.Invoke(selectedItem, amount);
+        
+        selectedItem = null;
+        selectedAction = null;
+    }
+    
     private void HandleCloseClick()
     {
         contextMenu.Hide();
+        quantitySelector.Hide();
         OnCloseButton?.Invoke();
     }
     
@@ -82,12 +101,12 @@ public class TradeWindow : Window
     {
         List<ContextMenuAction> actions = new();
         
-        actions.Add(new("Sell", () => HandleAction(ContextActionType.Sell, entry)));
+        actions.Add(new("Sell", () => Sell(entry)));
         
         if (entry.ItemData is FoodItemData)
-            actions.Add(new ContextMenuAction("Use", () => HandleAction(ContextActionType.Use, entry)));
+            actions.Add(new ContextMenuAction("Use", () => Use(entry)));
 
-        actions.Add(new("Discard", () => HandleAction(ContextActionType.Discard, entry)));
+        actions.Add(new("Discard", () => Discard(entry)));
         
         contextMenu.Show(new Vector2(position.X, position.Y), actions);
     }
@@ -96,14 +115,40 @@ public class TradeWindow : Window
     {
         List<ContextMenuAction> actions = new();
         
-        actions.Add(new("Buy", () => HandleAction(ContextActionType.Buy, entry)));
+        actions.Add(new("Buy", () => Buy(entry)));
         
         contextMenu.Show(new Vector2(position.X, position.Y), actions);
     }
-    
-    private void HandleAction(ContextActionType action, InventoryEntry entry)
+
+    private void Sell(InventoryEntry entry)
     {
-        Console.WriteLine("Action " + action + " on "+ entry);
-        //OnContextActionRequested?.Invoke(action, entry);
+        RequestQuantity($"Sell {entry.ItemData.Name}", entry, SellRequested);
+    }
+    
+    private void Buy(InventoryEntry entry)
+    {
+        RequestQuantity($"Buy {entry.ItemData.Name}", entry, BuyRequested);
+    }
+    
+    private void Use(InventoryEntry entry)
+    {
+        RequestQuantity($"Use {entry.ItemData.Name}", entry, UseRequested);
+    }
+    
+    private void Discard(InventoryEntry entry)
+    {
+        RequestQuantity($"Discard {entry.ItemData.Name}", entry, DiscardRequested);
+    }
+    
+    private void RequestQuantity(string title, InventoryEntry entry, Action<ItemData, int> action)
+    {
+        contextMenu.Hide();
+        playerInventory.ResetInteraction();
+        merchantInventory.ResetInteraction();
+        
+        selectedItem = entry.ItemData;
+        selectedAction = action;
+        
+        quantitySelector.Show(title, 1, entry.Quantity);
     }
 }
