@@ -20,7 +20,7 @@ public class TradeWindow : Window
 
     public TradeWindow()
     {
-        int width = 1200;
+        int width = 1400;
         int height = 800;
         int x = (int) ((1920 - width) * 0.5f);
         int y = (int) ((1080 - height) * 0.5f);
@@ -42,12 +42,11 @@ public class TradeWindow : Window
         inventoriesLayout.AddElement(playerInventory);
         inventoriesLayout.AddElement(merchantInventory);
         
-        closeButton = CreateElement<Button>();
-        closeButton.SetText("Close");
-        closeButton.OnClick += HandleCloseClick;
+        closeButton = CreateButton("Close", 200, 60, HandleCloseClick);
         
         buttonsLayout = new HorizontalLayout(Bounds);
         buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - buttonsHeight);
+        
         buttonsLayout.AddElement(closeButton);
         
         RefreshLayout();

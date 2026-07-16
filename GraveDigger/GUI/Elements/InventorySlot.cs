@@ -45,8 +45,8 @@ public class InventorySlot : ClickableUIElement
         
         background = Create<Image>();
         background.SetSize(Bounds.Width, Bounds.Height);
-        background.SetImage(SpriteManager.GetSprite("pixel").Texture);
-        background.SetTint(Color.DarkOliveGreen);
+        background.SetImage(SpriteManager.GetSprite("slot").Texture);
+        background.SetTint(Color.White);
         
         hoverEffect = Create<Image>();
         hoverEffect.SetSize(Bounds.Width, Bounds.Height);

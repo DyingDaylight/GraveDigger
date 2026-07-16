@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GraveDigger.Core;
 using GraveDigger.GUI.Elements;
 using GraveDigger.GUI.Layouts;
 using GraveDigger.Items;
@@ -22,16 +23,14 @@ public class InventoryWindow : Window
         inventoryView = CreateElement<InventoryView>();
         inventoryView.SetPosition(Bounds.X, Bounds.Y);
         inventoryView.SetSize(Bounds.Width, Bounds.Height - 120);
-        
-        closeButton = CreateElement<Button>();
-        closeButton.SetText("Close");
-        closeButton.OnClick += HandleCloseClick;
-        
+    
+        var closeButton = CreateButton("Close", 200, 60, HandleCloseClick);
+    
         buttonsLayout = new HorizontalLayout(Bounds);
         buttonsLayout.HorizontalPadding = 20;
         buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - 120);
         buttonsLayout.AddElement(closeButton);
-        
+    
         RefreshLayout();
     }
 

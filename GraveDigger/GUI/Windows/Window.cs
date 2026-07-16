@@ -17,7 +17,7 @@ public abstract class Window : UIContainer
         int y = (int) ((1080 - height) * 0.5f);
         Bounds = new Rectangle(x, y, width, height);
         
-        Color = Color.DimGray;
-        Texture = SpriteManager.GetSprite("pixel").Texture;
+        Color = Color.White;
+        Texture = SpriteManager.GetSprite("background").Texture;
     }
 }
