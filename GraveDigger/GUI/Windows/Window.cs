@@ -18,8 +18,8 @@ public abstract class Window : UIContainer
         int y = (int) (parentBounds.Y + (parentBounds.Height - height) * 0.5f);
         Bounds = new Rectangle(x, y, width, height);
         
-        Color = Color.DimGray;
-        Texture = SpriteManager.GetSprite("pixel").Texture;
+        Color = Color.White;
+        Texture = SpriteManager.GetSprite("background").Texture;
         
         contextMenu = new ContextMenu();
         quantitySelector = new QuantitySelector(Bounds);
@@ -51,6 +51,6 @@ public abstract class Window : UIContainer
 
     protected virtual void HandleQuantityConfirmed(int amount)
     {
-        
+       
     }
 }

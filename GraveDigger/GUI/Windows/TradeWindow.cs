@@ -31,7 +31,7 @@ public class TradeWindow : Window
 
     public TradeWindow(Rectangle parentBounds) : base(parentBounds)
     {
-        int width = 1200;
+        int width = 1400;
         int height = 800;
         int x = parentBounds.X + (parentBounds.Width - width) / 2;
         int y = parentBounds.Y + (parentBounds.Height - height) / 2;
@@ -53,12 +53,11 @@ public class TradeWindow : Window
         inventoriesLayout.AddElement(playerInventoryView);
         inventoriesLayout.AddElement(merchantInventoryView);
         
-        closeButton = CreateElement<Button>();
-        closeButton.SetText("Close");
-        closeButton.OnClick += HandleCloseClick;
+        closeButton = CreateButton("Close", 200, 60, HandleCloseClick);
         
         buttonsLayout = new HorizontalLayout(Bounds);
         buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - buttonsHeight);
+        
         buttonsLayout.AddElement(closeButton);
 
         playerInventoryView.ContextMenuRequested += OpenPlayerContextMenu;

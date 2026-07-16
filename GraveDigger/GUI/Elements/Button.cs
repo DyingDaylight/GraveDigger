@@ -41,6 +41,8 @@ public class Button : ClickableUIElement
     
     private bool isDisabled;
     
+    private bool isSizeLocked = false;
+    
     public Button() : this(UiButtonMode.Color)
     {
         SetSize(300, 80);
@@ -171,7 +173,7 @@ public class Button : ClickableUIElement
     private void ApplyTextureState()
     {
         Texture2D newTexture = currentState switch
-        
+            
         {
             UiButtonState.Normal => normalTexture,
             UiButtonState.Hover => hoverTexture ?? normalTexture,
@@ -180,11 +182,7 @@ public class Button : ClickableUIElement
             _ => normalTexture
         };
         
-        if (Texture != newTexture)
-        {
-            Texture = newTexture;
-            SetSize(Texture.Width, Texture.Height);
-        }
+        Texture = newTexture;
     }
     
     private void ApplyColorState()
@@ -202,5 +200,11 @@ public class Button : ClickableUIElement
     private void HandleLeftClick(Point position)
     {
         OnClick?.Invoke();
+    }
+    
+    public void LockSize(int width, int height)
+    {
+        base.SetSize(width, height);
+        isSizeLocked = true; 
     }
 }
