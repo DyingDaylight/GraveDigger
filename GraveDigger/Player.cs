@@ -20,6 +20,10 @@ public class Player : Animation
     private int previousAnimationRow = -1;
     private bool isColliding = false;
     
+    public int Hunger { get; private set; }
+    public int MaxHunger { get; } = 100;
+    public bool IsStarving => Hunger >= MaxHunger;
+    
     public Player(GameContext gameContext) : base("digger")
     {
         this.gameContext = gameContext;
@@ -76,7 +80,25 @@ public class Player : Animation
     public void OnCollisionEnter(Collider self, Collider other)
     {
     }
+    
+    public void DecreaseHunger(int amount)
+    {
+        if (amount <= 0)
+            return;
 
+        Hunger = Math.Clamp(Hunger - amount, 0, MaxHunger);
+        
+        Console.WriteLine("Hunger: " + Hunger);
+    }
+    
+    public void IncreaseHunger(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        Hunger = Math.Clamp(Hunger + amount, 0, MaxHunger);
+    }
+    
     private void UpdateSortingOrder()
     {
         SortingOrder = SortingUtility.CalculateByY(Bottom);

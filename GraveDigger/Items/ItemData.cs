@@ -21,6 +21,6 @@ public abstract class ItemData
     
     public override string ToString()
     {
-        return Name;
+        return Name + "\n" + Description;
     }
 }

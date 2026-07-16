@@ -11,4 +11,9 @@ public class FoodItemData : ItemData
     {
         Nutrition = nutrition;
     }
+    
+    public override string ToString()
+    {
+        return $"{Name} (-{Nutrition} Hunger)\n{Description}";
+    }
 }

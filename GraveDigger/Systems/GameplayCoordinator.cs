@@ -16,15 +16,20 @@ public class GameplayCoordinator : IGameplayActions
     private readonly LootGenerator lootGenerator;
     private readonly MerchentProvider merchentProvider;
     private readonly Inventory inventory;
+    private readonly Player player;
 
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
 
     public event Action<Tombstone> OnGraveDug;
     public event Action<Tombstone> OnGraveRepaired;
     
-    public GameplayCoordinator(IGameWindowService windowService, ReputationSystem reputationSystem,
+    public GameplayCoordinator(
+        Player player,
+        IGameWindowService windowService, 
+        ReputationSystem reputationSystem,
         RandomService randomService)
     {
+        this.player = player;
         this.windowService = windowService;
         this.reputationSystem = reputationSystem;
         this.randomService = randomService;
@@ -102,7 +107,16 @@ public class GameplayCoordinator : IGameplayActions
 
     public void UseItem(ItemData itemData, int amount)
     {
-        throw new NotImplementedException();
+        if (itemData is not FoodItemData food)
+            return;
+
+        if (amount <= 0)
+            return;
+
+        int nutritionAmount = food.Nutrition * amount;
+
+        player.DecreaseHunger(nutritionAmount);
+        inventory.Remove(food, amount);
     }
     
     public void DiscardItem(ItemData itemData, int amount)

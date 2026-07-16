@@ -161,15 +161,17 @@ public class Game1 : Game
         gui.LoadContent(Content);
         gui.Start();
         
+        player = new Player(gameContext);
+        // TODO: remove
+        player.IncreaseHunger(80);
+        player.Start();
+        
         reputationSystem = new ReputationSystem();
-        gameplayCoordinator = new GameplayCoordinator(gui, reputationSystem, randomService);
+        gameplayCoordinator = new GameplayCoordinator(player, gui, reputationSystem, randomService);
         
         level = new Level(gameContext, gameplayCoordinator);
         level.LoadTextures();
         level.Start();
-        
-        player = new Player(gameContext);
-        player.Start();
     }
 
 private void SubscribeToEvents()

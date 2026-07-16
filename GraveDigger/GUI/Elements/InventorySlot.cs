@@ -167,7 +167,7 @@ public class InventorySlot : ClickableUIElement
         price.Text = inventoryEntry.ItemData.Price.ToString();
         amount.Text = inventoryEntry.Quantity.ToString();
         
-        string tooltipText = inventoryEntry.ItemData.Name + "\n" + inventoryEntry.ItemData.Description;
+        string tooltipText = inventoryEntry.ItemData.ToString();
         tooltip.SetTooltip(tooltipText);
     }
 
