@@ -62,7 +62,8 @@ public abstract class UIContainer : UIElement
         btn.SetTextures(
             SpriteManager.GetSprite("ButtonMainMenu").Texture,
             SpriteManager.GetSprite("ButtonHover").Texture,
-            SpriteManager.GetSprite("ButtonPressed").Texture
+            SpriteManager.GetSprite("ButtonPressed").Texture,
+            SpriteManager.GetSprite("ButtonDisabled").Texture
         );
         btn.LockSize(width, height);
         btn.SetText(text);

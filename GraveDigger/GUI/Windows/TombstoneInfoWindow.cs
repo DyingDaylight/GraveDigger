@@ -36,17 +36,9 @@ public class TombstoneInfoWindow : Window
         natureLabel = CreateElement<Label>();
         stateLabel = CreateElement<Label>();
         
-        digButton = CreateElement<Button>();
-        digButton.SetText("Dig");
-        digButton.OnClick += HandleDigClick;
-        
-        repairButton = CreateElement<Button>();
-        repairButton.SetText("Repair");
-        repairButton.OnClick += HandleRepairClick;
-        
-        closeButton = CreateElement<Button>();
-        closeButton.SetText("Close");
-        closeButton.OnClick += HandleCloseButton;
+        digButton = CreateButton("Dig", 300, 80, HandleDigClick);
+        repairButton = CreateButton("Repair", 300, 80, HandleRepairClick);
+        closeButton = CreateButton("Close", 300, 80, HandleCloseButton);
         
         buttonsLayout = new HorizontalLayout(Bounds);
         buttonsLayout.HorizontalPadding = 20;
@@ -120,5 +112,7 @@ public class TombstoneInfoWindow : Window
     {
         OnCloseButton?.Invoke();
     }
+    
+    
     
 }
