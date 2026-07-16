@@ -97,12 +97,12 @@ public class GameplayCoordinator : IGameplayActions
 
     public void SellItem(ItemData itemData, int amount)
     {
-        throw new NotImplementedException();
+        Console.WriteLine("Selling " + amount + " " + itemData.Name);
     }
 
     public void BuyItem(ItemData itemData, int amount)
     {
-        throw new NotImplementedException();
+        Console.WriteLine("Buying " + amount + " " + itemData.Name);
     }
 
     public void UseItem(ItemData itemData, int amount)
