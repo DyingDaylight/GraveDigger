@@ -10,8 +10,8 @@ namespace GraveDigger.GUI.Windows;
 
 public class TradeWindow : Window
 {
-    private readonly InventoryView playerInventory;
-    private readonly InventoryView merchantInventory;
+    private readonly InventoryView playerInventoryView;
+    private readonly InventoryView merchantInventoryView;
     private readonly HorizontalLayout inventoriesLayout;
     private readonly HorizontalLayout buttonsLayout;
     
@@ -19,6 +19,9 @@ public class TradeWindow : Window
     
     private ItemData selectedItem;
     private Action<ItemData, int> selectedAction;
+    
+    private Inventory playerInventory;
+    private Inventory merchantInventory;
     
     public event Action<ItemData, int> DiscardRequested;
     public event Action<ItemData, int> UseRequested;
@@ -37,18 +40,18 @@ public class TradeWindow : Window
         int halfWidth = (int) (Bounds.Width * 0.5f);
         int buttonsHeight = 120;
         
-        playerInventory = CreateElement<InventoryView>();
-        playerInventory.SetSize(halfWidth, Bounds.Height - buttonsHeight);
+        playerInventoryView = CreateElement<InventoryView>();
+        playerInventoryView.SetSize(halfWidth, Bounds.Height - buttonsHeight);
         
-        merchantInventory = CreateElement<InventoryView>();
-        merchantInventory.SetSize(halfWidth, Bounds.Height - buttonsHeight);
+        merchantInventoryView = CreateElement<InventoryView>();
+        merchantInventoryView.SetSize(halfWidth, Bounds.Height - buttonsHeight);
 
         Rectangle inventoryRect = new Rectangle(Bounds.X, Bounds.Y, 
             Bounds.Width, Bounds.Height - buttonsHeight);
         inventoriesLayout = new HorizontalLayout(inventoryRect);
         
-        inventoriesLayout.AddElement(playerInventory);
-        inventoriesLayout.AddElement(merchantInventory);
+        inventoriesLayout.AddElement(playerInventoryView);
+        inventoriesLayout.AddElement(merchantInventoryView);
         
         closeButton = CreateElement<Button>();
         closeButton.SetText("Close");
@@ -58,8 +61,8 @@ public class TradeWindow : Window
         buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - buttonsHeight);
         buttonsLayout.AddElement(closeButton);
 
-        playerInventory.ContextMenuRequested += OpenPlayerContextMenu;
-        merchantInventory.ContextMenuRequested += OpenMerchantContextMenu;
+        playerInventoryView.ContextMenuRequested += OpenPlayerContextMenu;
+        merchantInventoryView.ContextMenuRequested += OpenMerchantContextMenu;
         
         RefreshLayout();
     }
@@ -72,11 +75,18 @@ public class TradeWindow : Window
     
     public void SetInventories(Inventory playerInventory, Inventory merchantInventory)
     {
-        this.playerInventory.SetTitle("Grave Digger");
-        this.playerInventory.SetInventory(playerInventory);
-        
-        this.merchantInventory.SetTitle("Merchant");
-        this.merchantInventory.SetInventory(merchantInventory);
+        UnsubscribeInventories();
+
+        this.playerInventory = playerInventory;
+        this.merchantInventory = merchantInventory;
+
+        if (this.playerInventory != null)
+            this.playerInventory.Changed += RefreshInventories;
+
+        if (this.merchantInventory != null)
+            this.merchantInventory.Changed += RefreshInventories;
+
+        RefreshInventories();
     }
     
     protected override void HandleQuantityConfirmed(int amount)
@@ -88,6 +98,24 @@ public class TradeWindow : Window
         
         selectedItem = null;
         selectedAction = null;
+    }
+    
+    private void UnsubscribeInventories()
+    {
+        if (playerInventory != null)
+            playerInventory.Changed -= RefreshInventories;
+
+        if (merchantInventory != null)
+            merchantInventory.Changed -= RefreshInventories;
+    }
+    
+    private void RefreshInventories()
+    {
+        playerInventoryView.SetTitle("Grave Digger");
+        playerInventoryView.SetInventory(playerInventory);
+        
+        merchantInventoryView.SetTitle("Merchant");
+        merchantInventoryView.SetInventory(merchantInventory);
     }
     
     private void HandleCloseClick()
@@ -143,8 +171,8 @@ public class TradeWindow : Window
     private void RequestQuantity(string title, InventoryEntry entry, Action<ItemData, int> action)
     {
         contextMenu.Hide();
-        playerInventory.ResetInteraction();
-        merchantInventory.ResetInteraction();
+        playerInventoryView.ResetInteraction();
+        merchantInventoryView.ResetInteraction();
         
         selectedItem = entry.ItemData;
         selectedAction = action;

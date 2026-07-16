@@ -18,6 +18,8 @@ public class InventoryWindow : Window
 
     private ItemData selectedItem;
     private Action<ItemData, int> selectedAction;
+
+    private Inventory inventory;
     
     public event Action<ItemData, int> DiscardRequested;
     public event Action<ItemData, int> UseRequested;
@@ -49,6 +51,19 @@ public class InventoryWindow : Window
     }
     
     public void SetInventory(Inventory inventory)
+    {
+        if (this.inventory != null)
+            this.inventory.Changed -= RefreshInventory;
+
+        this.inventory = inventory;
+
+        if (this.inventory != null)
+            this.inventory.Changed += RefreshInventory;
+
+        RefreshInventory();
+    }
+
+    private void RefreshInventory()
     {
         inventoryView.SetInventory(inventory);
     }
