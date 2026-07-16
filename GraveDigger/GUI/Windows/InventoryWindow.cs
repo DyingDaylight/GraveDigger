@@ -29,14 +29,14 @@ public class InventoryWindow : Window
     public InventoryWindow(Rectangle parentBounds) : base(parentBounds)
     {
         inventoryView = CreateElement<InventoryView>();
-        inventoryView.SetPosition(Bounds.X, Bounds.Y);
-        inventoryView.SetSize(Bounds.Width, Bounds.Height - 120);
+        inventoryView.SetPosition(Bounds.X + 40, Bounds.Y + 50);
+        inventoryView.SetSize(Bounds.Width - 80, Bounds.Height - 150);
     
         var closeButton = CreateButton("Close", 200, 60, HandleCloseClick);
     
         buttonsLayout = new HorizontalLayout(Bounds);
         buttonsLayout.HorizontalPadding = 20;
-        buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - 120);
+        buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - 150);
         buttonsLayout.AddElement(closeButton);
 
         inventoryView.ContextMenuRequested += OpenContextMenu;

@@ -32,12 +32,14 @@ public class TradeWindow : Window
     public TradeWindow(Rectangle parentBounds) : base(parentBounds)
     {
         int width = 1400;
-        int height = 800;
+        int height = 850;
         int x = parentBounds.X + (parentBounds.Width - width) / 2;
         int y = parentBounds.Y + (parentBounds.Height - height) / 2;
         Bounds = new Rectangle(x, y, width, height);
+
+        int borderWidth = 45;
         
-        int halfWidth = (int) (Bounds.Width * 0.5f);
+        int halfWidth = (int) (Bounds.Width * 0.5f) - borderWidth;
         int buttonsHeight = 120;
         
         playerInventoryView = CreateElement<InventoryView>();
@@ -46,7 +48,7 @@ public class TradeWindow : Window
         merchantInventoryView = CreateElement<InventoryView>();
         merchantInventoryView.SetSize(halfWidth, Bounds.Height - buttonsHeight);
 
-        Rectangle inventoryRect = new Rectangle(Bounds.X, Bounds.Y, 
+        Rectangle inventoryRect = new Rectangle(Bounds.X, Bounds.Y + 40, 
             Bounds.Width, Bounds.Height - buttonsHeight);
         inventoriesLayout = new HorizontalLayout(inventoryRect);
         
@@ -56,7 +58,7 @@ public class TradeWindow : Window
         closeButton = CreateButton("Close", 200, 60, HandleCloseClick);
         
         buttonsLayout = new HorizontalLayout(Bounds);
-        buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - buttonsHeight);
+        buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - buttonsHeight - 20);
         
         buttonsLayout.AddElement(closeButton);
 

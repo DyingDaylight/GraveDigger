@@ -13,7 +13,7 @@ public abstract class Window : UIContainer
     protected Window(Rectangle parentBounds)
     {
         int width = 1000;
-        int height = 800;
+        int height = 850;
         int x = (int) (parentBounds.X + (parentBounds.Width - width) * 0.5f);
         int y = (int) (parentBounds.Y + (parentBounds.Height - height) * 0.5f);
         Bounds = new Rectangle(x, y, width, height);

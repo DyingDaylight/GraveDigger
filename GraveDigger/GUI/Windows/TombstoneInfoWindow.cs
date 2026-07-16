@@ -35,14 +35,17 @@ public class TombstoneInfoWindow : Window
         wealthLabel = CreateElement<Label>();
         natureLabel = CreateElement<Label>();
         stateLabel = CreateElement<Label>();
+
+        int buttonWidth = 270;
+        int buttonHeight = 80;
         
-        digButton = CreateButton("Dig", 300, 80, HandleDigClick);
-        repairButton = CreateButton("Repair", 300, 80, HandleRepairClick);
-        closeButton = CreateButton("Close", 300, 80, HandleCloseButton);
+        digButton = CreateButton("Dig", buttonWidth, buttonHeight, HandleDigClick);
+        repairButton = CreateButton("Repair", buttonWidth, buttonHeight, HandleRepairClick);
+        closeButton = CreateButton("Close", buttonWidth, buttonHeight, HandleCloseButton);
         
         buttonsLayout = new HorizontalLayout(Bounds);
         buttonsLayout.HorizontalPadding = 20;
-        buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - 120);
+        buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - 190);
         
         buttonsLayout.AddElement(digButton);
         buttonsLayout.AddElement(repairButton);
