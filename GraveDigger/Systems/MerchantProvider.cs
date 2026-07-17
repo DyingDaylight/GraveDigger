@@ -4,7 +4,7 @@ using GraveDigger.Utils;
 
 namespace GraveDigger.Systems;
 
-public class MerchentProvider
+public class MerchantProvider
 {
     private static readonly List<FoodItemData> foodPool = new()
     {

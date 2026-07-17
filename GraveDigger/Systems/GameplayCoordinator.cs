@@ -14,11 +14,13 @@ public class GameplayCoordinator : IGameplayActions
     private readonly IGameWindowService windowService;
     private readonly RandomService randomService;
     private readonly LootGenerator lootGenerator;
-    private readonly MerchentProvider merchentProvider;
+    private readonly MerchantProvider merchantProvider;
+    private readonly Inventory merchantInventory;
     private readonly Inventory inventory;
     private readonly Player player;
 
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
+    public event Action<TradeResult> OnTradeCompleted;
 
     public event Action<Tombstone> OnGraveDug;
     public event Action<Tombstone> OnGraveRepaired;
@@ -34,11 +36,19 @@ public class GameplayCoordinator : IGameplayActions
         this.reputationSystem = reputationSystem;
         this.randomService = randomService;
         
-        merchentProvider = new MerchentProvider();
+        merchantProvider = new MerchantProvider();
         lootGenerator = new LootGenerator();
+        merchantInventory = new Inventory();
+        // TODO: make a real merchant
+        merchantInventory.AddMoney(100);
+        merchantInventory.Add(merchantProvider.GetRandomFood(randomService));
+        merchantInventory.Add(merchantProvider.GetRandomFood(randomService));
+        merchantInventory.Add(merchantProvider.GetRandomFood(randomService));
+        merchantInventory.Add(merchantProvider.GetRandomFood(randomService));
+        
         inventory = new Inventory();
         // TODO: food for testing purposes
-        ItemData food = merchentProvider.GetRandomFood(randomService);
+        ItemData food = merchantProvider.GetRandomFood(randomService);
         inventory.Add(food);
         inventory.Add(food);
         inventory.Add(food);
@@ -97,12 +107,12 @@ public class GameplayCoordinator : IGameplayActions
 
     public void SellItem(ItemData itemData, int amount)
     {
-        Console.WriteLine("Selling " + amount + " " + itemData.Name);
+        Trade(inventory, merchantInventory, itemData, amount);
     }
 
     public void BuyItem(ItemData itemData, int amount)
     {
-        Console.WriteLine("Buying " + amount + " " + itemData.Name);
+        Trade(merchantInventory, inventory, itemData, amount);
     }
 
     public void UseItem(ItemData itemData, int amount)
@@ -129,15 +139,55 @@ public class GameplayCoordinator : IGameplayActions
         windowService.OpenInventoryWindow(inventory);
     }
 
-    public void ShowMerchant()
+    public void ShowMarket()
     {
-        // TODO: make a real merchant
-        Inventory merchantInventory = new Inventory();
-        merchantInventory.AddMoney(100);
-        merchantInventory.Add(merchentProvider.GetRandomFood(randomService));
-        merchantInventory.Add(merchentProvider.GetRandomFood(randomService));
-        merchantInventory.Add(merchentProvider.GetRandomFood(randomService));
-        merchantInventory.Add(merchentProvider.GetRandomFood(randomService));
         windowService.OpenTradeWindow(inventory, merchantInventory);
+    }
+    
+    private TradeResult ValidateTrade(Inventory seller, Inventory buyer,
+        ItemData itemData, int amount)
+    {
+        if (itemData == null)
+            return TradeResult.ItemNotFound;
+
+        if (amount <= 0)
+            return TradeResult.InvalidQuantity;
+        
+        if (!seller.HasItem(itemData, amount))
+            return TradeResult.InvalidQuantity;
+
+        int fullPrice = itemData.Price * amount;
+
+        if (buyer.Money < fullPrice)
+            return TradeResult.NotEnoughMoney;
+        
+        if (!buyer.CanAdd(itemData, amount))
+            return TradeResult.NotEnoughInventorySpace;
+
+        return TradeResult.Success;
+    }
+    
+    private void Trade(Inventory seller, Inventory buyer, ItemData itemData, int amount)
+    {
+        TradeResult result = ValidateTrade(seller, buyer,
+            itemData, amount);
+
+        if (result != TradeResult.Success)
+        {
+            AudioManager.Instance.PlaySFX("chest-close");
+            OnTradeCompleted?.Invoke(result);
+            return;
+        }
+
+        int fullPrice = itemData.Price * amount;
+
+        seller.Remove(itemData, amount);
+        seller.AddMoney(fullPrice);
+        
+        buyer.Add(itemData, amount);
+        buyer.SpendMoney(fullPrice);
+
+        AudioManager.Instance.PlaySFX("coins");
+        OnTradeCompleted?.Invoke(result);
     }
 }

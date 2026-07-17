@@ -16,7 +16,7 @@ public class Inventory
 
     public event Action Changed;
     
-    public bool Add(ItemData item)
+    public bool Add(ItemData item, int amount = 1)
     {
         if (item == null || string.IsNullOrWhiteSpace(item.Id))
             return false;
@@ -26,7 +26,7 @@ public class Inventory
         
         if (items.TryGetValue(item.Id, out InventoryEntry entry))
         {
-            entry.Quantity++;
+            entry.Quantity += amount;
         }
         else
         {
@@ -44,7 +44,7 @@ public class Inventory
         return true;
     }
     
-    public bool Remove(ItemData itemData, int amount)
+    public bool Remove(ItemData itemData, int amount = 1)
     {
         if (itemData == null || amount <= 0)
             return false;
@@ -52,9 +52,10 @@ public class Inventory
         if (!items.TryGetValue(itemData.Id, out InventoryEntry entry))
             return false;
 
-        int removedAmount = Math.Min(amount, entry.Quantity);
+        if (entry.Quantity < amount)
+            return false;
 
-        entry.Quantity -= removedAmount;
+        entry.Quantity -= amount;
 
         if (entry.Quantity == 0)
             items.Remove(itemData.Id);
@@ -91,5 +92,25 @@ public class Inventory
             sb.AppendLine(entry.ToString());
         }
         return sb.ToString();
+    }
+    
+    public bool HasItem(ItemData itemData, int amount)
+    {
+        if (itemData == null || amount <= 0)
+            return false;
+
+        return items.TryGetValue(itemData.Id, out InventoryEntry entry)
+               && entry.Quantity >= amount;
+    }
+    
+    public bool CanAdd(ItemData itemData, int amount)
+    {
+        if (itemData == null)
+            return false;
+
+        if (items.ContainsKey(itemData.Id))
+            return true;
+
+        return items.Count < Capacity;
     }
 }

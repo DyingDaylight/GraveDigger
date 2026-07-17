@@ -2319,6 +2319,24 @@
 /processorParam:TextureFormat=Color
 /build:Images/Props/Tombstone9.png;Images/Props/Tombstone9
 
+#begin Sound/Effects/chest-close.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/Effects/chest-close.wav;Sound/Effects/chest-close
+
+#begin Sound/Effects/chest-shake.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/Effects/chest-shake.wav;Sound/Effects/chest-shake
+
+#begin Sound/Effects/coins.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/Effects/coins.wav;Sound/Effects/coins
+
 #begin Sound/Effects/scratch.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

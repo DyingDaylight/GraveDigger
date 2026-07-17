@@ -1,6 +1,7 @@
 ﻿using GraveDigger.Data;
 using GraveDigger.Items;
 using GraveDigger.Props;
+using GraveDigger.Systems;
 
 namespace Interfaces;
 
@@ -14,5 +15,4 @@ public interface IGameWindowService
     bool IsModalWindowOpen();
     bool IsInventoryOpen();
     void RefreshTombstoneWindow();
-    
 }

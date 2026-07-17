@@ -196,6 +196,7 @@ private void SubscribeToEvents()
     level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
 
     gameplayCoordinator.OnLootSpawn += level.SpawnLoot;
+    gameplayCoordinator.OnTradeCompleted += gui.ShowTradeResult;
 }
     
 private void SetGameState(GameState gameState)
@@ -259,7 +260,7 @@ private void SetGameState(GameState gameState)
         if (WasKeyJustPressed(keyboardState, Keys.T))
         {
             if (!gui.IsModalWindowOpen())
-                gameplayCoordinator.ShowMerchant();
+                gameplayCoordinator.ShowMarket();
         }
     }
     

@@ -5,6 +5,7 @@ using GraveDigger.GUI.Components;
 using GraveDigger.GUI.Windows;
 using GraveDigger.Items;
 using GraveDigger.Props;
+using GraveDigger.Systems;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -130,6 +131,12 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
     public void RefreshTombstoneWindow()
     {
         WindowManager.RefreshTombstoneWindow();
+    }
+
+    public void ShowTradeResult(TradeResult result)
+    {
+        if (WindowManager.TradeWindow != null && WindowManager.TradeWindow.Visible)
+            WindowManager.TradeWindow.ShowTradeResult(result);
     }
 
     public bool IsInventoryOpen()

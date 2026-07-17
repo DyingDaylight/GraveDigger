@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using GraveDigger.Core;
 using GraveDigger.GUI.Elements;
 using GraveDigger.GUI.Layouts;
 using GraveDigger.Items;
+using GraveDigger.Systems;
 using GUI.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,12 +26,17 @@ public class TradeWindow : Window
     
     private readonly Button closeButton;
     
+    private readonly Label tradeLabel;
+    private const float TradeResultDuration = 3000f;
+    private float tradeResultTimer = 0f;
+    
     private ItemData selectedItem;
     private Action<ItemData, int> selectedAction;
     
     private Inventory playerInventory;
     private Inventory merchantInventory;
-    
+
+    private int hintPadding = 500;
     
     private InventorySlot draggedSlot;
     private bool isDragging;
@@ -45,7 +52,7 @@ public class TradeWindow : Window
     public TradeWindow(Rectangle parentBounds) : base(parentBounds)
     {
         int width = 1400;
-        int height = 850;
+        int height = 900;
         int x = parentBounds.X + (parentBounds.Width - width) / 2;
         int y = parentBounds.Y + (parentBounds.Height - height) / 2;
         Bounds = new Rectangle(x, y, width, height);
@@ -54,15 +61,16 @@ public class TradeWindow : Window
         
         int halfWidth = (int) (Bounds.Width * 0.5f) - borderWidth;
         int buttonsHeight = 120;
+        int hintHeight = 50;
         
         playerInventoryView = CreateElement<InventoryView>();
-        playerInventoryView.SetSize(halfWidth, Bounds.Height - buttonsHeight);
+        playerInventoryView.SetSize(halfWidth, Bounds.Height - buttonsHeight - hintHeight);
         
         merchantInventoryView = CreateElement<InventoryView>();
-        merchantInventoryView.SetSize(halfWidth, Bounds.Height - buttonsHeight);
+        merchantInventoryView.SetSize(halfWidth, Bounds.Height - buttonsHeight - hintHeight);
 
         Rectangle inventoryRect = new Rectangle(Bounds.X, Bounds.Y + 40, 
-            Bounds.Width, Bounds.Height - buttonsHeight);
+            Bounds.Width, Bounds.Height - buttonsHeight - hintHeight);
         inventoriesLayout = new HorizontalLayout(inventoryRect);
         
         inventoriesLayout.AddElement(playerInventoryView);
@@ -74,14 +82,18 @@ public class TradeWindow : Window
         merchantHintLabel = CreateElement<Label>();
         merchantHintLabel.Text = "Drag to Buy";
         
-        Rectangle hintsRect = new Rectangle(Bounds.X, Bounds.Bottom - 140, Bounds.Width, 50);
+        tradeLabel = CreateElement<Label>();
+        tradeLabel.Text = "";
+        tradeLabel.Visible = false;
+        
+        Rectangle hintsRect = new Rectangle(Bounds.X, Bounds.Bottom - 200, Bounds.Width, 50);
         hintsLayout = new HorizontalLayout(hintsRect);
         
-        hintsLayout.HorizontalPadding = 500; 
+        hintsLayout.HorizontalPadding = (int)(hintPadding * 0.5f); 
 
         hintsLayout.AddElement(playerHintLabel);
+        hintsLayout.AddElement(tradeLabel);
         hintsLayout.AddElement(merchantHintLabel);
-        
         
         closeButton = CreateButton("Close", 200, 60, HandleCloseClick);
         
@@ -133,8 +145,10 @@ public class TradeWindow : Window
             draggedSlot = null;
             itemBeingDragged = null;
         }
+
+        TradeResultTimer(gameTime);
     }
-    
+
     public override void Draw(SpriteBatch spriteBatch)
     {
         base.Draw(spriteBatch);
@@ -267,7 +281,6 @@ public class TradeWindow : Window
     
     private InventorySlot FindSlotUnderMouse(Point mousePos)
     {
-       
         foreach (var slot in playerInventoryView.GetAllSlots()) 
             if (slot.Bounds.Contains(mousePos)) { slot.IsPlayerSlot = true; return slot; }
         
@@ -275,5 +288,53 @@ public class TradeWindow : Window
             if (slot.Bounds.Contains(mousePos)) { slot.IsPlayerSlot = false; return slot; }
         
         return null;
+    }
+
+    public void ShowTradeResult(TradeResult result)
+    {
+        string message = result switch
+        {
+            TradeResult.Success => "Done.",
+            TradeResult.ItemNotFound => "Item not found.",
+            TradeResult.InvalidQuantity => "Invalid amount.",
+            TradeResult.NotEnoughMoney => "Not enough money.",
+            TradeResult.NotEnoughInventorySpace => "No space.",
+            _ => "Failed."
+        };
+        tradeLabel.Text = message;
+        if (result == TradeResult.Success)
+        {
+            tradeLabel.Color = Color.DarkSeaGreen;
+        }
+        else
+        {
+            tradeLabel.Color = Color.Red;
+        }
+        tradeLabel.Visible = true;
+        hintsLayout.HorizontalPadding = (int)((hintPadding - tradeLabel.Bounds.Width) * 0.5f);
+        hintsLayout.UpdateLayout();
+
+        tradeResultTimer = TradeResultDuration;
+    }
+
+    private void HideTradeResult()
+    {
+        tradeLabel.Visible = false;
+        tradeLabel.Text = "";
+        hintsLayout.HorizontalPadding = (int)(hintPadding * 0.5f);
+        hintsLayout.UpdateLayout();
+        tradeResultTimer = 0;
+    }
+    
+    private void TradeResultTimer(GameTime gameTime)
+    {
+        if (tradeLabel.Visible)
+        {
+            tradeResultTimer -= gameTime.ElapsedGameTime.Milliseconds;
+            if (tradeResultTimer <= 0)
+            {
+                HideTradeResult();
+            }
+        }
     }
 }
