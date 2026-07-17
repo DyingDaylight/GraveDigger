@@ -8,11 +8,13 @@ public class Prop : Sprite
 {
     private const float GroundSortingOrder = 0.99f;
     
+    private string propName;
     public SortingMode Mode { get; set; } = SortingMode.Dynamic;
 
     
     public Prop(string name) : base(name)
     {
+        propName = name;
     }
 
     public override void Start()
@@ -41,8 +43,18 @@ public class Prop : Sprite
             SortingOrder = GroundSortingOrder;
             return;
         }
-
-        SortingOrder = SortingUtility.CalculateByY(Bottom);
+        // to draw earth after player
+        float baseOrder = SortingUtility.CalculateByY(Bottom);
+    
+        if (propName.StartsWith("grave_"))
+        {
+            SortingOrder = baseOrder + 0.035f; 
+        }
+        else
+        {
+            SortingOrder = baseOrder;
+        }
+        // SortingOrder = SortingUtility.CalculateByY(Bottom);
     }
 }
 
