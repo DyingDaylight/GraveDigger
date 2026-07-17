@@ -85,6 +85,8 @@ public class Game1 : Game
     {
         KeyboardState currentKeyboardState = Keyboard.GetState();
         
+        AudioManager.Instance.Update(currentGameState);
+        
         switch (currentGameState)
         {
             case GameState.Menu:
@@ -99,11 +101,6 @@ public class Game1 : Game
         gui.Update(gameTime);
         UpdateCamera(gameTime);
         previousKeyboardState = currentKeyboardState;
-
-        if (MediaPlayer.State == MediaState.Stopped)
-        {
-            GraveDigger.Systems.AudioManager.Instance.PlayNextMusic();
-        }
         
         base.Update(gameTime);
     }
