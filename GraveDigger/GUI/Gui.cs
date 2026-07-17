@@ -50,13 +50,11 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         SpriteManager.AddSprite("InventoryButtonPressed", "Images/GUI/inventory_button_pressed");
         SpriteManager.AddSprite("InventoryButtonDisabled", "Images/GUI/inventory_button_disabled");
 
+        SpriteManager.AddSprite("ReputationBadIcon", "Images/GUI/reputation_bad");
+        SpriteManager.AddSprite("ReputationGoodIcon", "Images/GUI/reputation_good");
+        SpriteManager.AddSprite("ReputationLineIcon", "Images/GUI/reputation_line");
+        SpriteManager.AddSprite("ReputationSliderIcon", "Images/GUI/reputation_slider");
 
-        /* OLD BUTTONS
-        SpriteManager.AddSprite("ButtonNormal", "Images/GUI/ButtonNormal");
-        SpriteManager.AddSprite("CloseButtonNormal", "Images/GUI/CloseButtonNormal");
-        SpriteManager.AddSprite("CloseButtonHover", "Images/GUI/CloseButtonHover");
-        SpriteManager.AddSprite("CloseButtonPressed", "Images/GUI/CloseButtonPressed");
-        */
         SpriteManager.AddSprite("Coin", "Images/Icons/Coin");
     }
     

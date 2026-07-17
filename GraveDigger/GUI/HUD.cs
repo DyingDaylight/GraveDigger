@@ -1,21 +1,22 @@
 ﻿using System;
 using GraveDigger.Core;
+using GraveDigger.GUI.Components;
 using GraveDigger.GUI.Elements;
-using Interfaces;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using IDrawable = Interfaces.IDrawable;
 
 namespace GUI;
 
 public class HUD : UIContainer
 {
+    private readonly ReputationView reputationView;
+    
     private readonly Button inventoryButton;
 
     public event Action InventoryRequested;
     
     public HUD(GameContext gameContext)
     {
+        reputationView = CreateElement<ReputationView>();
+        
         inventoryButton = CreateElement<Button>(Button.UiButtonMode.Texture);
         inventoryButton.SetTextures(SpriteManager.GetSprite("InventoryButtonNormal").Texture,
             SpriteManager.GetSprite("InventoryButtonHover").Texture,
@@ -27,10 +28,9 @@ public class HUD : UIContainer
         inventoryButton.OnClick += OpenInventory;
     }
 
-    public void UpdateReputation(int value)
+    public void UpdateReputation(int value, int min, int max)
     {
-        // TODO: draw interface on screen
-        Console.WriteLine("Reputation: " + value);
+        reputationView.UpdateReputation(value, min, max);
     }
     
     private void OpenInventory()
