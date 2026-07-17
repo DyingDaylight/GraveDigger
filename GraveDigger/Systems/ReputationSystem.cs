@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using GraveDigger.Props;
 
 namespace GraveDigger.Systems;
 
@@ -11,30 +13,28 @@ public class ReputationSystem
 
     public event Action<int, int, int> ReputationChanged;
     
-    public void AddReputation(int value)
-    {
-        if (value <= 0)
-            return;
-
-        ChangeReputation(value);
-    }
-
-    public void RemoveReputation(int value)
-    {
-        if (value <= 0)
-            return;
-
-        ChangeReputation(-value);
-    }
-    
-    private void ChangeReputation(int value)
+    public void ChangeReputation(int value)
     {
         int newValue = Math.Clamp(Value + value, MinValue, MaxValue);
 
         if (newValue == Value)
             return;
 
+        Console.WriteLine($"Reputation changed to {Value} -> {newValue}");
         Value = newValue;
         ReputationChanged?.Invoke(Value,  MinValue, MaxValue);
+    }
+
+    public void Calculate(List<Prop> props)
+    {
+        int total = 0;
+
+        foreach (Prop prop in props)
+        {
+            total += prop.GetReputationValue();
+        }
+
+        Console.WriteLine($"Initial reputation: {total}");
+        ChangeReputation(total);
     }
 }

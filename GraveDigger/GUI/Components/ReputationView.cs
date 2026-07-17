@@ -10,6 +10,7 @@ public class ReputationView : UIContainer
     private readonly Image goodIcon;
     private readonly Image lineIcon;
     private readonly Image sliderIcon;
+
     
     public ReputationView()
     {

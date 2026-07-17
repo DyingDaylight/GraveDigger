@@ -56,6 +56,11 @@ public class GameplayCoordinator : IGameplayActions
         inventory.Add(food);
         inventory.Add(food);
     }
+    
+    public void CalculateInitialReputation(List<Prop> props)
+    {
+        reputationSystem.Calculate(props);
+    }
 
     public void OpenTombstone(Tombstone tombstone)
     {
@@ -75,7 +80,7 @@ public class GameplayCoordinator : IGameplayActions
             EnemyType enemyType = UndeadGenerator.Generate(tombstone.Data, randomService);
             if (enemyType == EnemyType.Ghost)
             {
-                reputationSystem.RemoveReputation(1);
+                reputationSystem.ChangeReputation(1);
                 Console.WriteLine("Ghost appeared! Reputation reduced by 1!");
             } 
             else if (enemyType == EnemyType.Zombie)
@@ -83,7 +88,7 @@ public class GameplayCoordinator : IGameplayActions
                 Console.WriteLine("Zombie appeared! He will be eating you!");
             }
             
-            reputationSystem.RemoveReputation(tombstone.ReputationValue);
+            reputationSystem.ChangeReputation(tombstone.GetReputationValue());
             windowService.CloseCurrentWindow();
         }
     }
@@ -95,7 +100,7 @@ public class GameplayCoordinator : IGameplayActions
         if (repaired)
         {
             OnGraveRepaired?.Invoke(tombstone);
-            reputationSystem.AddReputation(tombstone.ReputationValue);
+            reputationSystem.ChangeReputation(tombstone.GetReputationValue());
             windowService.RefreshTombstoneWindow();
         }
     }

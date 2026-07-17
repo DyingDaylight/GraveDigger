@@ -9,6 +9,7 @@ public class Prop : Sprite
     private const float GroundSortingOrder = 0.99f;
     
     public SortingMode Mode { get; set; } = SortingMode.Dynamic;
+
     
     public Prop(string name) : base(name)
     {
@@ -24,6 +25,11 @@ public class Prop : Sprite
     {
         base.Update(gameTime);
         UpdateSortingOrder();
+    }
+
+    public virtual int GetReputationValue()
+    {
+        return 0;
     }
     
     // Use the sprite's bottom position to determine its draw order.

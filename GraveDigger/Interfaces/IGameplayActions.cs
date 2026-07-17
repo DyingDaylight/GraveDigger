@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GraveDigger.Data;
 using GraveDigger.Items;
 using GraveDigger.Props;
@@ -17,6 +18,8 @@ public interface IGameplayActions
     void BuyItem(ItemData itemData, int amount);
     void UseItem(ItemData itemData, int amount);
     void DiscardItem(ItemData itemData, int amount);
+    
+    void CalculateInitialReputation(List<Prop> props);
     
     public event Action<Tombstone> OnGraveDug;
     public event Action<Tombstone> OnGraveRepaired;

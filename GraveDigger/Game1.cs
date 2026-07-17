@@ -79,6 +79,8 @@ public class Game1 : Game
         SubscribeToEvents();
         
         SetGameState(GameState.Menu);
+        gui.Hud.UpdateReputation(reputationSystem.Value,
+            ReputationSystem.MinValue, ReputationSystem.MaxValue);
     }
 
     protected override void Update(GameTime gameTime)

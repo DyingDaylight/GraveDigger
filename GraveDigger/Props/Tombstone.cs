@@ -8,7 +8,6 @@ namespace GraveDigger.Props;
 public class Tombstone : Prop, IInteractionOwner
 {
     public GraveSiteData Data { get; private set; }
-    public int ReputationValue { get; private set; }
     
     // TODO: private set
     public Prop GraveTile { get; set; }
@@ -32,7 +31,6 @@ public class Tombstone : Prop, IInteractionOwner
     public Tombstone(string name) : base(name)
     {
         state = GraveSiteState.Intact;
-        ReputationValue = 5;
     }
 
     public void SetData(GraveSiteData data)
@@ -43,6 +41,16 @@ public class Tombstone : Prop, IInteractionOwner
     public void SetHighlighted(bool highlighted)
     {
         Highlighted = highlighted;
+    }
+
+    public override int GetReputationValue()
+    {
+        return State switch
+        {
+            GraveSiteState.DugOut => -10,
+            GraveSiteState.Broken => -3,
+            GraveSiteState.Intact => +2
+        };
     }
 
     public bool Repair()

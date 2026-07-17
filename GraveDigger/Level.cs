@@ -69,6 +69,8 @@ public class Level : IUpdatable, IDrawable
         foreach (IUpdatable updatable in updatables)
             updatable.Start();
         
+        gameplayActions.CalculateInitialReputation(props);
+        
         gameplayActions.OnGraveDug += SpawnGraveDirt;
         gameplayActions.OnGraveRepaired += RemoveGraveDirt;
     }
