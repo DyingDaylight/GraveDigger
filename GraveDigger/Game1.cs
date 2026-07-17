@@ -191,6 +191,8 @@ private void SubscribeToEvents()
     gui.WindowManager.TradeWindow.UseRequested += gameplayCoordinator.UseItem;
     gui.WindowManager.TradeWindow.DiscardRequested += gameplayCoordinator.DiscardItem;
 
+    gui.Hud.InventoryRequested += gameplayCoordinator.ShowInventory;
+    
     reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
         
     level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
@@ -206,16 +208,16 @@ private void SetGameState(GameState gameState)
     
     if (currentGameState == GameState.Menu)
     {
-        GraveDigger.Systems.AudioManager.Instance.SetMusicVolume(0.1f);
+        AudioManager.Instance.SetMusicVolume(0.1f);
         
         if (MediaPlayer.State == MediaState.Stopped)
         {
-            GraveDigger.Systems.AudioManager.Instance.PlayMusic("theme1", loop: false);
+            AudioManager.Instance.PlayMusic("theme1", loop: false);
         }
     }
     else
     {
-        GraveDigger.Systems.AudioManager.Instance.SetMusicVolume(0f);
+        AudioManager.Instance.SetMusicVolume(0f);
     }
 }
     private void UpdateCamera(GameTime gameTime)
@@ -251,6 +253,7 @@ private void SetGameState(GameState gameState)
     {
         if (WasKeyJustPressed(keyboardState, Keys.I))
         {
+            Console.WriteLine("I pressed I");
             if (gui.IsInventoryOpen())
                 gui.CloseCurrentWindow();
             else if (!gui.IsModalWindowOpen())

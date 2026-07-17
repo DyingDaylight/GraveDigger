@@ -45,6 +45,10 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         SpriteManager.AddSprite("slot", "Images/GUI/slot");
         SpriteManager.AddSprite("slothover", "Images/GUI/slothover");
         SpriteManager.AddSprite("ButtonDisabled", "Images/GUI/button_disabled");
+        SpriteManager.AddSprite("InventoryButtonNormal", "Images/GUI/inventory_button_normal");
+        SpriteManager.AddSprite("InventoryButtonHover", "Images/GUI/inventory_button_hover");
+        SpriteManager.AddSprite("InventoryButtonPressed", "Images/GUI/inventory_button_pressed");
+        SpriteManager.AddSprite("InventoryButtonDisabled", "Images/GUI/inventory_button_disabled");
 
 
         /* OLD BUTTONS
@@ -67,7 +71,7 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         WindowManager = new WindowManager(gameContext);
         MenuUi = new MenuUI(gameContext.ScreenSize);
         InteractionTooltip = new InteractionTooltip(gameContext.CoordinatesConverter);
-        Hud = new HUD();
+        Hud = new HUD(gameContext);
 
         Hud.Start();
         MenuUi.Start();
@@ -83,19 +87,23 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
             return;
         }
 
+        WindowManager.Update(gameTime);
+        if (WindowManager.IsModalWindow)
+            return;
+        
         Hud.Update(gameTime);
         InteractionTooltip.Update(gameTime);
-        WindowManager.Update(gameTime);
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        Hud.Draw(spriteBatch);
         InteractionTooltip.Draw(spriteBatch);
         WindowManager.Draw(spriteBatch);
 
         if (gameState == GameState.Menu)
             MenuUi.Draw(spriteBatch);
+        else
+            Hud.Draw(spriteBatch);
     }
 
     public void SetGameState(GraveDigger.GameState state) 
