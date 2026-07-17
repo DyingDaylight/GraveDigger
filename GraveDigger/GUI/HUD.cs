@@ -22,9 +22,9 @@ public class HUD : UIContainer
             SpriteManager.GetSprite("InventoryButtonHover").Texture,
         SpriteManager.GetSprite("InventoryButtonPressed").Texture,
         SpriteManager.GetSprite("InventoryButtonDisabled").Texture);
-        inventoryButton.SetSize(80, 100);
-        inventoryButton.SetPosition((int) gameContext.ScreenSize.X - 160,
-            (int) gameContext.ScreenSize.Y - 180);
+        inventoryButton.SetSize(80, 80);
+        inventoryButton.SetPosition((int) gameContext.ScreenSize.X - 100,
+            (int) gameContext.ScreenSize.Y - 100);
         inventoryButton.OnClick += OpenInventory;
     }
 

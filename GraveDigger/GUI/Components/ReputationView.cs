@@ -21,12 +21,12 @@ public class ReputationView : UIContainer
         
         badIcon = CreateElement<Image>();
         badIcon.SetSize(100, 100);
-        badIcon.SetPosition(20, 20);
+        badIcon.SetPosition(30, 20);
         badIcon.SetImage(SpriteManager.GetSprite("ReputationBadIcon").Texture);
         
         goodIcon = CreateElement<Image>();
-        goodIcon.SetSize(100, 100);
-        goodIcon.SetPosition(490, 20);
+        goodIcon.SetSize(100, 120);
+        goodIcon.SetPosition(490, 15);
         goodIcon.SetImage(SpriteManager.GetSprite("ReputationGoodIcon").Texture);
         
         sliderIcon = CreateElement<Image>();
