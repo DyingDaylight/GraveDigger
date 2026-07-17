@@ -48,7 +48,7 @@ public class Prop : Sprite
     
         if (propName.StartsWith("grave_"))
         {
-            SortingOrder = baseOrder + 0.035f; 
+            SortingOrder = baseOrder + 0.050f; 
         }
         else
         {

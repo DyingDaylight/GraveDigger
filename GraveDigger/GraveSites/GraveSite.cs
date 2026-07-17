@@ -15,7 +15,7 @@ public class GraveSite
         GraveTile = createPropObj(initialState == GraveSiteState.DugOut ? "grave_digged" : "grave_earth", position);
         GraveTile.CastSHadow = false;
 
-        Vector2 tombstonePosition = new Vector2(position.X, position.Y - 160);
+        Vector2 tombstonePosition = new Vector2(position.X, position.Y - 200);
         Tombstone = createTombstoneObj(tombstoneSpriteName, tombstonePosition);
     
         Tombstone.GraveTile = GraveTile; 
