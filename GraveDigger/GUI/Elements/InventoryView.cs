@@ -121,6 +121,11 @@ public class InventoryView : UIContainer
             slot.SetData(null);
     }
     
+    public IEnumerable<InventorySlot> GetAllSlots() 
+    {
+        return inventorySlots;
+    }
+    
     private void HandleContextMenuRequested(Point position, InventoryEntry entry)
     {
         ContextMenuRequested?.Invoke(position, entry);

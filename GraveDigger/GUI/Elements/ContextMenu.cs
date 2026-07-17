@@ -61,12 +61,9 @@ public class ContextMenu : UIContainer
         
         foreach (var action in actions)
         {
-            Button button = CreateElement<Button>();
-            button.SetText(action.Name);
-            button.SetSize(buttonWidth, buttonHeight);
-
-            button.OnClick += () => ExecuteAction(action);
-            
+           
+            Button button = CreateButton(action.Name, buttonWidth, buttonHeight, () => ExecuteAction(action));
+        
             buttons.Add(button);
             layout.AddElement(button);
         }

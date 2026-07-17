@@ -28,6 +28,10 @@ public class InventorySlot : ClickableUIElement
     private readonly Label amount;
     private readonly Tooltip tooltip;
     
+    public bool IsPlayerSlot { get; set; }
+
+    public InventoryEntry GetEntry() => inventoryEntry;
+    
     private readonly List<UIElement> children = new();
     
     private readonly Vector2 padding = new(20, 20);
@@ -50,8 +54,8 @@ public class InventorySlot : ClickableUIElement
         
         hoverEffect = Create<Image>();
         hoverEffect.SetSize(Bounds.Width, Bounds.Height);
-        hoverEffect.SetImage(SpriteManager.GetSprite("pixel").Texture);
-        hoverEffect.SetTint(Color.GreenYellow);
+        hoverEffect.SetImage(SpriteManager.GetSprite("slothover").Texture);
+        hoverEffect.SetTint(Color.White);
         
         icon = Create<Image>();
         icon.SetSize(Bounds.Width - (int) padding.X,
@@ -62,10 +66,10 @@ public class InventorySlot : ClickableUIElement
         priceIcon.SetImage(SpriteManager.GetSprite("Coin").Texture);
         
         price = Create<Label>();
-        price.Color = Color.Black;
+        price.Color = Color.White;
         
         amount = Create<Label>();
-        amount.Color = Color.Black;
+        amount.Color = Color.White;
 
         tooltip = Create<Tooltip>();
     }
@@ -205,8 +209,8 @@ public class InventorySlot : ClickableUIElement
         amount.Update(gameTime);
         tooltip.Update(gameTime);
     }
-    
-    private bool IsEmpty()
+
+    public bool IsEmpty()
     {
         return inventoryEntry == null || inventoryEntry.ItemData == null;
     }

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using GraveDigger.Core;
 using GraveDigger.GUI.Elements;
 using GraveDigger.GUI.Layouts;
 using GraveDigger.Items;
 using GUI.Windows;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace GraveDigger.GUI.Windows;
 
@@ -15,6 +18,10 @@ public class TradeWindow : Window
     private readonly HorizontalLayout inventoriesLayout;
     private readonly HorizontalLayout buttonsLayout;
     
+    private readonly Label playerHintLabel;
+    private readonly Label merchantHintLabel;
+    private readonly HorizontalLayout hintsLayout;
+    
     private readonly Button closeButton;
     
     private ItemData selectedItem;
@@ -22,6 +29,12 @@ public class TradeWindow : Window
     
     private Inventory playerInventory;
     private Inventory merchantInventory;
+    
+    
+    private InventorySlot draggedSlot;
+    private bool isDragging;
+    
+    private InventoryEntry itemBeingDragged;
     
     public event Action<ItemData, int> DiscardRequested;
     public event Action<ItemData, int> UseRequested;
@@ -55,6 +68,21 @@ public class TradeWindow : Window
         inventoriesLayout.AddElement(playerInventoryView);
         inventoriesLayout.AddElement(merchantInventoryView);
         
+        playerHintLabel = CreateElement<Label>();
+        playerHintLabel.Text = "Drag to Sell";
+
+        merchantHintLabel = CreateElement<Label>();
+        merchantHintLabel.Text = "Drag to Buy";
+        
+        Rectangle hintsRect = new Rectangle(Bounds.X, Bounds.Bottom - 140, Bounds.Width, 50);
+        hintsLayout = new HorizontalLayout(hintsRect);
+        
+        hintsLayout.HorizontalPadding = 500; 
+
+        hintsLayout.AddElement(playerHintLabel);
+        hintsLayout.AddElement(merchantHintLabel);
+        
+        
         closeButton = CreateButton("Close", 200, 60, HandleCloseClick);
         
         buttonsLayout = new HorizontalLayout(Bounds);
@@ -68,10 +96,66 @@ public class TradeWindow : Window
         RefreshLayout();
     }
     
+    public override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime); 
+
+        MouseState mouse = Mouse.GetState();
+
+        if (!isDragging && mouse.LeftButton == ButtonState.Pressed)
+        {
+            var slot = FindSlotUnderMouse(mouse.Position);
+            if (slot != null && !slot.IsEmpty())
+            {
+                draggedSlot = slot;
+                itemBeingDragged = slot.GetEntry(); 
+                isDragging = true;
+            }
+        }
+
+        if (isDragging && mouse.LeftButton == ButtonState.Released)
+        {
+            if (draggedSlot != null)
+            {
+                var targetSlot = FindSlotUnderMouse(mouse.Position);
+            
+                if (targetSlot != null && targetSlot.IsPlayerSlot != draggedSlot.IsPlayerSlot)
+                {
+                    var entry = draggedSlot.GetEntry();
+                    if (draggedSlot.IsPlayerSlot)
+                        Sell(entry); 
+                    else
+                        Buy(entry);  
+                }
+            }
+        
+            isDragging = false;
+            draggedSlot = null;
+            itemBeingDragged = null;
+        }
+    }
+    
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        base.Draw(spriteBatch);
+
+        if (isDragging && itemBeingDragged != null)
+        {
+            MouseState mouse = Mouse.GetState();
+            Texture2D texture = SpriteManager.GetSprite(itemBeingDragged.ItemData.SpriteName).Texture;
+            
+            Rectangle destination = new Rectangle(mouse.X - 50, mouse.Y - 50, 100, 100);
+            
+        
+            spriteBatch.Draw(texture, destination, Color.White);
+        }
+    }
+    
     protected override void RefreshLayout()
     {
         inventoriesLayout.UpdateLayout();
         buttonsLayout.UpdateLayout();
+        hintsLayout.UpdateLayout();
     }
     
     public void SetInventories(Inventory playerInventory, Inventory merchantInventory)
@@ -179,5 +263,17 @@ public class TradeWindow : Window
         selectedAction = action;
         
         quantitySelector.Show(title, 1, entry.Quantity);
+    }
+    
+    private InventorySlot FindSlotUnderMouse(Point mousePos)
+    {
+       
+        foreach (var slot in playerInventoryView.GetAllSlots()) 
+            if (slot.Bounds.Contains(mousePos)) { slot.IsPlayerSlot = true; return slot; }
+        
+        foreach (var slot in merchantInventoryView.GetAllSlots()) 
+            if (slot.Bounds.Contains(mousePos)) { slot.IsPlayerSlot = false; return slot; }
+        
+        return null;
     }
 }

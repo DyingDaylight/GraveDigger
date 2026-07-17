@@ -1191,6 +1191,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/GUI/slot.png
 
+#begin Images/GUI/slothover.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/slothover.png;Images/GUI/slothover
+
 #begin Images/Icons/Coin.png
 /importer:TextureImporter
 /processor:TextureProcessor

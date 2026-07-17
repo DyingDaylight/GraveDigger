@@ -43,8 +43,8 @@ public class QuantitySelector : UIContainer
         
         Bounds = new Rectangle(x, y, width, height);
         
-        Color = Color.Gray;
-        Texture = SpriteManager.GetSprite("pixel").Texture;
+        Color = Color.White;
+        Texture = SpriteManager.GetSprite("background").Texture;
         
         titleLabel = CreateElement<Label>();
         titleLabel.Scale = 1.5f;
@@ -53,30 +53,15 @@ public class QuantitySelector : UIContainer
         quantityLabel.Scale = 1.5f;
         UpdateQuantity();
         
-        plusButton = CreateElement<Button>();
-        plusButton.SetSize(buttonSize, buttonSize);
-        plusButton.SetText("+");
-        plusButton.OnClick += IncreaseQuantity;
+        plusButton = CreateButton("+", buttonSize, buttonSize, IncreaseQuantity);
 
-        minusButton = CreateElement<Button>();
-        minusButton.SetSize(buttonSize, buttonSize);
-        minusButton.SetText("-");
-        minusButton.OnClick += DecreaseQuantity;
+        minusButton = CreateButton("-", buttonSize, buttonSize, DecreaseQuantity);
 
-        confirmButton = CreateElement<Button>();
-        confirmButton.SetSize(buttonWidth, buttonHeight);
-        confirmButton.SetText("Confirm");
-        confirmButton.OnClick += Confirm;
+        confirmButton = CreateButton("Confirm", buttonWidth, buttonHeight, Confirm);
         
-        allButton = CreateElement<Button>();
-        allButton.SetSize(buttonWidth, buttonHeight);
-        allButton.SetText("All");
-        allButton.OnClick += ChooseAll;
+        allButton = CreateButton("All", buttonWidth, buttonHeight, ChooseAll);
         
-        cancelButton = CreateElement<Button>();
-        cancelButton.SetSize(buttonWidth, buttonHeight);
-        cancelButton.SetText("Cancel");
-        cancelButton.OnClick += Hide;
+        cancelButton = CreateButton("Cancel", buttonWidth, buttonHeight, Hide);
         
         Rectangle quantityBounds = new Rectangle(x, y, width, buttonSize);
         quantityLayout = new HorizontalLayout(quantityBounds);
