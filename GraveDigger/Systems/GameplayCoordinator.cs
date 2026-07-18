@@ -77,16 +77,13 @@ public class GameplayCoordinator : IGameplayActions
             OnLootSpawn?.Invoke(itemsData, tombstone);
             OnGraveDug?.Invoke(tombstone);
             
-            EnemyType enemyType = UndeadGenerator.Generate(tombstone.Data, randomService);
+            // TODO: check if night
+            EnemyType enemyType = UndeadGenerator.Generate(tombstone.Data, randomService, false);
             if (enemyType == EnemyType.Ghost)
             {
                 reputationSystem.ChangeReputation(1);
                 Console.WriteLine("Ghost appeared! Reputation reduced by 1!");
             } 
-            else if (enemyType == EnemyType.Zombie)
-            {
-                Console.WriteLine("Zombie appeared! He will be eating you!");
-            }
             
             reputationSystem.ChangeReputation(tombstone.GetReputationValue());
             windowService.CloseCurrentWindow();

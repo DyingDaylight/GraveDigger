@@ -123,6 +123,17 @@ public class GraveSiteGenerator
             [Personality.Mysterious] = MysteriousDescriptors
         };
     
+    private static readonly Dictionary<Personality, int[]> WealthWeights = new()
+    {
+        // Poor, Average, Wealthy, Rich
+        [Personality.Peaceful]   = [40, 35, 20, 5],
+        [Personality.Mysterious] = [30, 35, 25, 10],
+        [Personality.Restless]   = [30, 35, 25, 10],
+        [Personality.Bitter]     = [25, 30, 30, 15],
+        [Personality.Greedy]     = [10, 20, 35, 35],
+        [Personality.Cruel]      = [5, 15, 35, 45]
+    };
+    
     public static GraveSiteData Generate(RandomService randomService)
     {
         GraveSiteData graveSiteData = new GraveSiteData();
@@ -135,16 +146,36 @@ public class GraveSiteGenerator
         int age = randomService.PickWeightedRange(AgeRanges);
         int deathYear = birthYear + age;
         graveSiteData.LifeYears = $"{birthYear} - {deathYear}";
+
+        graveSiteData.Personality = randomService.RandomEnum<Personality>();
         
-        graveSiteData.Wealth = randomService.RandomEnum<Wealth>();
+        graveSiteData.Inscription = randomService.Pick(Inscriptions[graveSiteData.Personality]);
+        
+        graveSiteData.Wealth = GenerateWealth(graveSiteData.Personality, randomService);
+        
         string wealthDescriptor = randomService.Pick(WealthDescriptors);
         graveSiteData.WealthDescription = string.IsNullOrWhiteSpace(wealthDescriptor)
             ? graveSiteData.Wealth.ToString()
             : $"{wealthDescriptor} {graveSiteData.Wealth}";
         
-        graveSiteData.Personality = randomService.RandomEnum<Personality>();
-        graveSiteData.Inscription = randomService.Pick(Inscriptions[graveSiteData.Personality]);
-        
         return graveSiteData;
+    }
+    
+    private static Wealth GenerateWealth(Personality personality, RandomService random)
+    {
+        int[] weights = WealthWeights[personality];
+        int roll = random.Next(1, 101);
+
+        int total = 0;
+
+        for (int i = 0; i < weights.Length; i++)
+        {
+            total += weights[i];
+
+            if (roll <= total)
+                return (Wealth)i;
+        }
+
+        return (Wealth)(weights.Length - 1);
     }
 }
