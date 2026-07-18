@@ -24,6 +24,8 @@ public class Player : Animation
     public int MaxHunger { get; } = 100;
     public bool IsStarving => Hunger >= MaxHunger;
     
+    public event Action<int, int, int> HungerChanged;
+    
     public Player(GameContext gameContext) : base("digger")
     {
         this.gameContext = gameContext;
@@ -87,8 +89,7 @@ public class Player : Animation
             return;
 
         Hunger = Math.Clamp(Hunger - amount, 0, MaxHunger);
-        
-        Console.WriteLine("Hunger: " + Hunger);
+        HungerChanged?.Invoke(Hunger, 0, MaxHunger);
     }
     
     public void IncreaseHunger(int amount)
@@ -97,6 +98,7 @@ public class Player : Animation
             return;
 
         Hunger = Math.Clamp(Hunger + amount, 0, MaxHunger);
+        HungerChanged?.Invoke(amount, 0, MaxHunger);
     }
     
     private void UpdateSortingOrder()

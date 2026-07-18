@@ -7,7 +7,8 @@ namespace GUI;
 
 public class HUD : UIContainer
 {
-    private readonly ReputationView reputationView;
+    private readonly SliderBar reputationView;
+    private readonly SliderBar hungerView;
     
     private readonly Button inventoryButton;
 
@@ -15,7 +16,13 @@ public class HUD : UIContainer
     
     public HUD(GameContext gameContext)
     {
-        reputationView = CreateElement<ReputationView>();
+        reputationView = CreateElement<SliderBar>();
+        reputationView.SetLeftIcon(SpriteManager.GetSprite("ReputationBadIcon").Texture);
+        reputationView.SetRightIcon(SpriteManager.GetSprite("ReputationGoodIcon").Texture);
+        
+        hungerView = CreateElement<SliderBar>();
+        hungerView.SetPosition(0, 100);
+        hungerView.SetLeftIcon(SpriteManager.GetSprite("Hunger").Texture);
         
         inventoryButton = CreateElement<Button>(Button.UiButtonMode.Texture);
         inventoryButton.SetTextures(SpriteManager.GetSprite("InventoryButtonNormal").Texture,
@@ -30,7 +37,12 @@ public class HUD : UIContainer
 
     public void UpdateReputation(int value, int min, int max)
     {
-        reputationView.UpdateReputation(value, min, max);
+        reputationView.UpdateValue(value, min, max);
+    }
+    
+    public void UpdateHunger(int value, int min, int max)
+    {
+        hungerView.UpdateValue(value, min, max);
     }
     
     private void OpenInventory()

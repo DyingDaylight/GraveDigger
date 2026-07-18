@@ -56,6 +56,7 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         SpriteManager.AddSprite("ReputationSliderIcon", "Images/GUI/reputation_slider");
 
         SpriteManager.AddSprite("Coin", "Images/Icons/Coin");
+        SpriteManager.AddSprite("Hunger", "Images/Gui/hunger");
     }
     
     public void Start()
@@ -95,13 +96,15 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
 
     public void Draw(SpriteBatch spriteBatch)
     {
+        if (gameState == GameState.Menu)
+        {
+            MenuUi.Draw(spriteBatch);
+            return;
+        }
+
+        Hud.Draw(spriteBatch);
         InteractionTooltip.Draw(spriteBatch);
         WindowManager.Draw(spriteBatch);
-
-        if (gameState == GameState.Menu)
-            MenuUi.Draw(spriteBatch);
-        else
-            Hud.Draw(spriteBatch);
     }
 
     public void SetGameState(GraveDigger.GameState state) 

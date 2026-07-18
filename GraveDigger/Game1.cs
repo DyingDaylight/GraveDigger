@@ -81,6 +81,7 @@ public class Game1 : Game
         SetGameState(GameState.Menu);
         gui.Hud.UpdateReputation(reputationSystem.Value,
             ReputationSystem.MinValue, ReputationSystem.MaxValue);
+        gui.Hud.UpdateHunger(player.Hunger, 0, player.MaxHunger);
     }
 
     protected override void Update(GameTime gameTime)
@@ -192,6 +193,7 @@ private void SubscribeToEvents()
 
     gui.Hud.InventoryRequested += gameplayCoordinator.ShowInventory;
     
+    player.HungerChanged += gui.Hud.UpdateHunger;
     reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
         
     level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
@@ -252,7 +254,6 @@ private void SetGameState(GameState gameState)
     {
         if (WasKeyJustPressed(keyboardState, Keys.I))
         {
-            Console.WriteLine("I pressed I");
             if (gui.IsInventoryOpen())
                 gui.CloseCurrentWindow();
             else if (!gui.IsModalWindowOpen())
@@ -271,4 +272,4 @@ private void SetGameState(GameState gameState)
         return currentKeyboardState.IsKeyDown(key) &&
                previousKeyboardState.IsKeyUp(key);
     }
-    }
+}
