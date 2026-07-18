@@ -35,9 +35,10 @@ public class Sprite : IDrawable, IUpdatable
     public Color HighlightColor { get; set; } = Color.Red;
     public int HighlightThickness { get; set; } = 7;
     
-    public bool CastSHadow { get; set; } = false;
+    public bool CastShadow { get; set; } = false;
     public float ShadowOpacity { get; set; } = 0.33f;
-    public float ShadowScaleY { get; set; } = 0.15f;
+    public float ShadowScaleY { get; set; } = 0.13f;
+    public float ShadowOffsetY { get; set; } = -20f;
     
     
     public SpriteSheet SpriteSheet { get; private set; }
@@ -53,6 +54,7 @@ public class Sprite : IDrawable, IUpdatable
     
     public Texture2D Texture => SpriteSheet.Texture;
 
+    public bool Visible { get; set; } = true;
     
     public Sprite(string name)
     {
@@ -74,7 +76,7 @@ public class Sprite : IDrawable, IUpdatable
         if (SpriteSheet == null)
             return;
 
-        if (CastSHadow)
+        if (CastShadow)
             DrawShadow(spriteBatch);
         
         if (Highlighted)
@@ -87,7 +89,8 @@ public class Sprite : IDrawable, IUpdatable
             Transform.Scale,
             SpriteEffect,
             SortingOrder,
-            MathHelper.ToRadians(Transform.Rotation));
+            MathHelper.ToRadians(Transform.Rotation),
+            Origin);
     }
     
     public Rectangle GetDestRectangle(Rectangle? source)
@@ -135,31 +138,39 @@ public class Sprite : IDrawable, IUpdatable
                 Transform.Scale,
                 SpriteEffect,
                 SortingOrder + 0.001f,
-                MathHelper.ToRadians(Transform.Rotation));
+                MathHelper.ToRadians(Transform.Rotation), 
+                Origin);
         }
     }
     
     private void DrawShadow(SpriteBatch spriteBatch)
     {
-        Rectangle bounds = GetDestRectangle(SourceRectangle);
-
+        if (!SourceRectangle.HasValue)
+            return;
+        
+        Rectangle source = SourceRectangle.Value;
+        Rectangle bounds = GetDestRectangle(source);
+        
         SpriteEffects shadowEffect =
             SpriteEffect == SpriteEffects.FlipHorizontally
                 ? SpriteEffects.None
                 : SpriteEffects.FlipHorizontally;
-
-        Vector2 shadowPosition = new(Transform.Position.X, bounds.Bottom);
-
+        
+        Vector2 shadowPosition = new(Transform.Position.X, bounds.Bottom + ShadowOffsetY);
+        
+        Vector2 shadowOrigin = new(source.Width * Pivot.X, source.Height);
+        
         Vector2 shadowScale = new(Transform.Scale.X, Transform.Scale.Y * ShadowScaleY);
-
+        
         DrawSprite(
             spriteBatch,
             shadowPosition,
             Color.Black * ShadowOpacity,
             shadowScale,
             shadowEffect,
-            SortingOrder - 0.0001f,
-            MathHelper.Pi);
+            SortingOrder + 0.0001f,
+            MathHelper.Pi,
+            shadowOrigin);
     }
     
     private void DrawSprite(
@@ -169,15 +180,19 @@ public class Sprite : IDrawable, IUpdatable
         Vector2 scale,
         SpriteEffects effects,
         float sortingOrder,
-        float rotation)
+        float rotation,
+        Vector2 origin)
     {
+        if (!Visible)
+            return;
+        
         spriteBatch.Draw(
             Texture,
             position,
             SourceRectangle,
             tint,
             rotation,
-            Origin,
+            origin,
             scale,
             effects,
             sortingOrder);

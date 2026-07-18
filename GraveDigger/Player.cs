@@ -35,7 +35,7 @@ public class Player : Animation
     {
         base.Start();
 
-        CastSHadow = true;
+        CastShadow = true;
         
         Transform.Position = new Vector2(gameContext.ScreenSize.X * 0.5f, gameContext.ScreenSize.Y * 0.5f);
         previousPosition = Transform.Position;

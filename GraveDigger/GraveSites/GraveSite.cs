@@ -13,7 +13,7 @@ public class GraveSite
     public GraveSite(string tombstoneSpriteName, Vector2 position, GraveSiteData data, GraveSiteState initialState, System.Func<string, Vector2, Prop> createPropObj, System.Func<string, Vector2, Tombstone> createTombstoneObj)
     {
         GraveTile = createPropObj(initialState == GraveSiteState.DugOut ? "grave_digged" : "grave_earth", position);
-        GraveTile.CastSHadow = false;
+        GraveTile.CastShadow = false;
 
         Vector2 tombstonePosition = new Vector2(position.X, position.Y - 200);
         Tombstone = createTombstoneObj(tombstoneSpriteName, tombstonePosition);
@@ -21,6 +21,7 @@ public class GraveSite
         Tombstone.GraveTile = GraveTile; 
         Tombstone.GraveTile.Mode = SortingMode.Fixed;
         Tombstone.State = initialState;
+        Tombstone.CastShadow = true;
         
         if (initialState == GraveSiteState.DugOut)
         {

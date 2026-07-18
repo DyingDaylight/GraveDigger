@@ -147,7 +147,7 @@ public class Level : IUpdatable, IDrawable
     {
         T prop = factory(name);
         prop.Transform.Position = position;
-        prop.CastSHadow = true;
+        prop.CastShadow = true;
         switch (name)
         {
             case "lampost":
