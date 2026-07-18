@@ -322,6 +322,10 @@ public class Level : IUpdatable, IDrawable
         InteractionSystem.RegisterInteraction(interaction);
         
         props.Add(site.Tombstone);
+        if (site.GraveTile != null)
+            props.Add(site.GraveTile);
+        if (site.DirtPile != null)
+            props.Add(site.DirtPile);
         
         graveSites.Add(site);
     }
