@@ -52,6 +52,11 @@ public class Level : IUpdatable, IDrawable
         InteractionSystem = new InteractionSystem(gameContext.CoordinatesConverter);
     }
     
+    public GraveDigger.GraveSites.GraveSite GetGraveSiteByTombstone(Tombstone tombstone)
+    {
+        return graveSites.FirstOrDefault(s => s.Tombstone == tombstone);
+    }
+    
     public void LoadTextures()
     {
         LoadGroundTextures();
@@ -223,17 +228,13 @@ public class Level : IUpdatable, IDrawable
     
     private void SpawnGraveDirt(Tombstone tombstone)
     {
-        tombstone.GraveTile?.ChangeSprite("grave_digged");
         var site = graveSites.FirstOrDefault(s => s.Tombstone == tombstone);
-    
         site?.SyncDirtPile(CreatePropWrapper, UnregisterObject);
     }
 
     private void RemoveGraveDirt(Tombstone tombstone)
     {
-        tombstone.GraveTile?.ChangeSprite("grave_earth");
         var site = graveSites.FirstOrDefault(s => s.Tombstone == tombstone);
-    
         site?.RemoveDirtPile(UnregisterObject);
     }
 
@@ -313,23 +314,22 @@ public class Level : IUpdatable, IDrawable
         );
         
         site.Tombstone.SetData(graveSiteData);
+        site.Tombstone.ParentSite = site;
         
         TombstoneInteraction interaction = new TombstoneInteraction(site.Tombstone);
         interaction.OnTombstoneRead += OpenTombstone;
         site.Tombstone.Interaction = interaction;
         InteractionSystem.RegisterInteraction(interaction);
-
+        
         props.Add(site.Tombstone);
-        if (site.GraveTile != null) props.Add(site.GraveTile);
-        if (site.DirtPile != null) props.Add(site.DirtPile);
-
+        
         graveSites.Add(site);
     }
 
     private void OpenTombstone(Tombstone obj)
     {
         InteractionSystem.ClearState();
-        gameplayActions.OpenTombstone(obj);
+        gameplayActions.OpenTombstone(obj.ParentSite);
     }
 
     private Prop PropFactory(string spriteName)
@@ -376,6 +376,7 @@ public class Level : IUpdatable, IDrawable
 
         SpriteManager.AddSprite("grave_earth", "Images/Environment_New/grave_earth");
         SpriteManager.AddSprite("grave_digged", "Images/Environment_New/grave_digged");
+        SpriteManager.AddSprite("grave_broken", "Images/Environment_New/grave_broken");
     }
     
     private void LoadLootTextures()

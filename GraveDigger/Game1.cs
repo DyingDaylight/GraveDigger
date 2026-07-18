@@ -178,8 +178,8 @@ private void SubscribeToEvents()
     gui.MenuUi.OnSettingsClicked += OpenSettings; 
     gui.MenuUi.OnExitClicked += CloseGame;
 
-    gui.WindowManager.TombstoneInfoWindow.OnDigButton += gameplayCoordinator.DigGrave;
-    gui.WindowManager.TombstoneInfoWindow.OnRepairButton += gameplayCoordinator.RepairGrave;
+    gui.WindowManager.TombstoneInfoWindow.OnDigButton += (tombstone) => gameplayCoordinator.DigGrave(tombstone.ParentSite);
+    gui.WindowManager.TombstoneInfoWindow.OnRepairButton += (tombstone) => gameplayCoordinator.RepairGrave(tombstone.ParentSite);
     
     gui.WindowManager.InventoryWindow.UseRequested += gameplayCoordinator.UseItem;
     gui.WindowManager.InventoryWindow.DiscardRequested += gameplayCoordinator.DiscardItem;

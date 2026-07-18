@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GraveDigger.Enemies;
+using GraveDigger.GraveSites;
 using GraveDigger.Items;
 using GraveDigger.Props;
 using GraveDigger.Utils;
@@ -18,7 +19,7 @@ public class GameplayCoordinator : IGameplayActions
     private readonly Inventory merchantInventory;
     private readonly Inventory inventory;
     private readonly Player player;
-
+    
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
     public event Action<TradeResult> OnTradeCompleted;
 
@@ -62,22 +63,21 @@ public class GameplayCoordinator : IGameplayActions
         reputationSystem.Calculate(props);
     }
 
-    public void OpenTombstone(Tombstone tombstone)
+    public void OpenTombstone(GraveSite graveSite)
     {
-        windowService.OpenTombstoneWindow(tombstone);
+        windowService.OpenTombstoneWindow(graveSite);
     }
 
-    public void DigGrave(Tombstone tombstone)
+    public void DigGrave(GraveSite graveSite)
     {
         Console.WriteLine("Digging Grave");
-        bool dug = tombstone.Dig();
-        if (dug)
+        if (graveSite != null && graveSite.Dig())
         {
-            List<ItemData> itemsData = lootGenerator.Generate(tombstone.Data, randomService);
-            OnLootSpawn?.Invoke(itemsData, tombstone);
-            OnGraveDug?.Invoke(tombstone);
+            List<ItemData> itemsData = lootGenerator.Generate(graveSite.Tombstone.Data, randomService);
+            OnLootSpawn?.Invoke(itemsData, graveSite.Tombstone);
+            OnGraveDug?.Invoke(graveSite.Tombstone);
             
-            // TODO: check if night
+			// TODO: check if night
             EnemyType enemyType = UndeadGenerator.Generate(tombstone.Data, randomService, false);
             if (enemyType == EnemyType.Ghost)
             {
@@ -85,19 +85,19 @@ public class GameplayCoordinator : IGameplayActions
                 Console.WriteLine("Ghost appeared! Reputation reduced by 1!");
             } 
             
-            reputationSystem.ChangeReputation(tombstone.GetReputationValue());
+            reputationSystem.ChangeReputation(graveSite.GetReputationValue());
             windowService.CloseCurrentWindow();
         }
     }
 
-    public void RepairGrave(Tombstone tombstone)
+    public void RepairGrave(GraveSite graveSite)
     {
+        
         // TODO: check if we have resources
-        bool repaired = tombstone.Repair();
-        if (repaired)
+        if (graveSite != null && graveSite.Repair())
         {
-            OnGraveRepaired?.Invoke(tombstone);
-            reputationSystem.ChangeReputation(tombstone.GetReputationValue());
+            OnGraveRepaired?.Invoke(graveSite.Tombstone);
+            reputationSystem.ChangeReputation(graveSite.GetReputationValue());
             windowService.RefreshTombstoneWindow();
         }
     }

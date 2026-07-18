@@ -112,9 +112,9 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         this.gameState = state; 
     }
 
-    public void OpenTombstoneWindow(Tombstone tombstone)
+    public void OpenTombstoneWindow(GraveDigger.GraveSites.GraveSite graveSite)
     {
-        WindowManager.OpenTombstoneInfoWindow(tombstone);
+        WindowManager.OpenTombstoneInfoWindow(graveSite);
     }
 
     public void OpenInventoryWindow(Inventory inventory)

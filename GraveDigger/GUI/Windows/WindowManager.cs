@@ -1,4 +1,5 @@
 ﻿using GraveDigger.Core;
+using GraveDigger.GraveSites;
 using GraveDigger.Items;
 using GraveDigger.Props;
 using GUI.Windows;
@@ -51,9 +52,9 @@ public class WindowManager : IUpdatable, IDrawable
         currentWindow?.Draw(spriteBatch);
     }
     
-    public void OpenTombstoneInfoWindow(Tombstone tombstone)
+    public void OpenTombstoneInfoWindow(GraveSite graveSite)
     {
-        TombstoneInfoWindow.SetData(tombstone);
+        TombstoneInfoWindow.SetData(graveSite.Tombstone, graveSite);
         currentWindow = TombstoneInfoWindow;
     }
 
