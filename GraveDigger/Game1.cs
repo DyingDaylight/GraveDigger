@@ -198,7 +198,12 @@ private void SubscribeToEvents()
     level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
 
     gameplayCoordinator.OnLootSpawn += level.SpawnLoot;
+    gameplayCoordinator.OnGraveChanged += level.GraveChanged;
     gameplayCoordinator.OnTradeCompleted += gui.ShowTradeResult;
+
+    timeSystem.DayStarted += gameplayCoordinator.DayStarted;
+    timeSystem.DayTimeChanged += level.DayTimeChange;
+    timeSystem.DayStarted += level.DayStart;
 }
     
 private void SetGameState(GameState gameState)

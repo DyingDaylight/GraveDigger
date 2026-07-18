@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using GraveDigger.Core;
 using GraveDigger.Data;
+using GraveDigger.GraveSites;
 using GraveDigger.Interactions;
 using GraveDigger.Items;
 using GraveDigger.Props;
+using GraveDigger.Systems;
 using GraveDigger.Utils;
 using Interfaces;
 using Microsoft.Xna.Framework;
@@ -40,7 +42,7 @@ public class Level : IUpdatable, IDrawable
     private readonly GameContext gameContext;
     private readonly IGameplayActions gameplayActions;
     
-    private readonly List<GraveDigger.GraveSites.GraveSite> graveSites = new();
+    private readonly List<GraveSite> graveSites = new();
     
     public InteractionSystem InteractionSystem { get; private set; }
 
@@ -50,11 +52,6 @@ public class Level : IUpdatable, IDrawable
         this.gameplayActions = gameplayActions;
         
         InteractionSystem = new InteractionSystem(gameContext.CoordinatesConverter);
-    }
-    
-    public GraveDigger.GraveSites.GraveSite GetGraveSiteByTombstone(Tombstone tombstone)
-    {
-        return graveSites.FirstOrDefault(s => s.Tombstone == tombstone);
     }
     
     public void LoadTextures()
@@ -76,10 +73,10 @@ public class Level : IUpdatable, IDrawable
         foreach (IUpdatable updatable in updatables)
             updatable.Start();
         
-        gameplayActions.CalculateInitialReputation(props);
+        gameplayActions.RecalculateReputation(props);
         
-        gameplayActions.OnGraveDug += SpawnGraveDirt;
-        gameplayActions.OnGraveRepaired += RemoveGraveDirt;
+        //gameplayActions.OnGraveDug += SpawnGraveDirt;
+        //gameplayActions.OnGraveRepaired += RemoveGraveDirt;
     }
 
     public void Update(GameTime gameTime)
@@ -104,15 +101,37 @@ public class Level : IUpdatable, IDrawable
             collider.Draw(spriteBatch);
     }
     
+    public void DayTimeChange(DayTime dayTime)
+    {
+    }
+
+    public void DayStart(int day)
+    {
+        foreach (Prop prop in props)
+        {
+            if (prop is IDailyUpdatable dailyUpdatable)
+                dailyUpdatable.AdvanceDay(day);
+        }
+        
+        gameplayActions.RecalculateReputation(props);
+    }
+    
     public void SpawnLoot(List<ItemData> loot, Tombstone tombstone)
     {
-        List<Rectangle> occupiedAreas = props.Select(prop => prop.GetDestRectangle(prop.SourceRectangle)).ToList();
+        List<Rectangle> occupiedAreas = props.Where(prop => prop.Visible)
+            .Select(prop => prop.GetDestRectangle(prop.SourceRectangle))
+            .ToList();
 
         foreach (ItemData item in loot)
         {
             ItemPickUp itemPickUp = CreatePickupItem(tombstone, item, occupiedAreas);
             itemPickUp.Start();
         }
+    }
+    
+    public void GraveChanged(GraveSite graveSite)
+    {
+        gameplayActions.RecalculateReputation(props);
     }
     
     private T RegisterObject<T>(T obj)
@@ -226,26 +245,6 @@ public class Level : IUpdatable, IDrawable
         props.Remove(pickable);
     }
     
-    private void SpawnGraveDirt(Tombstone tombstone)
-    {
-        var site = graveSites.FirstOrDefault(s => s.Tombstone == tombstone);
-        site?.SyncDirtPile(CreatePropWrapper, UnregisterObject);
-    }
-
-    private void RemoveGraveDirt(Tombstone tombstone)
-    {
-        var site = graveSites.FirstOrDefault(s => s.Tombstone == tombstone);
-        site?.RemoveDirtPile(UnregisterObject);
-    }
-
-    // logic initialization to prop
-    private Prop CreatePropWrapper(string name, Vector2 pos) 
-    {
-        Prop p = PropFactory(name);
-        p.Transform.Position = pos;
-        return RegisterObject(p);
-    }
-    
     private void CreateProps()
     {
         CreateLevelObject(PropFactory,"crypt",  new Vector2(1300, 350));
@@ -293,41 +292,28 @@ public class Level : IUpdatable, IDrawable
         GraveSiteData graveSiteData = GraveSiteGenerator.Generate(gameContext.RandomService);
         GraveSiteState randomState = gameContext.RandomService.RandomEnum<GraveSiteState>();
 
-        var site = new GraveDigger.GraveSites.GraveSite(
-            name, 
-            position, 
-            graveSiteData, 
-            randomState,
-            (spriteName, pos) => {
-                Prop p = PropFactory(spriteName);
-                p.Transform.Position = pos;
-                if (spriteName == "dirt") p.Transform.Scale = new Vector2(0.05f, 0.05f);
-                if (spriteName.StartsWith("grave_")) p.Transform.Scale = new Vector2(0.08f, 0.08f);
-                return RegisterObject(p);
-            },
-            (spriteName, pos) => {
-                Tombstone t = TombstoneFactory(spriteName);
-                t.Transform.Position = pos;
-                t.Transform.Scale = new Vector2(0.3f, 0.3f);
-                return RegisterObject(t);
-            }
-        );
+        Tombstone tombstone = CreateLevelObject(TombstoneFactory, name, position);
         
-        site.Tombstone.SetData(graveSiteData);
-        site.Tombstone.ParentSite = site;
+        GraveTile graveTile = CreateLevelObject(GraveFactory, name, position);
+        graveTile.DecayInterval = gameContext.RandomService.Next(2, 5);
+        graveTile.State = randomState;
+
+        Prop dirt = CreateLevelObject(PropFactory, "dirt", position);
         
-        TombstoneInteraction interaction = new TombstoneInteraction(site.Tombstone);
+        GraveSite graveSite = new GraveSite();
+        graveSite.Transform.Position = position;
+        graveSite.SetTombstone(tombstone);
+        graveSite.SetGrave(graveTile);
+        graveSite.SetDirt(dirt);
+        
+        graveSite.Tombstone.SetData(graveSiteData);
+        
+        TombstoneInteraction interaction = new TombstoneInteraction(tombstone);
         interaction.OnTombstoneRead += OpenTombstone;
-        site.Tombstone.Interaction = interaction;
+        tombstone.Interaction = interaction;
         InteractionSystem.RegisterInteraction(interaction);
-        
-        props.Add(site.Tombstone);
-        if (site.GraveTile != null)
-            props.Add(site.GraveTile);
-        if (site.DirtPile != null)
-            props.Add(site.DirtPile);
-        
-        graveSites.Add(site);
+
+        graveSites.Add(graveSite);
     }
 
     private void OpenTombstone(Tombstone obj)
@@ -344,6 +330,11 @@ public class Level : IUpdatable, IDrawable
     private Tombstone TombstoneFactory(string spriteName)
     {
         return new Tombstone(spriteName);
+    }
+    
+    private GraveTile GraveFactory(string spriteName)
+    {
+        return new GraveTile(spriteName);
     }
 
     private ItemPickUp LootFactory(string spriteName)

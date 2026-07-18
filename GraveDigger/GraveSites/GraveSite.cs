@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GraveDigger.Core;
+using Microsoft.Xna.Framework;
 using GraveDigger.Props;
 using GraveDigger.Data;
 
@@ -6,72 +7,23 @@ namespace GraveDigger.GraveSites;
 
 public class GraveSite
 {
-    public Tombstone Tombstone { get; private set; }
-    public Prop GraveTile { get; private set; }
-    public Prop DirtPile { get; private set; }
+    public Transform Transform { get; } = new Transform();
     
-    private GraveSiteState state;
+    public Tombstone Tombstone { get; private set; }
+    public GraveTile GraveTile { get; private set; }
+    public Prop DirtPile { get; private set; }
+
     public GraveSiteState State
     {
-        get => state;
-        set {
-            state = value;
-            UpdateVisuals();
-        }
-    }
-
-    public GraveSite(string tombstoneSpriteName, Vector2 position, GraveSiteData data, GraveSiteState initialState, System.Func<string, Vector2, Prop> createPropObj, System.Func<string, Vector2, Tombstone> createTombstoneObj)
-    {
-        GraveTile = createPropObj(initialState == GraveSiteState.DugOut ? "grave_digged" : "grave_earth", position);
-        GraveTile.CastShadow = false;
-        GraveTile.Mode = SortingMode.Fixed;
-
-        Vector2 tombstonePosition = new Vector2(position.X, position.Y - 200);
-        Tombstone = createTombstoneObj(tombstoneSpriteName, tombstonePosition);
-
-        State = initialState;
-        
-        if (initialState == GraveSiteState.DugOut)
-        {
-            Vector2 dirtPosition = new Vector2(GraveTile.Transform.Position.X, GraveTile.Transform.Position.Y + 80);
-            DirtPile = createPropObj("dirt", dirtPosition);
-            DirtPile.SortingOrder = GraveTile.SortingOrder - 0.001f; 
-        }
-    }
-    
-    private void UpdateVisuals()
-    {
-        GraveTile.ChangeSprite(State switch {
-            GraveSiteState.DugOut => "grave_digged",
-            GraveSiteState.Broken => "grave_broken",
-            _ => "grave_earth"
-        });
-    }
-    
-    public void SyncDirtPile(System.Func<string, Vector2, Prop> createPropObj, System.Action<Prop> removePropObj)
-    {
-        Vector2 dirtPosition = new Vector2(GraveTile.Transform.Position.X, GraveTile.Transform.Position.Y + 140);
-
-        if (State == GraveSiteState.DugOut && DirtPile == null)
-        {
-            DirtPile = createPropObj("dirt", dirtPosition);
-            DirtPile.Transform.Scale = new Vector2(0.05f, 0.05f);
-        }
-    }
-    
-    public void RemoveDirtPile(System.Action<Prop> removePropObj)
-    {
-        if (DirtPile != null)
-        {
-            removePropObj(DirtPile);
-            DirtPile = null;
-        }
+        get => GraveTile.State;
+        set => GraveTile.State = value;
     }
     
     public bool Dig() 
     {
         if (State == GraveSiteState.DugOut) return false;
         State = GraveSiteState.DugOut;
+        DirtPile.Visible = true;
         return true;
     }
 
@@ -79,6 +31,7 @@ public class GraveSite
     {
         if (State == GraveSiteState.Intact) return false;
         State = GraveSiteState.Intact;
+        DirtPile.Visible = false;
         return true;
     }
     
@@ -88,7 +41,31 @@ public class GraveSite
         {
             GraveSiteState.DugOut => -10,
             GraveSiteState.Broken => -3,
-            GraveSiteState.Intact => +2
+            GraveSiteState.Intact => +2,
+            _ => 0
         };
+    }
+
+    public void SetTombstone(Tombstone tombstone)
+    {
+        Tombstone = tombstone;
+        Tombstone.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y - 200);
+        Tombstone.Transform.Scale = new Vector2(0.3f, 0.3f);
+        Tombstone.ParentSite = this;
+    }
+
+    public void SetGrave(GraveTile graveTile)
+    {
+        GraveTile = graveTile;
+        GraveTile.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y);
+        GraveTile.Transform.Scale = new Vector2(0.08f, 0.08f);
+    }
+
+    public void SetDirt(Prop dirt)
+    {
+        DirtPile = dirt;
+        DirtPile.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y + 120);
+        DirtPile.Transform.Scale = new Vector2(0.05f, 0.05f);
+        DirtPile.Visible = State == GraveSiteState.DugOut;
     }
 }

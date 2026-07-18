@@ -20,8 +20,5 @@ public interface IGameplayActions
     void UseItem(ItemData itemData, int amount);
     void DiscardItem(ItemData itemData, int amount);
     
-    void CalculateInitialReputation(List<Prop> props);
-    
-    public event Action<Tombstone> OnGraveDug;
-    public event Action<Tombstone> OnGraveRepaired;
+    void RecalculateReputation(IEnumerable<Prop> props);
 }

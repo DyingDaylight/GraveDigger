@@ -26,8 +26,7 @@ public class GameplayCoordinator : IGameplayActions
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
     public event Action<TradeResult> OnTradeCompleted;
 
-    public event Action<Tombstone> OnGraveDug;
-    public event Action<Tombstone> OnGraveRepaired;
+    public event Action<GraveSite> OnGraveChanged;
     
     public GameplayCoordinator(
         Player player,
@@ -61,15 +60,19 @@ public class GameplayCoordinator : IGameplayActions
         inventory.Add(food);
         inventory.Add(food);
         inventory.Add(food);
-
-        timeSystem.DayTimeChanged += DayTimeChanged;
     }
 
-    public void CalculateInitialReputation(List<Prop> props)
+    public void RecalculateReputation(IEnumerable<Prop> props)
     {
-        reputationSystem.Calculate(props);
+        reputationSystem.Recalculate(props);
     }
 
+    public void DayStarted(int currentDay)
+    {
+        Console.WriteLine("Day started: " + currentDay);
+        player.IncreaseHunger(HungerPerDay);
+    }
+    
     public void OpenTombstone(GraveSite graveSite)
     {
         windowService.OpenTombstoneWindow(graveSite);
@@ -81,30 +84,26 @@ public class GameplayCoordinator : IGameplayActions
         {
             List<ItemData> itemsData = lootGenerator.Generate(graveSite.Tombstone.Data, randomService);
             OnLootSpawn?.Invoke(itemsData, graveSite.Tombstone);
-            OnGraveDug?.Invoke(graveSite.Tombstone);
             
             EnemyType enemyType = UndeadGenerator.Generate(graveSite.Tombstone.Data, randomService, 
                 timeSystem.CurrentDayTime == DayTime.Night);
             if (enemyType == EnemyType.Ghost)
             {
-                reputationSystem.ChangeReputation(1);
-                Console.WriteLine("Ghost appeared! Reputation reduced by 1!");
+                Console.WriteLine("Ghost appeared!");
             } 
-            
-            reputationSystem.ChangeReputation(graveSite.GetReputationValue());
             windowService.CloseCurrentWindow();
+            
+            OnGraveChanged?.Invoke(graveSite);
         }
     }
 
     public void RepairGrave(GraveSite graveSite)
     {
-        
         // TODO: check if we have resources
         if (graveSite != null && graveSite.Repair())
         {
-            OnGraveRepaired?.Invoke(graveSite.Tombstone);
-            reputationSystem.ChangeReputation(graveSite.GetReputationValue());
             windowService.RefreshTombstoneWindow();
+            OnGraveChanged?.Invoke(graveSite);
         }
     }
 
@@ -197,11 +196,5 @@ public class GameplayCoordinator : IGameplayActions
 
         AudioManager.Instance.PlaySFX("coins");
         OnTradeCompleted?.Invoke(result);
-    }
-    
-    private void DayTimeChanged(DayTime obj)
-    {
-        Console.WriteLine("Day time: " + obj);
-        player.IncreaseHunger(HungerPerDay);
     }
 }

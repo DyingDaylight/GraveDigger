@@ -13,28 +13,26 @@ public class ReputationSystem
 
     public event Action<int, int, int> ReputationChanged;
     
-    public void ChangeReputation(int value)
-    {
-        int newValue = Math.Clamp(Value + value, MinValue, MaxValue);
-
-        if (newValue == Value)
-            return;
-
-        Console.WriteLine($"Reputation changed to {Value} -> {newValue}");
-        Value = newValue;
-        ReputationChanged?.Invoke(Value,  MinValue, MaxValue);
-    }
-
-    public void Calculate(List<Prop> props)
+    public void Recalculate(IEnumerable<Prop> props)
     {
         int total = 0;
 
         foreach (Prop prop in props)
-        {
             total += prop.GetReputationValue();
-        }
 
-        Console.WriteLine($"Initial reputation: {total}");
-        ChangeReputation(total);
+        SetValue(total);
+    }
+
+    private void SetValue(int value)
+    {
+        int newValue = Math.Clamp(value, MinValue, MaxValue);
+
+        if (newValue == Value)
+            return;
+
+        Console.WriteLine($"Reputation changed: {Value} -> {newValue}");
+
+        Value = newValue;
+        ReputationChanged?.Invoke(Value, MinValue, MaxValue);
     }
 }

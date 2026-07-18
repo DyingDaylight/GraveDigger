@@ -8,7 +8,6 @@ public class Prop : Sprite
 {
     private const float GroundSortingOrder = 0.99f;
     
-    private string propName;
     public SortingMode Mode { get; set; } = SortingMode.Dynamic;
 
     
