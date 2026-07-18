@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GraveDigger.Enemies;
+using GraveDigger.GraveSites;
 using GraveDigger.Items;
 using GraveDigger.Props;
 using GraveDigger.Utils;
@@ -19,8 +20,6 @@ public class GameplayCoordinator : IGameplayActions
     private readonly Inventory inventory;
     private readonly Player player;
     
-    private Level level;
-
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
     public event Action<TradeResult> OnTradeCompleted;
 
@@ -64,28 +63,22 @@ public class GameplayCoordinator : IGameplayActions
         reputationSystem.Calculate(props);
     }
 
-    public void OpenTombstone(Tombstone tombstone)
+    public void OpenTombstone(GraveSite graveSite)
     {
-        if (level == null) return;
-        
-        var graveSite = level.GetGraveSiteByTombstone(tombstone);
-        windowService.OpenTombstoneWindow(tombstone, graveSite);    
+        windowService.OpenTombstoneWindow(graveSite);
     }
 
-    public void DigGrave(Tombstone tombstone)
+    public void DigGrave(GraveSite graveSite)
     {
-        if (level == null) return;
-        
         Console.WriteLine("Digging Grave");
-        var graveSite = level.GetGraveSiteByTombstone(tombstone);
         if (graveSite != null && graveSite.Dig())
             
         {
-            List<ItemData> itemsData = lootGenerator.Generate(tombstone.Data, randomService);
-            OnLootSpawn?.Invoke(itemsData, tombstone);
-            OnGraveDug?.Invoke(tombstone);
+            List<ItemData> itemsData = lootGenerator.Generate(graveSite.Tombstone.Data, randomService);
+            OnLootSpawn?.Invoke(itemsData, graveSite.Tombstone);
+            OnGraveDug?.Invoke(graveSite.Tombstone);
             
-            EnemyType enemyType = UndeadGenerator.Generate(tombstone.Data, randomService);
+            EnemyType enemyType = UndeadGenerator.Generate(graveSite.Tombstone.Data, randomService);
             if (enemyType == EnemyType.Ghost)
             {
                 reputationSystem.ChangeReputation(1);
@@ -101,15 +94,13 @@ public class GameplayCoordinator : IGameplayActions
         }
     }
 
-    public void RepairGrave(Tombstone tombstone)
+    public void RepairGrave(GraveSite graveSite)
     {
-        if (level == null) return;
         
-        var graveSite = level.GetGraveSiteByTombstone(tombstone);
         // TODO: check if we have resources
         if (graveSite != null && graveSite.Repair())
         {
-            OnGraveRepaired?.Invoke(tombstone);
+            OnGraveRepaired?.Invoke(graveSite.Tombstone);
             reputationSystem.ChangeReputation(graveSite.GetReputationValue());
             windowService.RefreshTombstoneWindow();
         }
@@ -204,10 +195,5 @@ public class GameplayCoordinator : IGameplayActions
 
         AudioManager.Instance.PlaySFX("coins");
         OnTradeCompleted?.Invoke(result);
-    }
-    
-    public void SetLevel(Level level)
-    {
-        this.level = level;
     }
 }

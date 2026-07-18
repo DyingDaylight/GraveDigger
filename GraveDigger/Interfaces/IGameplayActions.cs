@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GraveDigger.Data;
+using GraveDigger.GraveSites;
 using GraveDigger.Items;
 using GraveDigger.Props;
 using GraveDigger.Systems;
@@ -9,9 +10,9 @@ namespace Interfaces;
 
 public interface IGameplayActions
 { 
-    void OpenTombstone(Tombstone tombstone);
-    void DigGrave(Tombstone tombstone);
-    void RepairGrave(Tombstone tombstone);
+    void OpenTombstone(GraveSite graveSite);
+    void DigGrave(GraveSite graveSite);
+    void RepairGrave(GraveSite graveSite);
     
     void PickupItem(ItemData itemData);
     void SellItem(ItemData itemData, int amount);

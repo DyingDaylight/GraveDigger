@@ -52,9 +52,9 @@ public class WindowManager : IUpdatable, IDrawable
         currentWindow?.Draw(spriteBatch);
     }
     
-    public void OpenTombstoneInfoWindow(Tombstone tombstone, GraveSite graveSite)
+    public void OpenTombstoneInfoWindow(GraveSite graveSite)
     {
-        TombstoneInfoWindow.SetData(tombstone, graveSite);
+        TombstoneInfoWindow.SetData(graveSite.Tombstone, graveSite);
         currentWindow = TombstoneInfoWindow;
     }
 

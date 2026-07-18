@@ -8,7 +8,7 @@ namespace Interfaces;
 
 public interface IGameWindowService
 {
-    void OpenTombstoneWindow(Tombstone tombstone, GraveSite graveSite);
+    void OpenTombstoneWindow(GraveSite graveSite);
     void OpenInventoryWindow(Inventory inventory);
     void OpenTradeWindow(Inventory inventory, Inventory inventory1);
     

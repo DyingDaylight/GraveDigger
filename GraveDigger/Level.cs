@@ -329,7 +329,7 @@ public class Level : IUpdatable, IDrawable
     private void OpenTombstone(Tombstone obj)
     {
         InteractionSystem.ClearState();
-        gameplayActions.OpenTombstone(obj);
+        gameplayActions.OpenTombstone(obj.ParentSite);
     }
 
     private Prop PropFactory(string spriteName)
