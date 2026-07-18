@@ -19,10 +19,9 @@ public class GraveSite
         Tombstone = createTombstoneObj(tombstoneSpriteName, tombstonePosition);
     
         Tombstone.GraveTile = GraveTile; 
+        Tombstone.GraveTile.Mode = SortingMode.Fixed;
         Tombstone.State = initialState;
-
-       // GraveTile.SortingOrder = Tombstone.SortingOrder - 0.001f;
-
+        
         if (initialState == GraveSiteState.DugOut)
         {
             Vector2 dirtPosition = new Vector2(GraveTile.Transform.Position.X, GraveTile.Transform.Position.Y + 80);
