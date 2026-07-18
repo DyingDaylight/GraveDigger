@@ -67,7 +67,6 @@ public class Game1 : Game
         base.Initialize();
     }
     
-    
     protected override void LoadContent()
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
