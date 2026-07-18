@@ -169,6 +169,7 @@ public class Game1 : Game
         gameplayCoordinator = new GameplayCoordinator(player, gui, reputationSystem, randomService);
         
         level = new Level(gameContext, gameplayCoordinator);
+        gameplayCoordinator.SetLevel(level);
         level.LoadTextures();
         level.Start();
     }

@@ -2,12 +2,13 @@
 using GraveDigger.Items;
 using GraveDigger.Props;
 using GraveDigger.Systems;
+using GraveDigger.GraveSites;
 
 namespace Interfaces;
 
 public interface IGameWindowService
 {
-    void OpenTombstoneWindow(Tombstone tombstone);
+    void OpenTombstoneWindow(Tombstone tombstone, GraveSite graveSite);
     void OpenInventoryWindow(Inventory inventory);
     void OpenTradeWindow(Inventory inventory, Inventory inventory1);
     

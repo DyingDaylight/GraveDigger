@@ -18,6 +18,8 @@ public class GameplayCoordinator : IGameplayActions
     private readonly Inventory merchantInventory;
     private readonly Inventory inventory;
     private readonly Player player;
+    
+    private Level level;
 
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
     public event Action<TradeResult> OnTradeCompleted;
@@ -64,14 +66,20 @@ public class GameplayCoordinator : IGameplayActions
 
     public void OpenTombstone(Tombstone tombstone)
     {
-        windowService.OpenTombstoneWindow(tombstone);
+        if (level == null) return;
+        
+        var graveSite = level.GetGraveSiteByTombstone(tombstone);
+        windowService.OpenTombstoneWindow(tombstone, graveSite);    
     }
 
     public void DigGrave(Tombstone tombstone)
     {
+        if (level == null) return;
+        
         Console.WriteLine("Digging Grave");
-        bool dug = tombstone.Dig();
-        if (dug)
+        var graveSite = level.GetGraveSiteByTombstone(tombstone);
+        if (graveSite != null && graveSite.Dig())
+            
         {
             List<ItemData> itemsData = lootGenerator.Generate(tombstone.Data, randomService);
             OnLootSpawn?.Invoke(itemsData, tombstone);
@@ -88,19 +96,21 @@ public class GameplayCoordinator : IGameplayActions
                 Console.WriteLine("Zombie appeared! He will be eating you!");
             }
             
-            reputationSystem.ChangeReputation(tombstone.GetReputationValue());
+            reputationSystem.ChangeReputation(graveSite.GetReputationValue());
             windowService.CloseCurrentWindow();
         }
     }
 
     public void RepairGrave(Tombstone tombstone)
     {
+        if (level == null) return;
+        
+        var graveSite = level.GetGraveSiteByTombstone(tombstone);
         // TODO: check if we have resources
-        bool repaired = tombstone.Repair();
-        if (repaired)
+        if (graveSite != null && graveSite.Repair())
         {
             OnGraveRepaired?.Invoke(tombstone);
-            reputationSystem.ChangeReputation(tombstone.GetReputationValue());
+            reputationSystem.ChangeReputation(graveSite.GetReputationValue());
             windowService.RefreshTombstoneWindow();
         }
     }
@@ -194,5 +204,10 @@ public class GameplayCoordinator : IGameplayActions
 
         AudioManager.Instance.PlaySFX("coins");
         OnTradeCompleted?.Invoke(result);
+    }
+    
+    public void SetLevel(Level level)
+    {
+        this.level = level;
     }
 }

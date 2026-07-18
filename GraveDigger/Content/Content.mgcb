@@ -303,6 +303,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Environment_New/earth_tile2.png;Images/Environment_New/earth_tile2
 
+#begin Images/Environment_New/grave_broken.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Environment_New/grave_broken.png
+
 #begin Images/Environment_New/grave_digged.png
 /importer:TextureImporter
 /processor:TextureProcessor

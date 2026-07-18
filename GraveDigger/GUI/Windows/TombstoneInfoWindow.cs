@@ -1,4 +1,5 @@
 ﻿using System;
+using GraveDigger.GraveSites;
 using GraveDigger.GUI.Elements;
 using GraveDigger.GUI.Layouts;
 using GraveDigger.Props;
@@ -23,6 +24,7 @@ public class TombstoneInfoWindow : Window
     private readonly VerticalLayout infoLayout;
     
     private Tombstone tombstone;
+    private GraveSite graveSite;
     
     public event Action<Tombstone> OnDigButton;
     public event Action<Tombstone> OnRepairButton;
@@ -64,15 +66,16 @@ public class TombstoneInfoWindow : Window
         infoLayout.UpdateLayout();
     }
 
-    public void SetData(Tombstone tombstone)
+    public void SetData(Tombstone tombstone, GraveSite graveSite)
     {
         this.tombstone = tombstone;
+        this.graveSite = graveSite;
         RefreshContent();
     }
 
     public void Refresh()
     {
-        if (tombstone == null)
+        if (tombstone == null || graveSite == null)
             return;
         
         RefreshContent();
@@ -80,16 +83,19 @@ public class TombstoneInfoWindow : Window
 
     private void RefreshContent()
     {
+        if (tombstone == null || graveSite == null)
+            return;
+        
         nameLabel.Text = tombstone.Data.Name;
         yearLabel.Text = tombstone.Data.LifeYears;
         wealthLabel.Text = $"Wealth: {tombstone.Data.WealthDescription}";
         natureLabel.Text = $"Nature: {tombstone.Data.Inscription}";
-        stateLabel.Text = $"State: {tombstone.State}";
+        stateLabel.Text = $"State: {graveSite.State}";
         
-        digButton.SetDisabled(tombstone.State == GraveSiteState.DugOut);
+        digButton.SetDisabled(graveSite.State == GraveSiteState.DugOut);
         
         // TODO: Decide whether a dug-out grave can also be repaired.
-        repairButton.SetDisabled(tombstone.State == GraveSiteState.Intact);
+        repairButton.SetDisabled(graveSite.State == GraveSiteState.Intact);
         //repairButton.SetDisabled(tombstone.State != TombstoneState.Broken);
         
         infoLayout.UpdateLayout();
