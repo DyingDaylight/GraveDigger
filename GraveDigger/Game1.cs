@@ -161,8 +161,6 @@ public class Game1 : Game
         gui.Start();
         
         player = new Player(gameContext);
-        // TODO: remove
-        player.IncreaseHunger(80);
         player.Start();
         
         timeSystem = new TimeSystem(5, 5);

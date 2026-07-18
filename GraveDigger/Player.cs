@@ -98,7 +98,7 @@ public class Player : Animation
             return;
 
         Hunger = Math.Clamp(Hunger + amount, 0, MaxHunger);
-        HungerChanged?.Invoke(amount, 0, MaxHunger);
+        HungerChanged?.Invoke(Hunger, 0, MaxHunger);
     }
     
     private void UpdateSortingOrder()
@@ -156,7 +156,7 @@ public class Player : Animation
         }
         else
         {
-            GraveDigger.Systems.AudioManager.Instance.PauseSFX("steps");
+            Systems.AudioManager.Instance.PauseSFX("steps");
             Stop();
             previousAnimationRow = -1;
         }

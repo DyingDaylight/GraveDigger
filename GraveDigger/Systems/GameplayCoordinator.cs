@@ -20,6 +20,8 @@ public class GameplayCoordinator : IGameplayActions
     private readonly TimeSystem timeSystem;
     private readonly Inventory inventory;
     private readonly Player player;
+
+    private const int HungerPerDay = 10;
     
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
     public event Action<TradeResult> OnTradeCompleted;
@@ -61,11 +63,6 @@ public class GameplayCoordinator : IGameplayActions
         inventory.Add(food);
 
         timeSystem.DayTimeChanged += DayTimeChanged;
-    }
-
-    private void DayTimeChanged(DayTime obj)
-    {
-        Console.WriteLine("Day time: " + obj);
     }
 
     public void CalculateInitialReputation(List<Prop> props)
@@ -200,5 +197,11 @@ public class GameplayCoordinator : IGameplayActions
 
         AudioManager.Instance.PlaySFX("coins");
         OnTradeCompleted?.Invoke(result);
+    }
+    
+    private void DayTimeChanged(DayTime obj)
+    {
+        Console.WriteLine("Day time: " + obj);
+        player.IncreaseHunger(HungerPerDay);
     }
 }
