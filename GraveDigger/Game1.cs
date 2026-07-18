@@ -72,7 +72,6 @@ public class Game1 : Game
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
         cursorTexture = Content.Load<Texture2D>("Images/GUI/cursor"); // custom cursor
-        spriteBatch = new SpriteBatch(GraphicsDevice);
         
         LoadCoreSprites();
         CreateGameObjects();
