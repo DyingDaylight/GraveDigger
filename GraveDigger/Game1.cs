@@ -18,6 +18,7 @@ public class Game1 : Game
     private GameplayCoordinator gameplayCoordinator;
     private ReputationSystem reputationSystem;
     private RandomService randomService;
+    private TimeSystem timeSystem;
     
     private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
@@ -164,8 +165,10 @@ public class Game1 : Game
         player.IncreaseHunger(80);
         player.Start();
         
+        timeSystem = new TimeSystem(5, 5);
         reputationSystem = new ReputationSystem();
-        gameplayCoordinator = new GameplayCoordinator(player, gui, reputationSystem, randomService);
+        gameplayCoordinator = new GameplayCoordinator(player, timeSystem, gui, reputationSystem, randomService);
+        timeSystem.Start();
         
         level = new Level(gameContext, gameplayCoordinator);
         level.LoadTextures();
@@ -236,6 +239,8 @@ private void SetGameState(GameState gameState)
     
     private void UpdateGameplay(GameTime gameTime, KeyboardState keyboardState)
     {
+        timeSystem.Update(gameTime);
+        
         HandleWindowInput(keyboardState);
 
         if (gui.IsModalWindowOpen())

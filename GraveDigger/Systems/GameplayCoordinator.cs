@@ -17,6 +17,7 @@ public class GameplayCoordinator : IGameplayActions
     private readonly LootGenerator lootGenerator;
     private readonly MerchantProvider merchantProvider;
     private readonly Inventory merchantInventory;
+    private readonly TimeSystem timeSystem;
     private readonly Inventory inventory;
     private readonly Player player;
     
@@ -28,15 +29,17 @@ public class GameplayCoordinator : IGameplayActions
     
     public GameplayCoordinator(
         Player player,
+        TimeSystem timeSystem,
         IGameWindowService windowService, 
         ReputationSystem reputationSystem,
         RandomService randomService)
     {
         this.player = player;
+        this.timeSystem = timeSystem;
         this.windowService = windowService;
         this.reputationSystem = reputationSystem;
         this.randomService = randomService;
-        
+
         merchantProvider = new MerchantProvider();
         lootGenerator = new LootGenerator();
         merchantInventory = new Inventory();
@@ -56,8 +59,15 @@ public class GameplayCoordinator : IGameplayActions
         inventory.Add(food);
         inventory.Add(food);
         inventory.Add(food);
+
+        timeSystem.DayTimeChanged += DayTimeChanged;
     }
-    
+
+    private void DayTimeChanged(DayTime obj)
+    {
+        Console.WriteLine("Day time: " + obj);
+    }
+
     public void CalculateInitialReputation(List<Prop> props)
     {
         reputationSystem.Calculate(props);
@@ -70,15 +80,14 @@ public class GameplayCoordinator : IGameplayActions
 
     public void DigGrave(GraveSite graveSite)
     {
-        Console.WriteLine("Digging Grave");
         if (graveSite != null && graveSite.Dig())
         {
             List<ItemData> itemsData = lootGenerator.Generate(graveSite.Tombstone.Data, randomService);
             OnLootSpawn?.Invoke(itemsData, graveSite.Tombstone);
             OnGraveDug?.Invoke(graveSite.Tombstone);
             
-			// TODO: check if night
-            EnemyType enemyType = UndeadGenerator.Generate(tombstone.Data, randomService, false);
+            EnemyType enemyType = UndeadGenerator.Generate(graveSite.Tombstone.Data, randomService, 
+                timeSystem.CurrentDayTime == DayTime.Night);
             if (enemyType == EnemyType.Ghost)
             {
                 reputationSystem.ChangeReputation(1);
