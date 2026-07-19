@@ -1,4 +1,5 @@
 ﻿using System;
+using GraveDigger.Core;
 using GraveDigger.GraveSites;
 using GraveDigger.GUI.Elements;
 using GraveDigger.GUI.Layouts;
@@ -15,6 +16,7 @@ public class TombstoneInfoWindow : Window
     private readonly Label wealthLabel;
     private readonly Label natureLabel;
     private readonly Label stateLabel;
+    private readonly Label hintLabel;
 
     private readonly Button digButton;
     private readonly Button repairButton;
@@ -23,8 +25,9 @@ public class TombstoneInfoWindow : Window
     private readonly HorizontalLayout buttonsLayout;
     private readonly VerticalLayout infoLayout;
     
-    private Tombstone tombstone;
-    private GraveSite graveSite;
+    private Tombstone? tombstone;
+    private GraveSite? graveSite;
+    private bool hasEnoughMoney;
     
     public event Action<Tombstone> OnDigButton;
     public event Action<Tombstone> OnRepairButton;
@@ -37,12 +40,14 @@ public class TombstoneInfoWindow : Window
         wealthLabel = CreateElement<Label>();
         natureLabel = CreateElement<Label>();
         stateLabel = CreateElement<Label>();
+        hintLabel = CreateElement<Label>();
 
         int buttonWidth = 270;
         int buttonHeight = 80;
         
         digButton = CreateButton("Dig", buttonWidth, buttonHeight, HandleDigClick);
         repairButton = CreateButton("Repair", buttonWidth, buttonHeight, HandleRepairClick);
+        repairButton.SetIcon(SpriteManager.GetSprite("Coin").Texture);
         closeButton = CreateButton("Close", buttonWidth, buttonHeight, HandleCloseButton);
         
         buttonsLayout = new HorizontalLayout(Bounds);
@@ -52,7 +57,6 @@ public class TombstoneInfoWindow : Window
         buttonsLayout.AddElement(digButton);
         buttonsLayout.AddElement(repairButton);
         buttonsLayout.AddElement(closeButton);
-        buttonsLayout.UpdateLayout();
         
         Rectangle contentBounds = new Rectangle(Bounds.X, Bounds.Y, Bounds.Width, Bounds.Height - 120);
         infoLayout = new VerticalLayout(contentBounds);
@@ -63,22 +67,32 @@ public class TombstoneInfoWindow : Window
         infoLayout.AddElement(wealthLabel);
         infoLayout.AddElement(natureLabel);
         infoLayout.AddElement(stateLabel);
-        infoLayout.UpdateLayout();
+        infoLayout.AddElement(hintLabel);
+
+        RefreshLayout();
     }
 
-    public void SetData(Tombstone tombstone, GraveSite graveSite)
+    public void SetData(GraveSite graveSite, bool hasEnoughMoney)
     {
-        this.tombstone = tombstone;
         this.graveSite = graveSite;
+        this.hasEnoughMoney = hasEnoughMoney;
+        tombstone = graveSite.Tombstone;
         RefreshContent();
     }
 
-    public void Refresh()
+    public void Refresh(bool hasEnoughMoney)
     {
         if (tombstone == null || graveSite == null)
             return;
         
+        this.hasEnoughMoney = hasEnoughMoney;
         RefreshContent();
+    }
+    
+    protected override void RefreshLayout()
+    {
+        buttonsLayout.UpdateLayout();
+        infoLayout.UpdateLayout();
     }
 
     private void RefreshContent()
@@ -94,11 +108,28 @@ public class TombstoneInfoWindow : Window
         
         digButton.SetDisabled(graveSite.State == GraveSiteState.DugOut);
         
-        // TODO: Decide whether a dug-out grave can also be repaired.
-        repairButton.SetDisabled(graveSite.State == GraveSiteState.Intact);
-        //repairButton.SetDisabled(tombstone.State != TombstoneState.Broken);
+        repairButton.SetDisabled(graveSite.State == GraveSiteState.Intact || !hasEnoughMoney);
+        if (graveSite.State != GraveSiteState.Intact)
+        {
+            repairButton.SetText($"Repair ({graveSite.RepairCost})");
+            if (!hasEnoughMoney)
+            {
+                hintLabel.Text = "Not enough money to repair";
+                hintLabel.Color = Color.Red;
+                hintLabel.Visible = true;
+            }
+            else
+            {
+                hintLabel.Visible = false;
+            }
+        }
+        else
+        {
+            repairButton.SetText("Repair");
+            hintLabel.Visible = false;
+        }
         
-        infoLayout.UpdateLayout();
+        RefreshLayout();
     }
     
     private void HandleDigClick()
@@ -111,7 +142,7 @@ public class TombstoneInfoWindow : Window
     
     private void HandleRepairClick()
     {
-        if (tombstone == null)
+        if (tombstone == null || !hasEnoughMoney)
             return;
         
         OnRepairButton?.Invoke(tombstone);
@@ -121,7 +152,4 @@ public class TombstoneInfoWindow : Window
     {
         OnCloseButton?.Invoke();
     }
-    
-    
-    
 }

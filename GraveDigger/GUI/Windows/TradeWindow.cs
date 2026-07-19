@@ -89,7 +89,7 @@ public class TradeWindow : Window
         Rectangle hintsRect = new Rectangle(Bounds.X, Bounds.Bottom - 200, Bounds.Width, 50);
         hintsLayout = new HorizontalLayout(hintsRect);
         
-        hintsLayout.HorizontalPadding = (int)(hintPadding * 0.5f); 
+        hintsLayout.HorizontalPadding = hintPadding; 
 
         hintsLayout.AddElement(playerHintLabel);
         hintsLayout.AddElement(tradeLabel);
@@ -302,14 +302,10 @@ public class TradeWindow : Window
             _ => "Failed."
         };
         tradeLabel.Text = message;
-        if (result == TradeResult.Success)
-        {
-            tradeLabel.Color = Color.DarkSeaGreen;
-        }
-        else
-        {
-            tradeLabel.Color = Color.Red;
-        }
+        tradeLabel.Color =
+            result == TradeResult.Success
+                ? Color.DarkSeaGreen
+                : Color.Red;
         tradeLabel.Visible = true;
         hintsLayout.HorizontalPadding = (int)((hintPadding - tradeLabel.Bounds.Width) * 0.5f);
         hintsLayout.UpdateLayout();
@@ -321,7 +317,7 @@ public class TradeWindow : Window
     {
         tradeLabel.Visible = false;
         tradeLabel.Text = "";
-        hintsLayout.HorizontalPadding = (int)(hintPadding * 0.5f);
+        hintsLayout.HorizontalPadding = hintPadding;
         hintsLayout.UpdateLayout();
         tradeResultTimer = 0;
     }
@@ -330,7 +326,7 @@ public class TradeWindow : Window
     {
         if (tradeLabel.Visible)
         {
-            tradeResultTimer -= gameTime.ElapsedGameTime.Milliseconds;
+            tradeResultTimer -= (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             if (tradeResultTimer <= 0)
             {
                 HideTradeResult();

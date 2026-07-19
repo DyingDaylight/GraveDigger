@@ -75,7 +75,8 @@ public class GameplayCoordinator : IGameplayActions
     
     public void OpenTombstone(GraveSite graveSite)
     {
-        windowService.OpenTombstoneWindow(graveSite);
+        bool hasEnoughMoney = inventory.HasEnoughMoney(graveSite.RepairCost);
+        windowService.OpenTombstoneWindow(graveSite, hasEnoughMoney);
     }
 
     public void DigGrave(GraveSite graveSite)
@@ -99,12 +100,22 @@ public class GameplayCoordinator : IGameplayActions
 
     public void RepairGrave(GraveSite graveSite)
     {
-        // TODO: check if we have resources
-        if (graveSite != null && graveSite.Repair())
-        {
-            windowService.RefreshTombstoneWindow();
-            OnGraveChanged?.Invoke(graveSite);
-        }
+        if (graveSite == null)
+            return;
+        
+        int repairCost = graveSite.RepairCost;
+        
+        if (!inventory.HasEnoughMoney(repairCost))
+            return;
+        
+        bool success = graveSite.Repair();
+        if (!success)
+            return;
+
+        repairCost = graveSite.RepairCost;
+        inventory.SpendMoney(repairCost);
+        windowService.RefreshTombstoneWindow(inventory.HasEnoughMoney(repairCost));
+        OnGraveChanged?.Invoke(graveSite);
     }
 
     public void PickupItem(ItemData itemData)
@@ -132,8 +143,10 @@ public class GameplayCoordinator : IGameplayActions
 
         int nutritionAmount = food.Nutrition * amount;
 
+        if (!inventory.Remove(food, amount))
+            return;
+
         player.DecreaseHunger(nutritionAmount);
-        inventory.Remove(food, amount);
     }
     
     public void DiscardItem(ItemData itemData, int amount)

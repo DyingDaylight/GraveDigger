@@ -33,7 +33,7 @@ public class InventoryWindow : Window
         inventoryView.SetSize(Bounds.Width - 80, Bounds.Height - 150);
     
         var closeButton = CreateButton("Close", 200, 60, HandleCloseClick);
-    
+        
         buttonsLayout = new HorizontalLayout(Bounds);
         buttonsLayout.HorizontalPadding = 20;
         buttonsLayout.SetPosition(Bounds.X, Bounds.Bottom - 150);

@@ -1,5 +1,4 @@
-﻿using System;
-using GraveDigger.Core;
+﻿using GraveDigger.Core;
 using GUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,8 +23,6 @@ public class Tooltip : UIElement
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
-        
-        label.CenterIn(Bounds);
         label.Update(gameTime);
     }
 
@@ -35,25 +32,23 @@ public class Tooltip : UIElement
         label.Draw(spriteBatch);
     }
     
-    public override void SetPosition(int x, int y)
-    {
-        base.SetPosition(x, y);
-        label.CenterIn(Bounds);
-    }
-    
     public void SetTooltip(string tooltip)
     {
         label.Text = tooltip;
         
-        SetSize((int) (label.VisibleSize.X + padding.X),
-            (int) (label.VisibleSize.Y + padding.Y));
-        
-        label.CenterIn(Bounds);
+        SetSize((int) (label.Size.X + padding.X),
+            (int) (label.Size.Y + padding.Y));
     }
     
     public void SetFont(SpriteFont font)
     {
         label.Font = font;
+        RefreshLayout();
+    }
+
+    protected override void RefreshLayout()
+    {
+        base.RefreshLayout();
         label.CenterIn(Bounds);
     }
 }

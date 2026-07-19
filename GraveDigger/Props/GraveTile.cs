@@ -24,7 +24,6 @@ public class GraveTile : Prop, IDailyUpdatable
 
     public GraveTile(string name) : base(name)
     {
-        CastShadow = false;
         Mode = SortingMode.Fixed;
     }
     
@@ -36,6 +35,9 @@ public class GraveTile : Prop, IDailyUpdatable
 
     public void AdvanceDay(int day)
     {
+        if (DecayInterval <= 0)
+            return;
+        
         daysSinceConditionChange++;
 
         if (daysSinceConditionChange < DecayInterval)
@@ -56,6 +58,7 @@ public class GraveTile : Prop, IDailyUpdatable
 
     private void UpdateVisuals()
     {
+        CastShadow = false;
         ChangeSprite(State switch {
             GraveSiteState.DugOut => "grave_digged",
             GraveSiteState.Broken => "grave_broken",

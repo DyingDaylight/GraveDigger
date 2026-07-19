@@ -15,7 +15,7 @@ public abstract class UIElement : IUpdatable, IDrawable, ILayoutElement
     
     public bool Visible { get; set; } = true;
     
-    public virtual Vector2 VisibleSize => new(Bounds.Width, Bounds.Height);
+    public virtual Vector2 Size => new(Bounds.Width, Bounds.Height);
 
     public virtual void Start()
     {
@@ -27,7 +27,8 @@ public abstract class UIElement : IUpdatable, IDrawable, ILayoutElement
 
     public virtual void Draw(SpriteBatch spriteBatch)
     {
-        if (Texture == null) return;
+        if (!Visible || Texture == null)
+            return;
         
         spriteBatch.Draw(Texture, Bounds, Color);
     }

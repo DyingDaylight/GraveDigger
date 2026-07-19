@@ -2,6 +2,7 @@
 using GraveDigger.GraveSites;
 using GraveDigger.Items;
 using GraveDigger.Props;
+using GraveDigger.Systems;
 using GUI.Windows;
 using Interfaces;
 using Microsoft.Xna.Framework;
@@ -52,9 +53,9 @@ public class WindowManager : IUpdatable, IDrawable
         currentWindow?.Draw(spriteBatch);
     }
     
-    public void OpenTombstoneInfoWindow(GraveSite graveSite)
+    public void OpenTombstoneInfoWindow(GraveSite graveSite, bool hasEnoughMoney)
     {
-        TombstoneInfoWindow.SetData(graveSite.Tombstone, graveSite);
+        TombstoneInfoWindow.SetData(graveSite, hasEnoughMoney);
         currentWindow = TombstoneInfoWindow;
     }
 
@@ -64,9 +65,9 @@ public class WindowManager : IUpdatable, IDrawable
         currentWindow = InventoryWindow;
     }
     
-    public void OpenTradeWindow(Inventory inventory, Inventory inventory1)
+    public void OpenTradeWindow(Inventory playerInventory, Inventory merchantInventory)
     {
-        TradeWindow.SetInventories(inventory, inventory1);
+        TradeWindow.SetInventories(playerInventory, merchantInventory);
         currentWindow = TradeWindow;
     }
 
@@ -75,9 +76,15 @@ public class WindowManager : IUpdatable, IDrawable
         currentWindow = null;
     }
 
-    public void RefreshTombstoneWindow()
+    public void RefreshTombstoneWindow(bool hasEnoughMoney)
     {
-        if (currentWindow == TombstoneInfoWindow)
-            TombstoneInfoWindow?.Refresh();
+        if (currentWindow != null && currentWindow == TombstoneInfoWindow)
+            TombstoneInfoWindow.Refresh(hasEnoughMoney);
+    }
+
+    public void ShowTradeResult(TradeResult result)
+    {
+        if (currentWindow != null && currentWindow == TradeWindow)
+            TradeWindow.ShowTradeResult(result);
     }
 }

@@ -1,37 +1,50 @@
 ﻿using GraveDigger.Core;
 using Microsoft.Xna.Framework;
 using GraveDigger.Props;
-using GraveDigger.Data;
 
 namespace GraveDigger.GraveSites;
 
 public class GraveSite
 {
+    private const int BaseRepairCost = 10;
+    private const int AdditionalDugOutRepairCost = 5;
+    
     public Transform Transform { get; } = new Transform();
     
     public Tombstone Tombstone { get; private set; }
     public GraveTile GraveTile { get; private set; }
     public Prop DirtPile { get; private set; }
 
+    public int RepairCost => State switch
+    {
+        GraveSiteState.DugOut => BaseRepairCost + AdditionalDugOutRepairCost,
+        GraveSiteState.Broken => BaseRepairCost,
+        _ => 0
+    };
+
     public GraveSiteState State
     {
         get => GraveTile.State;
-        set => GraveTile.State = value;
+        set => GraveTile?.State = value;
     }
     
     public bool Dig() 
     {
-        if (State == GraveSiteState.DugOut) return false;
+        if (State == GraveSiteState.DugOut) 
+            return false;
+        
         State = GraveSiteState.DugOut;
-        DirtPile.Visible = true;
+        DirtPile?.Visible = true;
         return true;
     }
 
     public bool Repair() 
     {
-        if (State == GraveSiteState.Intact) return false;
+        if (State == GraveSiteState.Intact) 
+            return false;
+        
         State = GraveSiteState.Intact;
-        DirtPile.Visible = false;
+        DirtPile?.Visible = false;
         return true;
     }
     
@@ -49,23 +62,23 @@ public class GraveSite
     public void SetTombstone(Tombstone tombstone)
     {
         Tombstone = tombstone;
-        Tombstone.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y - 200);
-        Tombstone.Transform.Scale = new Vector2(0.3f, 0.3f);
-        Tombstone.ParentSite = this;
+        Tombstone?.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y - 200);
+        Tombstone?.Transform.Scale = new Vector2(0.3f, 0.3f);
+        Tombstone?.ParentSite = this;
     }
 
     public void SetGrave(GraveTile graveTile)
     {
         GraveTile = graveTile;
-        GraveTile.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y);
-        GraveTile.Transform.Scale = new Vector2(0.08f, 0.08f);
+        GraveTile?.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y);
+        GraveTile?.Transform.Scale = new Vector2(0.08f, 0.08f);
     }
 
     public void SetDirt(Prop dirt)
     {
         DirtPile = dirt;
-        DirtPile.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y + 120);
-        DirtPile.Transform.Scale = new Vector2(0.05f, 0.05f);
-        DirtPile.Visible = State == GraveSiteState.DugOut;
+        DirtPile?.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y + 120);
+        DirtPile?.Transform.Scale = new Vector2(0.05f, 0.05f);
+        DirtPile?.Visible = State == GraveSiteState.DugOut;
     }
 }

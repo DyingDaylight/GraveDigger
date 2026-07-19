@@ -83,7 +83,7 @@ public class ContextMenu : UIContainer
         foreach (var button in buttons)
             RemoveElement(button);
         buttons.Clear();
-        layout.RemoveAll();
+        layout.RemoveAllElements();
     }
     
     private void ExecuteAction(ContextMenuAction action)

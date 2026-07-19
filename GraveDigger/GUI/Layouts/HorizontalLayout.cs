@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using Interfaces;
 using Microsoft.Xna.Framework;
 
@@ -7,6 +7,15 @@ namespace GraveDigger.GUI.Layouts;
 
 public class HorizontalLayout : Layout
 {
+
+    public enum VerticalAlignment
+    {
+        UpperCenter,
+        MiddleCenter,
+        LowerCenter
+    } 
+    
+    public VerticalAlignment Alignment { get; set; } = VerticalAlignment.UpperCenter; 
     
     public HorizontalLayout(Rectangle bounds) : base(bounds)
     {
@@ -20,7 +29,11 @@ public class HorizontalLayout : Layout
     
     public override void UpdateLayout()
     {
-        if (elements.Count == 0)
+        var visibleElements = elements
+            .Where(element => element.Visible)
+            .ToList();
+        
+        if (visibleElements.Count == 0)
             return;
         
         int spacerCount = 0;
@@ -28,16 +41,16 @@ public class HorizontalLayout : Layout
         
         // Calculate the total width of all visible elements
         // and count the spacers that will share the remaining space.
-        foreach (ILayoutElement element in elements)
+        foreach (ILayoutElement element in visibleElements)
         {
             if (element is ISpacer)
                 spacerCount++;
             else
-                contentWidth += (int) element.VisibleSize.X;
+                contentWidth += (int) element.Size.X;
         }
-
+        
         // Padding is added between every pair of layout elements.
-        contentWidth += HorizontalPadding * (elements.Count - 1);
+        contentWidth += HorizontalPadding * (visibleElements.Count - 1);
         
         Rectangle contentBounds = GetContentBounds();
         
@@ -55,9 +68,9 @@ public class HorizontalLayout : Layout
         int x = (int) (contentBounds.X 
                        + (contentBounds.Width - totalWidth) * 0.5f);
         
-        for (int i = 0; i < elements.Count; i++)
+        for (int i = 0; i < visibleElements.Count; i++)
         {
-            ILayoutElement element = elements[i];
+            ILayoutElement element = visibleElements[i];
             
             if (element is ISpacer)
             {
@@ -65,12 +78,25 @@ public class HorizontalLayout : Layout
             }
             else
             {
-                element.SetPosition(x, contentBounds.Y);
-                x += (int) element.VisibleSize.X;
+                int elementY = contentBounds.Y;
+                switch (Alignment)
+                {
+                    case VerticalAlignment.UpperCenter:
+                        elementY = contentBounds.Y; 
+                        break;
+                    case VerticalAlignment.MiddleCenter:
+                        elementY = (int) (contentBounds.Y + (contentBounds.Height - element.Size.Y) / 2);
+                        break;
+                    case VerticalAlignment.LowerCenter:
+                        elementY = contentBounds.Bottom - (int)element.Size.Y;
+                        break;
+                }
+                element.SetPosition(x, elementY);
+                x += (int) element.Size.X;
             }
             
             // Add padding after every element except the last one.
-            if (i < elements.Count - 1)
+            if (i < visibleElements.Count - 1)
                 x += HorizontalPadding;
         }
     }

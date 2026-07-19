@@ -1,6 +1,7 @@
 ﻿using System;
 using GraveDigger;
 using GraveDigger.Core;
+using GraveDigger.GraveSites;
 using GraveDigger.GUI.Components;
 using GraveDigger.GUI.Windows;
 using GraveDigger.Items;
@@ -107,14 +108,14 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         WindowManager.Draw(spriteBatch);
     }
 
-    public void SetGameState(GraveDigger.GameState state) 
+    public void SetGameState(GameState state) 
     {
-        this.gameState = state; 
+        gameState = state; 
     }
 
-    public void OpenTombstoneWindow(GraveDigger.GraveSites.GraveSite graveSite)
+    public void OpenTombstoneWindow(GraveSite graveSite, bool hasEnoughMoney)
     {
-        WindowManager.OpenTombstoneInfoWindow(graveSite);
+        WindowManager.OpenTombstoneInfoWindow(graveSite, hasEnoughMoney);
     }
 
     public void OpenInventoryWindow(Inventory inventory)
@@ -122,9 +123,9 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         WindowManager.OpenInventoryWindow(inventory);
     }
 
-    public void OpenTradeWindow(Inventory inventory, Inventory inventory1)
+    public void OpenTradeWindow(Inventory playerInventory, Inventory merchantInventory)
     {
-        WindowManager.OpenTradeWindow(inventory, inventory1);
+        WindowManager.OpenTradeWindow(playerInventory, merchantInventory);
     }
 
     public void CloseCurrentWindow()
@@ -137,15 +138,14 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         return WindowManager.IsModalWindow;
     }
 
-    public void RefreshTombstoneWindow()
+    public void RefreshTombstoneWindow(bool hasEnoughMoney)
     {
-        WindowManager.RefreshTombstoneWindow();
+        WindowManager.RefreshTombstoneWindow(hasEnoughMoney);
     }
 
     public void ShowTradeResult(TradeResult result)
     {
-        if (WindowManager.TradeWindow != null && WindowManager.TradeWindow.Visible)
-            WindowManager.TradeWindow.ShowTradeResult(result);
+        WindowManager.ShowTradeResult(result); 
     }
 
     public bool IsInventoryOpen()

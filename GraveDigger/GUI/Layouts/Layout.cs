@@ -15,7 +15,8 @@ public abstract class Layout : ILayoutElement
     public int HorizontalPadding { get; set; }
     public int VerticalPadding { get; set; }
     
-    public virtual Vector2 VisibleSize => new(bounds.Width, bounds.Height);
+    public virtual Vector2 Size => new(bounds.Width, bounds.Height);
+    public bool Visible { get; } = true;
 
 
     protected Layout(Rectangle bounds)
@@ -23,7 +24,7 @@ public abstract class Layout : ILayoutElement
         this.bounds = bounds;
     }
     
-    public void AddElement(ILayoutElement element)
+    public virtual void AddElement(ILayoutElement element)
     {
         if (element == null || elements.Contains(element))
             return;
@@ -43,6 +44,11 @@ public abstract class Layout : ILayoutElement
     }
     
     public abstract void UpdateLayout();
+    
+    public virtual void RemoveAllElements()
+    {
+        elements.Clear();
+    }
     
     protected Rectangle GetContentBounds()
     {

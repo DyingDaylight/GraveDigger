@@ -18,7 +18,7 @@ public class Inventory
     
     public bool Add(ItemData item, int amount = 1)
     {
-        if (item == null || string.IsNullOrWhiteSpace(item.Id))
+        if (item == null || string.IsNullOrWhiteSpace(item.Id) || amount <= 0)
             return false;
         
         // TODO: implement Max Stack
@@ -35,7 +35,7 @@ public class Inventory
             
             entry = new();
             entry.ItemData = item;
-            entry.Quantity = 1;
+            entry.Quantity = amount;
 
             items.Add(item.Id, entry);
         }
@@ -112,5 +112,10 @@ public class Inventory
             return true;
 
         return items.Count < Capacity;
+    }
+
+    public bool HasEnoughMoney(int money)
+    {
+        return Money >= money;
     }
 }

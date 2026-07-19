@@ -41,12 +41,9 @@ public class GridLayout : Layout
         UpdateLayout();
     }
 
-    public void AddElement(ILayoutElement element)
+    public override void AddElement(ILayoutElement element)
     {
-        if (element == null || elements.Contains(element))
-            return;
-        
-        elements.Add(element);
+        base.AddElement(element);
         UpdateLayout();
     }
 
@@ -61,8 +58,8 @@ public class GridLayout : Layout
                 "The grid does not have enough cells for all elements.");
         }
         
-        int cellWidth = (int) elements.Max(e => e.VisibleSize.X);
-        int cellHeight = (int) elements.Max(e => e.VisibleSize.Y);
+        int cellWidth = (int) elements.Max(e => e.Size.X);
+        int cellHeight = (int) elements.Max(e => e.Size.Y);
         
         // Calculate the total size of the grid,
         // including padding between cells.
@@ -89,8 +86,8 @@ public class GridLayout : Layout
                 int cellY = startY + row * (cellHeight + VerticalPadding);
                 
                 // Center the element inside its grid cell.
-                int elementX = cellX + (int)((cellWidth - element.VisibleSize.X) * 0.5f);
-                int elementY = cellY + (int)((cellHeight - element.VisibleSize.Y) * 0.5f);
+                int elementX = cellX + (int)((cellWidth - element.Size.X) * 0.5f);
+                int elementY = cellY + (int)((cellHeight - element.Size.Y) * 0.5f);
                 
                 element.SetPosition(elementX, elementY);
             }

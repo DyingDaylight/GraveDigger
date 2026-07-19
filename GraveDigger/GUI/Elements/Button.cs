@@ -1,9 +1,8 @@
 ﻿using System;
+using GraveDigger.GUI.Layouts;
 using GUI;
-using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace GraveDigger.GUI.Elements;
 
@@ -38,10 +37,10 @@ public class Button : ClickableUIElement
     private UiButtonState currentState;
     private readonly UiButtonMode buttonMode;
     private readonly Label label = new();
+    private readonly Image icon = new();
+    private readonly HorizontalLayout horizontalLayout;
     
     private bool isDisabled;
-    
-    private bool isSizeLocked = false;
     
     public Button() : this(UiButtonMode.Color)
     {
@@ -52,28 +51,41 @@ public class Button : ClickableUIElement
             GUIResources.ButtonHoverColor,
             GUIResources.ButtonPressedColor,
             GUIResources.ButtonDisabledColor);
-        
-        SetFont(GUIResources.DefaultFont);
-        SetTextColor(Color.Black);
     }
     
     public Button(UiButtonMode mode)
     {
         buttonMode = mode;
+        
+        horizontalLayout = new HorizontalLayout(Bounds);
+        horizontalLayout.Alignment = HorizontalLayout.VerticalAlignment.MiddleCenter;
+        
+        horizontalLayout.AddElement(icon);
+        horizontalLayout.AddElement(label);
+        
+        icon.SetSize(50, 50);
+        icon.Visible = false;
+        
+        SetFont(GUIResources.DefaultFont);
+        SetTextColor(Color.Black);
+        UpdateContentLayout();
+        
         LeftClicked += HandleLeftClick;
     }
+
+    public bool Enabled => !isDisabled;
 
     public override void Start()
     {
         base.Start();
         label.Start();
+        UpdateContentLayout();
     }
 
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
-        
-        UpdateLabel(gameTime);
+        label.Update(gameTime);
 
         if (isDisabled)
         {
@@ -97,21 +109,35 @@ public class Button : ClickableUIElement
     {
         base.Draw(spriteBatch);
         label.Draw(spriteBatch);
+        if (icon.Visible)
+            icon.Draw(spriteBatch);
     }
 
     public void SetText(string text)
     {
         label.Text = text;
+        UpdateContentLayout();
     }
 
     public void SetFont(SpriteFont font)
     {
         label.Font = font;
+        UpdateContentLayout();
     }
 
     public void SetTextColor(Color color)
     {
         label.Color = color;
+    }
+
+    public void SetIcon(Texture2D? texture)
+    {
+        icon.Visible = texture != null;
+
+        if (texture != null)
+            icon.SetImage(texture);
+
+        UpdateContentLayout();
     }
 
     public void SetTextures(Texture2D normal, 
@@ -120,9 +146,6 @@ public class Button : ClickableUIElement
         Texture2D? disabled = null)
     {
         if (buttonMode != UiButtonMode.Texture)
-            return;
-
-        if (normal == null)
             return;
         
         normalTexture = normal;
@@ -154,12 +177,6 @@ public class Button : ClickableUIElement
     {
         isDisabled = disabled;
         currentState = disabled? UiButtonState.Disabled : UiButtonState.Normal;
-    }
-    
-    private void UpdateLabel(GameTime gameTime)
-    {
-        label.CenterIn(Bounds);
-        label.Update(gameTime);
     }
     
     private void ApplyState()
@@ -205,6 +222,29 @@ public class Button : ClickableUIElement
     public void LockSize(int width, int height)
     {
         base.SetSize(width, height);
-        isSizeLocked = true; 
+    }
+    
+    private void UpdateContentLayout()
+    {
+        int contentHeight = Math.Max(
+            icon.Visible ? icon.Bounds.Height : 0,
+            label.Bounds.Height
+        );
+
+        var contentBounds = new Rectangle(
+            Bounds.X,
+            (int)(Bounds.Y + (Bounds.Height - contentHeight) * 0.5f),
+            Bounds.Width,
+            contentHeight
+        );
+
+        horizontalLayout.SetBounds(contentBounds);
+        horizontalLayout.UpdateLayout();
+    }
+
+    protected override void RefreshLayout()
+    {
+        base.RefreshLayout();
+        UpdateContentLayout();
     }
 }

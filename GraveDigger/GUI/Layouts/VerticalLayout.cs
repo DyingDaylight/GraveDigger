@@ -1,4 +1,5 @@
-﻿using Interfaces;
+﻿using System.Linq;
+using Interfaces;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace GraveDigger.GUI.Layouts;
@@ -10,31 +11,29 @@ public class VerticalLayout : Layout
     {
     }
 
-    public void AddElement(ILayoutElement element)
-    {
-        if (element != null && !elements.Contains(element))
-            elements.Add(element);
-    }
-
     public override void UpdateLayout()
     {
-        if (elements.Count == 0)
+        var visibleElements = elements
+            .Where(element => element.Visible)
+            .ToList();
+        
+        if (visibleElements.Count == 0)
             return;
         
-        int contentHeight = VerticalPadding * (elements.Count - 1);
-        foreach (ILayoutElement element in elements)
-            contentHeight += (int) element.VisibleSize.Y;
+        int contentHeight = VerticalPadding * (visibleElements.Count - 1);
+        foreach (ILayoutElement element in visibleElements)
+            contentHeight += (int) element.Size.Y;
 
         Rectangle contentBounds = GetContentBounds();
         
         int y = (int) (contentBounds.Y + (contentBounds.Height - contentHeight) * 0.5f);
         
-        foreach (ILayoutElement element in elements)
+        foreach (ILayoutElement element in visibleElements)
         {
-            int x = (int) (contentBounds.Center.X - element.VisibleSize.X * 0.5f);
+            int x = (int) (contentBounds.Center.X - element.Size.X * 0.5f);
             element.SetPosition(x, y);
             
-            y += (int) element.VisibleSize.Y + VerticalPadding;
+            y += (int) element.Size.Y + VerticalPadding;
         }
     }
     
@@ -42,10 +41,5 @@ public class VerticalLayout : Layout
     {
         base.SetPosition(x, y);
         UpdateLayout();
-    }
-
-    public void RemoveAll()
-    {
-        elements.Clear();
     }
 }
