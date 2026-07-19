@@ -1,5 +1,7 @@
 ﻿using System;
+using GraveDigger.Characters;
 using GraveDigger.Core;
+using GraveDigger.Interactions;
 using GraveDigger.Systems;
 using GraveDigger.Utils;
 using GUI;
@@ -23,6 +25,7 @@ public class Game1 : Game
     private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
 
+    private Merchant merchant;
     private Camera camera;
     private Player player;
     private Level level;
@@ -53,15 +56,13 @@ public class Game1 : Game
         graphics.PreferredBackBufferWidth = 1920;
         graphics.PreferredBackBufferHeight = 1080;
         graphics.ApplyChanges();
-        
-        SortingUtility.Initialize(WorldSize.Y);
-        
+
         Vector2 screenSize = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         
-        randomService = new RandomService(1234);
-        
+        SortingUtility.Initialize(WorldSize.Y);
         AudioManager.Instance.Initialize(Content);
         
+        randomService = new RandomService(1234);
         camera = new Camera(GraphicsDevice.Viewport, WorldSize);
         gameContext = new GameContext(camera, screenSize, WorldSize, randomService);
         
@@ -119,6 +120,7 @@ public class Game1 : Game
             
             level.Draw(spriteBatch);
             player.Draw(spriteBatch);
+            merchant.Draw(spriteBatch);
             
             spriteBatch.End();
         }
@@ -151,6 +153,7 @@ public class Game1 : Game
     private void LoadCoreSprites()
     {
         SpriteManager.AddSprite("digger", "Images/Characters/keeper_wasd2", columns: 4, rows: 4);
+        SpriteManager.AddSprite("merchant", "Images/Characters/merchant", columns: 4, rows: 4);
         SpriteManager.AddSprite("pixel", "Images/pixel");
     }
 
@@ -163,7 +166,10 @@ public class Game1 : Game
         player = new Player(gameContext);
         player.Start();
         
-        timeSystem = new TimeSystem(5, 5);
+        merchant = new Merchant(gameContext);
+        merchant.Start();
+        
+        timeSystem = new TimeSystem(90, 90);
         reputationSystem = new ReputationSystem();
         gameplayCoordinator = new GameplayCoordinator(player, timeSystem, gui, reputationSystem, randomService);
         timeSystem.Start();
@@ -173,58 +179,75 @@ public class Game1 : Game
         level.Start();
     }
 
-private void SubscribeToEvents()
-{
-    gui.MenuUi.OnStartClicked += StartGame; 
-    gui.MenuUi.OnSettingsClicked += OpenSettings; 
-    gui.MenuUi.OnExitClicked += CloseGame;
-
-    gui.WindowManager.TombstoneInfoWindow.OnDigButton += (tombstone) => gameplayCoordinator.DigGrave(tombstone.ParentSite);
-    gui.WindowManager.TombstoneInfoWindow.OnRepairButton += (tombstone) => gameplayCoordinator.RepairGrave(tombstone.ParentSite);
-    
-    gui.WindowManager.InventoryWindow.UseRequested += gameplayCoordinator.UseItem;
-    gui.WindowManager.InventoryWindow.DiscardRequested += gameplayCoordinator.DiscardItem;
-
-    gui.WindowManager.TradeWindow.SellRequested += gameplayCoordinator.SellItem;
-    gui.WindowManager.TradeWindow.BuyRequested += gameplayCoordinator.BuyItem;
-    gui.WindowManager.TradeWindow.UseRequested += gameplayCoordinator.UseItem;
-    gui.WindowManager.TradeWindow.DiscardRequested += gameplayCoordinator.DiscardItem;
-
-    gui.Hud.InventoryRequested += gameplayCoordinator.ShowInventory;
-    
-    player.HungerChanged += gui.Hud.UpdateHunger;
-    reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
-        
-    level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
-
-    gameplayCoordinator.OnLootSpawn += level.SpawnLoot;
-    gameplayCoordinator.OnGraveChanged += level.GraveChanged;
-    gameplayCoordinator.OnTradeCompleted += gui.ShowTradeResult;
-
-    timeSystem.DayStarted += gameplayCoordinator.DayStarted;
-    timeSystem.DayTimeChanged += level.DayTimeChange;
-    timeSystem.DayStarted += level.DayStart;
-}
-    
-private void SetGameState(GameState gameState)
-{
-    currentGameState = gameState;
-    gui.SetGameState(currentGameState);
-    
-    if (currentGameState == GameState.Menu)
+    private void SubscribeToEvents()
     {
-        AudioManager.Instance.SetMusicVolume(0.1f);
+        gui.MenuUi.OnStartClicked += StartGame; 
+        gui.MenuUi.OnSettingsClicked += OpenSettings; 
+        gui.MenuUi.OnExitClicked += CloseGame;
+
+        gui.WindowManager.TombstoneInfoWindow.OnDigButton += (tombstone) => gameplayCoordinator.DigGrave(tombstone.ParentSite);
+        gui.WindowManager.TombstoneInfoWindow.OnRepairButton += (tombstone) => gameplayCoordinator.RepairGrave(tombstone.ParentSite);
         
-        if (MediaPlayer.State == MediaState.Stopped)
+        gui.WindowManager.InventoryWindow.UseRequested += gameplayCoordinator.UseItem;
+        gui.WindowManager.InventoryWindow.DiscardRequested += gameplayCoordinator.DiscardItem;
+
+        gui.WindowManager.TradeWindow.SellRequested += gameplayCoordinator.SellItem;
+        gui.WindowManager.TradeWindow.BuyRequested += gameplayCoordinator.BuyItem;
+        gui.WindowManager.TradeWindow.UseRequested += gameplayCoordinator.UseItem;
+        gui.WindowManager.TradeWindow.DiscardRequested += gameplayCoordinator.DiscardItem;
+
+        gui.Hud.InventoryRequested += gameplayCoordinator.ShowInventory;
+        
+        player.HungerChanged += gui.Hud.UpdateHunger;
+        reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
+            
+        level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
+
+        gameplayCoordinator.OnLootSpawn += level.SpawnLoot;
+        gameplayCoordinator.OnGraveChanged += level.GraveChanged;
+        gameplayCoordinator.OnTradeCompleted += gui.ShowTradeResult;
+
+        timeSystem.DayStarted += gameplayCoordinator.DayStarted;
+        timeSystem.DayTimeChanged += level.DayTimeChange;
+        // TODO: temp
+        timeSystem.DayTimeChanged += DayNighttChanged;
+        timeSystem.DayStarted += level.DayStart;
+    }
+
+    private void DayNighttChanged(DayTime obj)
+    {
+        if (obj == DayTime.Day)
         {
-            AudioManager.Instance.PlayMusic("theme1", loop: false);
+            Console.WriteLine("++ Day started ++");
+            merchant.ChangeState(MerchantState.Arriving);
+        } 
+        else if (obj == DayTime.Night)
+        {
+            Console.WriteLine("++ Night started ++");
+            merchant.ChangeState(MerchantState.Leaving);
         }
     }
-    else
+
+    private void SetGameState(GameState gameState)
     {
-        AudioManager.Instance.SetMusicVolume(0f);
+        currentGameState = gameState;
+        gui.SetGameState(currentGameState);
+        
+        if (currentGameState == GameState.Menu)
+        {
+            AudioManager.Instance.SetMusicVolume(0.1f);
+            
+            if (MediaPlayer.State == MediaState.Stopped)
+            {
+                AudioManager.Instance.PlayMusic("theme1", loop: false);
+            }
+        }
+        else
+        {
+            AudioManager.Instance.SetMusicVolume(0f);
+        }
     }
-}
+    
     private void UpdateCamera(GameTime gameTime)
     {
         camera.SetTarget(player.Transform.Position);
@@ -251,6 +274,7 @@ private void SetGameState(GameState gameState)
 
         level.Update(gameTime);
         player.Update(gameTime);
+        merchant.Update(gameTime);
 
         if (WasKeyJustPressed(keyboardState, Keys.Escape))
             SetGameState(GameState.Menu);

@@ -10,7 +10,7 @@ public class Tombstone : Prop, IInteractionOwner
     public Interaction Interaction { get; set; }
     public Rectangle InteractionArea => DestRectangle;
     
-    public GraveDigger.GraveSites.GraveSite ParentSite { get; set; }
+    public GraveSites.GraveSite ParentSite { get; set; }
 
     public Tombstone(string name) : base(name) { }
 

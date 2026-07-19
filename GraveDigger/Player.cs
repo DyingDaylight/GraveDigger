@@ -143,7 +143,7 @@ public class Player : Animation
             if (direction != Vector2.Zero)
                 direction.Normalize();
             
-            GraveDigger.Systems.AudioManager.Instance.PlaySFX("steps", loop: true);
+            Systems.AudioManager.Instance.PlaySFX("steps", loop: true);
 
             if (CurrentRow != previousAnimationRow)
             {
