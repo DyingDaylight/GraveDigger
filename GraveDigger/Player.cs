@@ -31,6 +31,7 @@ public class Player : Animation
         this.gameContext = gameContext;
         Collider = new Collider(this);
         Collider.IsTrigger = false;
+        ShadowOffsetY = 0;
     }
     
     public override void Start()
