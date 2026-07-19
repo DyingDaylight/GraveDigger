@@ -1,40 +1,43 @@
-﻿using System;
-using GraveDigger.Core;
+﻿using GraveDigger.Core;
 using GraveDigger.Interactions;
 using GraveDigger.Items;
+using GraveDigger.Systems;
 using GraveDigger.Utils;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace GraveDigger.Characters;
 
 public class Merchant : Animation, IInteractionOwner
 {
-    private readonly Vector2 offMapPosition = Vector2.Zero;
-    private readonly Vector2 onMapPosition = Vector2.Zero;
+    private const float ArrivalThreshold = 10f;
+    private const float MovementSpeed = 200f;
+    
+    private Vector2 offMapPosition = Vector2.Zero;
+    private Vector2 onMapPosition = Vector2.Zero;
     
     private MerchantState state = MerchantState.Idle;
     private Vector2 targetPosition = Vector2.Zero;
-    private GameContext gameContext;
     
-    private float arrivalThreshold = 0.05f;
-    private float movementSpeed = 200f;
+    private bool leaveRequested = false;
     
-    public Rectangle InteractionArea { get; }
-    public Inventory Inventory { get; private set; }
-    public TraderInteraction TraderInteraction { get; private set; }
+    public Rectangle InteractionArea => DestRectangle;
+    public Inventory Inventory { get; set; }
+    public TraderInteraction TraderInteraction { get; set; }
 
-    public Merchant(GameContext gameContext) : base("merchant")
+    public Merchant() : base("merchant")
     {
-        this.gameContext = gameContext;
         Inventory = new Inventory();
-        
-        TraderInteraction = new TraderInteraction(this);
-        
-        offMapPosition = new Vector2(
-            gameContext.WorldSize.X + Width, 
-            gameContext.WorldSize.Y + Height);
-        onMapPosition = new Vector2(1920, 1080);
+    }
+
+    public void SetOffMapPosition(Vector2 position)
+    {
+        offMapPosition = position;
+    }
+    
+    public void SetOnMapPosition(Vector2 position)
+    {
+        onMapPosition = position;
     }
 
     public override void Start()
@@ -43,7 +46,7 @@ public class Merchant : Animation, IInteractionOwner
         CastShadow = true;
         
         Transform.Position = offMapPosition;
-        state = MerchantState.Idle;
+        ChangeState(MerchantState.Arriving);
         
         Transform.Scale = new Vector2(0.7f, 0.7f);
         
@@ -64,23 +67,45 @@ public class Merchant : Animation, IInteractionOwner
     {
         if (state == newState)
             return;
-        
-        Console.WriteLine($"Merchant Changes from {state} to {newState}");
-        
+
+        if (state == MerchantState.Trading && newState == MerchantState.Leaving)
+        {
+            leaveRequested = true;
+            return;
+        }
+
+        if (state == MerchantState.Trading && leaveRequested)
+        {
+            leaveRequested = false;
+            newState = MerchantState.Leaving;
+        }
+
         switch (newState)
         {
-            case MerchantState.Idle:
-                TraderInteraction.IsActive = true;
+            case MerchantState.Hidden:
+                TraderInteraction.IsActive = false;
                 break;
+
             case MerchantState.Arriving:
                 targetPosition = onMapPosition;
                 TraderInteraction.IsActive = false;
                 break;
+
+            case MerchantState.Idle:
+                TraderInteraction.IsActive = true;
+                break;
+
+            case MerchantState.Trading:
+                TraderInteraction.IsActive = false;
+                break;
+
             case MerchantState.Leaving:
                 targetPosition = offMapPosition;
                 TraderInteraction.IsActive = false;
                 break;
         }
+
+        state = newState;
     }
 
     public void SetHighlighted(bool highlighted)
@@ -95,9 +120,12 @@ public class Merchant : Animation, IInteractionOwner
     
     private void UpdateMovement(float dt)
     {
+        if (state is MerchantState.Idle or MerchantState.Hidden or MerchantState.Trading)
+            return;
+        
         Vector2 direction = targetPosition - Transform.Position;
-
-        if (direction.Length() <= arrivalThreshold)
+        
+        if (direction.Length() <= ArrivalThreshold)
         {
             Transform.Position = targetPosition;
             ReachDestination();
@@ -107,32 +135,20 @@ public class Merchant : Animation, IInteractionOwner
 
         direction.Normalize();
 
-        Transform.Position += direction * movementSpeed * dt;
+        Transform.Position += direction * MovementSpeed * dt;
 
-        if (direction.X > direction.Y)
+        if (direction.X != 0)
         {
-            if (direction.X > 0)
-            {
-                CurrentRow = 2;
-                // right
-            }
-            else
-            {
-                CurrentRow = 2;
-                // left
-            }
+            CurrentRow = 2;
+            SpriteEffect = direction.X > 0
+                ? SpriteEffects.FlipHorizontally
+                : SpriteEffects.None;
         }
         else
         {
-            if (direction.Y > 0)
-            {
-                CurrentRow = 1;
-            }
-            else
-            {
-                CurrentRow = 0;
-            }
+            CurrentRow = direction.Y > 0 ? 1 : 0;
         }
+
         Play(3);
     }
 
@@ -142,5 +158,17 @@ public class Merchant : Animation, IInteractionOwner
             ChangeState(MerchantState.Hidden);
         else if (state == MerchantState.Arriving)
             ChangeState(MerchantState.Idle);
+    }
+
+    public void RefreshInventory(RandomService randomService)
+    {
+        Inventory.ClearItemsByType<LootItemData>();
+
+        // TODO: add other items
+        int amount = randomService.Next(1, 6);
+        for (int i = 0; i < amount; i++)
+        {
+            Inventory.Add(InventoryGenerator.GetRandomFood(randomService));
+        }
     }
 }

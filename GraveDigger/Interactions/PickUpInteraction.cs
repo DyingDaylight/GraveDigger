@@ -10,9 +10,9 @@ public class PickUpInteraction : Interaction
     
     public event Action<ItemPickUp> OnItemPickedUp;
     
-    public PickUpInteraction(ItemPickUp parent) : base(parent)
+    public PickUpInteraction(ItemPickUp interactionOwner) : base(interactionOwner)
     {
-        owner = parent;
+        owner = interactionOwner;
         Hint = $"Take {owner.ItemData.Name}";
     }
 

@@ -1,4 +1,5 @@
-﻿using GraveDigger.Items;
+﻿using System;
+using GraveDigger.Items;
 using GraveDigger.GraveSites;
 
 namespace Interfaces;
@@ -13,4 +14,6 @@ public interface IGameWindowService
     bool IsModalWindowOpen();
     bool IsInventoryOpen();
     void RefreshTombstoneWindow(bool hasEnoughMoney);
+
+    event Action MarketClosed;
 }

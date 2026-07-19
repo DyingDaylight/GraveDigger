@@ -2,6 +2,7 @@
 using GraveDigger.Characters;
 using GraveDigger.Core;
 using GraveDigger.Interactions;
+using GraveDigger.Items;
 using GraveDigger.Systems;
 using GraveDigger.Utils;
 using GUI;
@@ -14,6 +15,8 @@ namespace GraveDigger;
 
 public class Game1 : Game
 {
+    private const int DayDuration = 40;
+    private const int NightDuration = 40;
     private static readonly Vector2 WorldSize = new(4520, 3960);
     
     private GameContext gameContext;
@@ -24,8 +27,7 @@ public class Game1 : Game
     
     private readonly GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
-
-    private Merchant merchant;
+    
     private Camera camera;
     private Player player;
     private Level level;
@@ -120,7 +122,6 @@ public class Game1 : Game
             
             level.Draw(spriteBatch);
             player.Draw(spriteBatch);
-            merchant.Draw(spriteBatch);
             
             spriteBatch.End();
         }
@@ -166,10 +167,7 @@ public class Game1 : Game
         player = new Player(gameContext);
         player.Start();
         
-        merchant = new Merchant(gameContext);
-        merchant.Start();
-        
-        timeSystem = new TimeSystem(90, 90);
+        timeSystem = new TimeSystem(DayDuration, NightDuration);
         reputationSystem = new ReputationSystem();
         gameplayCoordinator = new GameplayCoordinator(player, timeSystem, gui, reputationSystem, randomService);
         timeSystem.Start();
@@ -206,26 +204,11 @@ public class Game1 : Game
         gameplayCoordinator.OnLootSpawn += level.SpawnLoot;
         gameplayCoordinator.OnGraveChanged += level.GraveChanged;
         gameplayCoordinator.OnTradeCompleted += gui.ShowTradeResult;
+        gameplayCoordinator.OnMarketClosed += level.MarketClosed;
 
         timeSystem.DayStarted += gameplayCoordinator.DayStarted;
         timeSystem.DayTimeChanged += level.DayTimeChange;
-        // TODO: temp
-        timeSystem.DayTimeChanged += DayNighttChanged;
         timeSystem.DayStarted += level.DayStart;
-    }
-
-    private void DayNighttChanged(DayTime obj)
-    {
-        if (obj == DayTime.Day)
-        {
-            Console.WriteLine("++ Day started ++");
-            merchant.ChangeState(MerchantState.Arriving);
-        } 
-        else if (obj == DayTime.Night)
-        {
-            Console.WriteLine("++ Night started ++");
-            merchant.ChangeState(MerchantState.Leaving);
-        }
     }
 
     private void SetGameState(GameState gameState)
@@ -274,7 +257,6 @@ public class Game1 : Game
 
         level.Update(gameTime);
         player.Update(gameTime);
-        merchant.Update(gameTime);
 
         if (WasKeyJustPressed(keyboardState, Keys.Escape))
             SetGameState(GameState.Menu);
@@ -290,10 +272,12 @@ public class Game1 : Game
                 gameplayCoordinator.ShowInventory();
         }
 
+        // TODO: not a real mechant, testing purposes only!!
         if (WasKeyJustPressed(keyboardState, Keys.T))
         {
-            if (!gui.IsModalWindowOpen())
-                gameplayCoordinator.ShowMarket();
+            Merchant merchant = new Merchant();
+            merchant.Inventory = InventoryGenerator.CreateInventory(randomService);
+            gameplayCoordinator.ShowMarket(merchant);
         }
     }
     

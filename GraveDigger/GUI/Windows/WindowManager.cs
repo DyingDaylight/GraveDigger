@@ -55,18 +55,27 @@ public class WindowManager : IUpdatable, IDrawable
     
     public void OpenTombstoneInfoWindow(GraveSite graveSite, bool hasEnoughMoney)
     {
+        if (IsModalWindow)
+            return;
+        
         TombstoneInfoWindow.SetData(graveSite, hasEnoughMoney);
         currentWindow = TombstoneInfoWindow;
     }
 
     public void OpenInventoryWindow(Inventory inventory)
     {
+        if (IsModalWindow)
+            return;
+        
         InventoryWindow.SetInventory(inventory);
         currentWindow = InventoryWindow;
     }
     
     public void OpenTradeWindow(Inventory playerInventory, Inventory merchantInventory)
     {
+        if (IsModalWindow)
+            return;
+        
         TradeWindow.SetInventories(playerInventory, merchantInventory);
         currentWindow = TradeWindow;
     }

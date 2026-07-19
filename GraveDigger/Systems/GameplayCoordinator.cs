@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GraveDigger.Characters;
 using GraveDigger.Enemies;
 using GraveDigger.GraveSites;
 using GraveDigger.Items;
@@ -15,18 +16,19 @@ public class GameplayCoordinator : IGameplayActions
     private readonly IGameWindowService windowService;
     private readonly RandomService randomService;
     private readonly LootGenerator lootGenerator;
-    private readonly MerchantProvider merchantProvider;
-    private readonly Inventory merchantInventory;
     private readonly TimeSystem timeSystem;
     private readonly Inventory inventory;
     private readonly Player player;
 
     private const int HungerPerDay = 10;
     
+    private Merchant? currentMerchant;
+    
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
     public event Action<TradeResult> OnTradeCompleted;
 
     public event Action<GraveSite> OnGraveChanged;
+    public event Action OnMarketClosed;
     
     public GameplayCoordinator(
         Player player,
@@ -41,25 +43,9 @@ public class GameplayCoordinator : IGameplayActions
         this.reputationSystem = reputationSystem;
         this.randomService = randomService;
 
-        merchantProvider = new MerchantProvider();
         lootGenerator = new LootGenerator();
-        merchantInventory = new Inventory();
-        // TODO: make a real merchant
-        merchantInventory.AddMoney(100);
-        merchantInventory.Add(merchantProvider.GetRandomFood(randomService));
-        merchantInventory.Add(merchantProvider.GetRandomFood(randomService));
-        merchantInventory.Add(merchantProvider.GetRandomFood(randomService));
-        merchantInventory.Add(merchantProvider.GetRandomFood(randomService));
         
-        inventory = new Inventory();
-        // TODO: food for testing purposes
-        ItemData food = merchantProvider.GetRandomFood(randomService);
-        inventory.Add(food);
-        inventory.Add(food);
-        inventory.Add(food);
-        inventory.Add(food);
-        inventory.Add(food);
-        inventory.Add(food);
+        inventory = InventoryGenerator.CreateInventory(randomService);
     }
 
     public void RecalculateReputation(IEnumerable<Prop> props)
@@ -111,10 +97,9 @@ public class GameplayCoordinator : IGameplayActions
         bool success = graveSite.Repair();
         if (!success)
             return;
-
-        repairCost = graveSite.RepairCost;
+        
         inventory.SpendMoney(repairCost);
-        windowService.RefreshTombstoneWindow(inventory.HasEnoughMoney(repairCost));
+        windowService.RefreshTombstoneWindow(inventory.HasEnoughMoney(graveSite.RepairCost));
         OnGraveChanged?.Invoke(graveSite);
     }
 
@@ -125,12 +110,18 @@ public class GameplayCoordinator : IGameplayActions
 
     public void SellItem(ItemData itemData, int amount)
     {
-        Trade(inventory, merchantInventory, itemData, amount);
+        if (currentMerchant == null)
+            return;
+        
+        Trade(inventory, currentMerchant.Inventory, itemData, amount);
     }
 
     public void BuyItem(ItemData itemData, int amount)
     {
-        Trade(merchantInventory, inventory, itemData, amount);
+        if (currentMerchant == null)
+            return;
+        
+        Trade(currentMerchant.Inventory, inventory, itemData, amount);
     }
 
     public void UseItem(ItemData itemData, int amount)
@@ -159,9 +150,21 @@ public class GameplayCoordinator : IGameplayActions
         windowService.OpenInventoryWindow(inventory);
     }
 
-    public void ShowMarket()
+    public void ShowMarket(Merchant merchant)
     {
-        windowService.OpenTradeWindow(inventory, merchantInventory);
+        if (merchant == null || currentMerchant != null)
+            return;
+        
+        currentMerchant = merchant;
+        windowService.OpenTradeWindow(inventory, currentMerchant.Inventory);
+        windowService.MarketClosed += CloseMarket;
+    }
+
+    private void CloseMarket()
+    {
+        windowService.MarketClosed -= CloseMarket;
+        OnMarketClosed?.Invoke();
+        currentMerchant = null;
     }
     
     private TradeResult ValidateTrade(Inventory seller, Inventory buyer,
@@ -178,7 +181,7 @@ public class GameplayCoordinator : IGameplayActions
 
         int fullPrice = itemData.Price * amount;
 
-        if (buyer.Money < fullPrice)
+        if (!buyer.HasEnoughMoney(fullPrice))
             return TradeResult.NotEnoughMoney;
         
         if (!buyer.CanAdd(itemData, amount))

@@ -4,10 +4,11 @@ namespace GraveDigger.Interactions;
 
 public class TraderInteraction : Interaction
 {
-    public event Action OnTradeRequest;
+    public event Action OnTradeRequested;
     
-    public TraderInteraction(IInteractionOwner parent) : base(parent)
+    public TraderInteraction(IInteractionOwner interactionOwner) : base(interactionOwner)
     {
+        Hint = "Trade";
     }
 
     public override void Interact()
@@ -15,6 +16,6 @@ public class TraderInteraction : Interaction
         if (!IsActive)
             return;
         
-        OnTradeRequest?.Invoke();
+        OnTradeRequested?.Invoke();
     }
 }

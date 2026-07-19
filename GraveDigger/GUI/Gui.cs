@@ -27,6 +27,8 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
     public MenuUI MenuUi { get; private set; }
     public HUD Hud { get; private set; }
     
+    public event Action MarketClosed;
+    
 
     public Gui(GameContext gameContext)
     {
@@ -77,6 +79,8 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         MenuUi.Start();
         WindowManager.Start();
         InteractionTooltip.Start();
+        
+        WindowManager.TradeWindow.OnCloseButton += HandleMarketClosed;
     }
 
     public void Update(GameTime gameTime)
@@ -151,5 +155,10 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
     public bool IsInventoryOpen()
     {
         return WindowManager.IsInventoryOpen;
+    }
+    
+    private void HandleMarketClosed()
+    {
+        MarketClosed?.Invoke();
     }
 }

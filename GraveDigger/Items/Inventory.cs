@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace GraveDigger.Items;
@@ -116,6 +117,16 @@ public class Inventory
 
     public bool HasEnoughMoney(int money)
     {
-        return Money >= money;
+        return money >= 0 && Money >= money;
+    }
+
+    public void ClearItemsByType<T>()
+    {
+        var entries = Items.Values
+            .Where(entry => entry.ItemData is T)
+            .ToList();
+
+        foreach (InventoryEntry entry in entries)
+            Remove(entry.ItemData, entry.Quantity);
     }
 }

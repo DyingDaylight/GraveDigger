@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GraveDigger.Characters;
 using GraveDigger.Data;
 using GraveDigger.GraveSites;
 using GraveDigger.Items;
@@ -21,4 +22,5 @@ public interface IGameplayActions
     void DiscardItem(ItemData itemData, int amount);
     
     void RecalculateReputation(IEnumerable<Prop> props);
+    void ShowMarket(Merchant merchant);
 }

@@ -4,7 +4,7 @@ using GraveDigger.Utils;
 
 namespace GraveDigger.Systems;
 
-public class MerchantProvider
+public static class InventoryGenerator
 {
     private static readonly List<FoodItemData> foodPool = new()
     {
@@ -19,9 +19,21 @@ public class MerchantProvider
         new FoodItemData("fish",       "Dried Fish",      "Simple but nourishing trail food.",            "Food9", 15, 10, 35),
         new FoodItemData("honey",      "Jar of Honey",    "Golden honey with a naturally sweet taste.",   "Food10",22, 10, 30),
     };
-        
-    public ItemData GetRandomFood(RandomService random)
+    
+    public static ItemData GetRandomFood(RandomService randomService)
     {
-        return random.Pick(foodPool);
+        return randomService.Pick(foodPool);
+    }
+
+    public static Inventory CreateInventory(RandomService randomService)
+    {
+        // TODO: make more reasonable generation
+        Inventory inventory = new Inventory();
+        inventory.AddMoney(100);
+        inventory.Add(GetRandomFood(randomService));
+        inventory.Add(GetRandomFood(randomService));
+        inventory.Add(GetRandomFood(randomService));
+        inventory.Add(GetRandomFood(randomService));
+        return inventory;
     }
 }

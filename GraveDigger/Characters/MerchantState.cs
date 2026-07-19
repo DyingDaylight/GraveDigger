@@ -5,5 +5,6 @@ public enum MerchantState
     Hidden,
     Arriving,
     Idle,
-    Leaving,
+    Trading,
+    Leaving
 }

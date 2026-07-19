@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraveDigger.Characters;
 using GraveDigger.Core;
 using GraveDigger.Data;
 using GraveDigger.GraveSites;
@@ -44,6 +45,8 @@ public class Level : IUpdatable, IDrawable
     
     private readonly List<GraveSite> graveSites = new();
     
+    private Merchant merchant;
+    
     public InteractionSystem InteractionSystem { get; private set; }
 
     public Level(GameContext gameContext, IGameplayActions gameplayActions)
@@ -69,7 +72,9 @@ public class Level : IUpdatable, IDrawable
         CreateProps();
         CreateLamps();
         CreateTombstones();
-        
+
+        CreateMerchant();
+
         foreach (IUpdatable updatable in updatables)
             updatable.Start();
         
@@ -103,6 +108,17 @@ public class Level : IUpdatable, IDrawable
     
     public void DayTimeChange(DayTime dayTime)
     {
+        if (dayTime == DayTime.Day)
+        {
+            Console.WriteLine("++ Day started ++");
+            merchant.RefreshInventory(gameContext.RandomService);
+            merchant.ChangeState(MerchantState.Arriving);
+        } 
+        else if (dayTime == DayTime.Night)
+        {
+            Console.WriteLine("++ Night started ++");
+            merchant.ChangeState(MerchantState.Leaving);
+        }
     }
 
     public void DayStart(int day)
@@ -165,7 +181,14 @@ public class Level : IUpdatable, IDrawable
     {
         map.TileMap = tileMapSchema;
         map.Start();
-    }    
+    }
+
+    private T CreateLevelCharacter<T>() where T : new()
+    {
+        T levelCharacter = new T();
+        RegisterObject(levelCharacter);
+        return  levelCharacter;
+    }
     
     private T CreateLevelObject<T>(Func<string, T> factory, string name, Vector2 position) where T : Prop
     {
@@ -243,6 +266,22 @@ public class Level : IUpdatable, IDrawable
         InteractionSystem.UnregisterInteraction(pickable.Interaction);
         UnregisterObject(pickable);
         props.Remove(pickable);
+    }
+
+    private void CreateMerchant()
+    {
+        merchant = CreateLevelCharacter<Merchant>();
+        merchant.SetOffMapPosition(new Vector2(
+            gameContext.WorldSize.X + merchant.Width,
+            gameContext.WorldSize.Y + merchant.Height));
+        merchant.SetOnMapPosition(new Vector2(1920, 1080));
+        
+        TraderInteraction interaction = new TraderInteraction(merchant);
+        interaction.OnTradeRequested += ShowMarket;
+        merchant.TraderInteraction = interaction;
+        InteractionSystem.RegisterInteraction(interaction);
+        
+        merchant.Inventory = InventoryGenerator.CreateInventory(gameContext.RandomService);
     }
     
     private void CreateProps()
@@ -391,5 +430,17 @@ public class Level : IUpdatable, IDrawable
         {
             SpriteManager.AddSprite($"Food{i}",  $"Images/Food/Food{i}");
         }
+    }
+    
+    private void ShowMarket()
+    {
+        InteractionSystem.ClearState();
+        merchant.ChangeState(MerchantState.Trading);
+        gameplayActions.ShowMarket(merchant);
+    }
+
+    public void MarketClosed()
+    {
+        merchant.ChangeState(MerchantState.Idle);
     }
 }
