@@ -6,6 +6,8 @@ namespace GraveDigger.Systems;
 
 public class TimeSystem : IUpdatable
 {
+    private float elapsedTime;
+    
     public float DayDuration { get; }
     public float NightDuration { get; }
 
@@ -15,7 +17,8 @@ public class TimeSystem : IUpdatable
     public event Action<int> DayStarted;
     public event Action<DayTime> DayTimeChanged;
     
-    private float elapsedTime;
+    public float CurrentPhaseDuration => CurrentDayTime == DayTime.Day ? DayDuration : NightDuration;
+    public float PhaseProgress => elapsedTime / CurrentPhaseDuration;
     
     public TimeSystem(float dayDuration, float nightDuration)
     {

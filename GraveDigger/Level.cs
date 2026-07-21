@@ -73,8 +73,9 @@ public class Level : IUpdatable, IDrawable
         LoadTombstoneTextures();
         LoadLootTextures();
         LoadFoodTextures();
+        LoadChatacterTextures();
     }
-    
+
     public void Start()
     { 
         CreateMap();
@@ -471,6 +472,13 @@ public class Level : IUpdatable, IDrawable
         {
             SpriteManager.AddSprite($"Food{i}",  $"Images/Food/Food{i}");
         }
+    }
+    
+    private void LoadChatacterTextures()
+    {
+        SpriteManager.AddSprite("digger", "Images/Characters/digger", columns: 4, rows: 4);
+        SpriteManager.AddSprite("merchant", "Images/Characters/merchant", columns: 4, rows: 4);
+        SpriteManager.AddSprite("ghost", "Images/Characters/ghost", columns: 4, rows: 4);
     }
     
     private void ShowMarket()

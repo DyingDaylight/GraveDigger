@@ -1,8 +1,6 @@
 ﻿using System;
 using GraveDigger.Characters;
 using GraveDigger.Core;
-using GraveDigger.Interactions;
-using GraveDigger.Items;
 using GraveDigger.Systems;
 using GraveDigger.Utils;
 using GUI;
@@ -19,6 +17,13 @@ public class Game1 : Game
     private const int NightDuration = 40;
     private static readonly Vector2 WorldSize = new(4520, 3960);
     
+    private const float TransitionDuration = 0.15f;
+    private readonly Color dawnColor = new(130, 92, 98, 28);
+    private readonly Color dayColor = Color.Transparent;
+    private readonly Color sunsetColor = new(110, 85, 95, 55);
+    private readonly Color duskColor = new(50, 45, 70, 90);
+    private readonly Color nightColor = new(20, 30, 70, 130);
+    
     private GameContext gameContext;
     private GameplayCoordinator gameplayCoordinator;
     private ReputationSystem reputationSystem;
@@ -32,10 +37,11 @@ public class Game1 : Game
     private Level level;
     
     private Gui gui;
-    
+
     private Texture2D cursorTexture;
+    private Texture2D dayNightOverlay;
     private GameState currentGameState = GameState.Menu;
-    
+
     private KeyboardState previousKeyboardState;
     
     // Indicates whether the game has been started.
@@ -78,6 +84,8 @@ public class Game1 : Game
         LoadCoreSprites();
         CreateGameObjects();
         SubscribeToEvents();
+        
+        dayNightOverlay = SpriteManager.GetSprite("pixel").Texture;
         
         SetGameState(GameState.Menu);
         gui.Hud.UpdateReputation(reputationSystem.Value,
@@ -126,18 +134,78 @@ public class Game1 : Game
                 transformMatrix: camera.TransformMatrix);
             
             level.Draw(spriteBatch);
-            //player.Draw(spriteBatch);
             
+            spriteBatch.End();
+            
+            spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
+            DrawDayNightOverlay(spriteBatch);
             spriteBatch.End();
         }
         
         spriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend); 
+        
         gui.Draw(spriteBatch);
         
         MouseState mouseState = Mouse.GetState();
         spriteBatch.Draw(cursorTexture, new Vector2(mouseState.X, mouseState.Y), Color.White);
         spriteBatch.End();
         
+    }
+    
+    private void DrawDayNightOverlay(SpriteBatch spriteBatch)
+    {
+        Color overlayColor = GetDayNightOverlayColor();
+        
+        spriteBatch.Draw(
+            dayNightOverlay,
+            GraphicsDevice.Viewport.Bounds,
+            overlayColor);
+    }
+
+    private Color GetDayNightOverlayColor()
+    {
+        float progress = MathHelper.Clamp(timeSystem.PhaseProgress, 0f, 1f);
+
+        if (timeSystem.CurrentDayTime == DayTime.Day)
+        {
+            // 0.00–0.15: dawn -> day
+            if (progress < TransitionDuration)
+            {
+                float t = progress / TransitionDuration;
+                return Color.Lerp(dawnColor, dayColor, t);
+            }
+
+            // 0.15–0.85: day
+            if (progress < 1f - TransitionDuration)
+                return dayColor;
+
+            // 0.85–1.00: day -> sunset
+            float tSunset = (progress - (1f - TransitionDuration)) / TransitionDuration;
+            return Color.Lerp(dayColor, sunsetColor, tSunset);
+        }
+
+        // 0.00–0.15: sunset -> dusk
+        if (progress < TransitionDuration)
+        {
+            float t = progress / TransitionDuration;
+            return Color.Lerp(sunsetColor, duskColor, t);
+        }
+
+        // 0.15–0.30: dusk -> night
+        if (progress < TransitionDuration * 2f)
+        {
+            float t = (progress - TransitionDuration) / TransitionDuration;
+            return Color.Lerp(duskColor, nightColor, t);
+        }
+
+        // 0.30–0.85: night
+        if (progress < 1f - TransitionDuration)
+            return nightColor;
+
+        // 0.85–1.00: night -> dawn
+        float tDawn = (progress - (1f - TransitionDuration)) / TransitionDuration;
+
+        return Color.Lerp(nightColor, dawnColor, tDawn);
     }
 
     private void StartGame()
@@ -158,9 +226,6 @@ public class Game1 : Game
     
     private void LoadCoreSprites()
     {
-        SpriteManager.AddSprite("digger", "Images/Characters/digger", columns: 4, rows: 4);
-        SpriteManager.AddSprite("merchant", "Images/Characters/merchant", columns: 4, rows: 4);
-        SpriteManager.AddSprite("ghost", "Images/Characters/ghost", columns: 4, rows: 4);
         SpriteManager.AddSprite("pixel", "Images/pixel");
     }
 
