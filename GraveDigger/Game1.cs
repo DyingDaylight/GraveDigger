@@ -97,6 +97,7 @@ public class Game1 : Game
     {
         if (!IsActive)
         {
+            //previousKeyboardState = Keyboard.GetState();
             base.Update(gameTime);
             return;
         }
@@ -337,6 +338,8 @@ public class Game1 : Game
     
     private void HandleWindowInput(KeyboardState keyboardState)
     {
+        LogKeyStateChange(keyboardState, Keys.I);
+        
         if (WasKeyJustPressed(keyboardState, Keys.I))
         {
             if (gui.IsInventoryOpen())
@@ -356,12 +359,24 @@ public class Game1 : Game
     
     private bool WasKeyJustPressed(KeyboardState currentKeyboardState, Keys key)
     {
-        if (key == Keys.I)
-        {
-            //Console.WriteLine("Current Keyboard State: " + currentKeyboardState.IsKeyDown(Keys.I));
-            //Console.WriteLine("Previous Keyboard State: " + previousKeyboardState.IsKeyDown(Keys.I));
-        }
         return currentKeyboardState.IsKeyDown(key) &&
                previousKeyboardState.IsKeyUp(key);
+    }
+    
+    private void LogKeyStateChange(
+        KeyboardState currentKeyboardState,
+        Keys key)
+    {
+        bool currentDown = currentKeyboardState.IsKeyDown(key);
+        bool previousDown = previousKeyboardState.IsKeyDown(key);
+
+        if (currentDown == previousDown)
+            return;
+
+        Console.WriteLine(
+            $"[KEY] {key}: " +
+            $"previous={(previousDown ? "DOWN" : "UP")}, " +
+            $"current={(currentDown ? "DOWN" : "UP")}, " +
+            $"justPressed={currentDown && !previousDown}");
     }
 }
