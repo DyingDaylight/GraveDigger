@@ -4,6 +4,7 @@ using System.Linq;
 using GraveDigger.Characters;
 using GraveDigger.Core;
 using GraveDigger.Data;
+using GraveDigger.Enemies;
 using GraveDigger.GraveSites;
 using GraveDigger.Interactions;
 using GraveDigger.Items;
@@ -39,11 +40,13 @@ public class Level : IUpdatable, IDrawable
     private readonly List<IUpdatable> updatables = new();
     private readonly List<IDrawable> drawables = new();
     private readonly List<Collider> colliders = new();
+    private readonly List<IReputationContributor> contributors = new();
 
     private readonly GameContext gameContext;
     private readonly IGameplayActions gameplayActions;
     
     private readonly List<GraveSite> graveSites = new();
+    private readonly List<Ghost> ghosts = new();
     
     private Merchant merchant;
     
@@ -78,10 +81,7 @@ public class Level : IUpdatable, IDrawable
         foreach (IUpdatable updatable in updatables)
             updatable.Start();
         
-        gameplayActions.RecalculateReputation(props);
-        
-        //gameplayActions.OnGraveDug += SpawnGraveDirt;
-        //gameplayActions.OnGraveRepaired += RemoveGraveDirt;
+        gameplayActions.RecalculateReputation(contributors);
     }
 
     public void Update(GameTime gameTime)
@@ -129,7 +129,7 @@ public class Level : IUpdatable, IDrawable
                 dailyUpdatable.AdvanceDay(day);
         }
         
-        gameplayActions.RecalculateReputation(props);
+        gameplayActions.RecalculateReputation(contributors);
     }
     
     public void SpawnLoot(List<ItemData> loot, Tombstone tombstone)
@@ -147,7 +147,7 @@ public class Level : IUpdatable, IDrawable
     
     public void GraveChanged(GraveSite graveSite)
     {
-        gameplayActions.RecalculateReputation(props);
+        gameplayActions.RecalculateReputation(contributors);
     }
     
     private T RegisterObject<T>(T obj)
@@ -161,6 +161,9 @@ public class Level : IUpdatable, IDrawable
         if (obj is IHasCollider hasCollider && hasCollider.Collider != null 
                                             && !colliders.Contains(hasCollider.Collider))
             colliders.Add(hasCollider.Collider);
+        
+        if (obj is IReputationContributor contributor)
+            contributors.Add(contributor);
 
         return obj;
     }
@@ -175,6 +178,9 @@ public class Level : IUpdatable, IDrawable
 
         if (obj is IHasCollider hasCollider && hasCollider.Collider != null)
             colliders.Remove(hasCollider.Collider);
+        
+        if (obj is IReputationContributor contributor)
+            contributors.Remove(contributor);
     }
     
     private void CreateMap()
@@ -266,6 +272,15 @@ public class Level : IUpdatable, IDrawable
         InteractionSystem.UnregisterInteraction(pickable.Interaction);
         UnregisterObject(pickable);
         props.Remove(pickable);
+    }
+
+    private void CreateGhost(Vector2 position)
+    {
+        Console.WriteLine("Ghost appeared!");
+        Ghost ghost = CreateLevelCharacter<Ghost>();
+        ghost.Transform.Position = new Vector2(position.X, position.Y);
+        ghost.Transform.Scale = new Vector2(0.7f, 0.7f);
+        ghosts.Add(ghost);
     }
 
     private void CreateMerchant()
@@ -442,5 +457,18 @@ public class Level : IUpdatable, IDrawable
     public void MarketClosed()
     {
         merchant.ChangeState(MerchantState.Idle);
+    }
+
+    public void SpawnUndead(EnemyType enemyType, GraveSite graveSite)
+    {
+        switch (enemyType)
+        {
+            case EnemyType.Ghost:
+                CreateGhost(graveSite.Transform.Position);
+                gameplayActions.RecalculateReputation(contributors);
+                break;
+        }
+        
+        
     }
 }

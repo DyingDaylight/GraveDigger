@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GraveDigger.Props;
+using Interfaces;
 
 namespace GraveDigger.Systems;
 
@@ -13,12 +14,12 @@ public class ReputationSystem
 
     public event Action<int, int, int> ReputationChanged;
     
-    public void Recalculate(IEnumerable<Prop> props)
+    public void Recalculate(IEnumerable<IReputationContributor> contributors)
     {
         int total = 0;
 
-        foreach (Prop prop in props)
-            total += prop.GetReputationValue();
+        foreach (IReputationContributor contributor in contributors)
+            total += contributor.GetReputationValue();
 
         SetValue(total);
     }

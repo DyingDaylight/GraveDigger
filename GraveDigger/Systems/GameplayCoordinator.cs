@@ -29,6 +29,7 @@ public class GameplayCoordinator : IGameplayActions
 
     public event Action<GraveSite> OnGraveChanged;
     public event Action OnMarketClosed;
+    public event Action<EnemyType, GraveSite> OnUndeadSpawned;
     
     public GameplayCoordinator(
         Player player,
@@ -48,9 +49,9 @@ public class GameplayCoordinator : IGameplayActions
         inventory = InventoryGenerator.CreateInventory(randomService);
     }
 
-    public void RecalculateReputation(IEnumerable<Prop> props)
+    public void RecalculateReputation(IEnumerable<IReputationContributor> contributors)
     {
-        reputationSystem.Recalculate(props);
+        reputationSystem.Recalculate(contributors);
     }
 
     public void DayStarted(int currentDay)
@@ -72,15 +73,15 @@ public class GameplayCoordinator : IGameplayActions
             List<ItemData> itemsData = lootGenerator.Generate(graveSite.Tombstone.Data, randomService);
             OnLootSpawn?.Invoke(itemsData, graveSite.Tombstone);
             
+            windowService.CloseCurrentWindow();
+            OnGraveChanged?.Invoke(graveSite);
+            
             EnemyType enemyType = UndeadGenerator.Generate(graveSite.Tombstone.Data, randomService, 
                 timeSystem.CurrentDayTime == DayTime.Night);
             if (enemyType == EnemyType.Ghost)
             {
-                Console.WriteLine("Ghost appeared!");
+                OnUndeadSpawned?.Invoke(enemyType, graveSite);
             } 
-            windowService.CloseCurrentWindow();
-            
-            OnGraveChanged?.Invoke(graveSite);
         }
     }
 

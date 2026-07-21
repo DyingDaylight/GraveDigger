@@ -1,10 +1,11 @@
 ﻿using GraveDigger.Core;
 using GraveDigger.Utils;
+using Interfaces;
 using Microsoft.Xna.Framework;
 
 namespace GraveDigger.Props;
 
-public class Prop : Sprite
+public class Prop : Sprite, IReputationContributor
 {
     private const float GroundSortingOrder = 0.99f;
     

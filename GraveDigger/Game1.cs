@@ -88,6 +88,12 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
+        if (!IsActive)
+        {
+            base.Update(gameTime);
+            return;
+        }
+        
         KeyboardState currentKeyboardState = Keyboard.GetState();
         
         AudioManager.Instance.Update(currentGameState);
@@ -155,6 +161,7 @@ public class Game1 : Game
     {
         SpriteManager.AddSprite("digger", "Images/Characters/keeper_wasd2", columns: 4, rows: 4);
         SpriteManager.AddSprite("merchant", "Images/Characters/merchant", columns: 4, rows: 4);
+        SpriteManager.AddSprite("ghost", "Images/Characters/ghost", columns: 4, rows: 4);
         SpriteManager.AddSprite("pixel", "Images/pixel");
     }
 
@@ -205,6 +212,7 @@ public class Game1 : Game
         gameplayCoordinator.OnGraveChanged += level.GraveChanged;
         gameplayCoordinator.OnTradeCompleted += gui.ShowTradeResult;
         gameplayCoordinator.OnMarketClosed += level.MarketClosed;
+        gameplayCoordinator.OnUndeadSpawned += level.SpawnUndead;
 
         timeSystem.DayStarted += gameplayCoordinator.DayStarted;
         timeSystem.DayTimeChanged += level.DayTimeChange;
@@ -283,6 +291,11 @@ public class Game1 : Game
     
     private bool WasKeyJustPressed(KeyboardState currentKeyboardState, Keys key)
     {
+        if (key == Keys.I)
+        {
+            Console.WriteLine("Current Keyboard State: " + currentKeyboardState.IsKeyDown(Keys.I));
+            Console.WriteLine("Previous Keyboard State: " + previousKeyboardState.IsKeyDown(Keys.I));
+        }
         return currentKeyboardState.IsKeyDown(key) &&
                previousKeyboardState.IsKeyUp(key);
     }
