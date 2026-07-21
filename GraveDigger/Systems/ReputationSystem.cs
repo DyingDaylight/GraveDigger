@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using GraveDigger.Props;
 using Interfaces;
 
 namespace GraveDigger.Systems;

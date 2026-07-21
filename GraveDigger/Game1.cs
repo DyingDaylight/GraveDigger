@@ -29,7 +29,6 @@ public class Game1 : Game
     private SpriteBatch spriteBatch;
     
     private Camera camera;
-    private Player player;
     private Level level;
     
     private Gui gui;
@@ -83,7 +82,7 @@ public class Game1 : Game
         SetGameState(GameState.Menu);
         gui.Hud.UpdateReputation(reputationSystem.Value,
             ReputationSystem.MinValue, ReputationSystem.MaxValue);
-        gui.Hud.UpdateHunger(player.Hunger, 0, player.MaxHunger);
+        gui.Hud.UpdateHunger(level.Player.Hunger, 0, level.Player.MaxHunger);
     }
 
     protected override void Update(GameTime gameTime)
@@ -127,7 +126,7 @@ public class Game1 : Game
                 transformMatrix: camera.TransformMatrix);
             
             level.Draw(spriteBatch);
-            player.Draw(spriteBatch);
+            //player.Draw(spriteBatch);
             
             spriteBatch.End();
         }
@@ -171,12 +170,9 @@ public class Game1 : Game
         gui.LoadContent(Content);
         gui.Start();
         
-        player = new Player(gameContext);
-        player.Start();
-        
         timeSystem = new TimeSystem(DayDuration, NightDuration);
         reputationSystem = new ReputationSystem();
-        gameplayCoordinator = new GameplayCoordinator(player, timeSystem, gui, reputationSystem, randomService);
+        gameplayCoordinator = new GameplayCoordinator(timeSystem, gui, reputationSystem, randomService);
         timeSystem.Start();
         
         level = new Level(gameContext, gameplayCoordinator);
@@ -203,7 +199,7 @@ public class Game1 : Game
 
         gui.Hud.InventoryRequested += gameplayCoordinator.ShowInventory;
         
-        player.HungerChanged += gui.Hud.UpdateHunger;
+        level.Player.HungerChanged += gui.Hud.UpdateHunger;
         reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
             
         level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
@@ -213,8 +209,8 @@ public class Game1 : Game
         gameplayCoordinator.OnTradeCompleted += gui.ShowTradeResult;
         gameplayCoordinator.OnMarketClosed += level.MarketClosed;
         gameplayCoordinator.OnUndeadSpawned += level.SpawnUndead;
+        gameplayCoordinator.OnNutritionReceived += level.DecreaseHunger;
 
-        timeSystem.DayStarted += gameplayCoordinator.DayStarted;
         timeSystem.DayTimeChanged += level.DayTimeChange;
         timeSystem.DayStarted += level.DayStart;
     }
@@ -241,7 +237,7 @@ public class Game1 : Game
     
     private void UpdateCamera(GameTime gameTime)
     {
-        camera.SetTarget(player.Transform.Position);
+        camera.SetTarget(level.Player.Transform.Position);
         camera.Update(gameTime);
     }
     
@@ -264,7 +260,6 @@ public class Game1 : Game
             return;
 
         level.Update(gameTime);
-        player.Update(gameTime);
 
         if (WasKeyJustPressed(keyboardState, Keys.Escape))
             SetGameState(GameState.Menu);
@@ -293,8 +288,8 @@ public class Game1 : Game
     {
         if (key == Keys.I)
         {
-            Console.WriteLine("Current Keyboard State: " + currentKeyboardState.IsKeyDown(Keys.I));
-            Console.WriteLine("Previous Keyboard State: " + previousKeyboardState.IsKeyDown(Keys.I));
+            //Console.WriteLine("Current Keyboard State: " + currentKeyboardState.IsKeyDown(Keys.I));
+            //Console.WriteLine("Previous Keyboard State: " + previousKeyboardState.IsKeyDown(Keys.I));
         }
         return currentKeyboardState.IsKeyDown(key) &&
                previousKeyboardState.IsKeyUp(key);

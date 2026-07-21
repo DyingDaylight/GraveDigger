@@ -28,6 +28,7 @@ public class Sprite : IDrawable, IUpdatable
 
     public Transform Transform { get; } = new();
     public Color Color { get; set; } = Color.White;
+    public float Opacity { get; set; } = 1f;
     public float SortingOrder { get; set; }
     public SpriteEffects SpriteEffect { get; set; } = SpriteEffects.None;
 
@@ -85,7 +86,7 @@ public class Sprite : IDrawable, IUpdatable
         DrawSprite(
             spriteBatch,
             Transform.Position,
-            Color,
+            Color * Opacity,
             Transform.Scale,
             SpriteEffect,
             SortingOrder,

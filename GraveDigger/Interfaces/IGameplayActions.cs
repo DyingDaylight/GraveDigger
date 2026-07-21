@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using GraveDigger.Characters;
-using GraveDigger.Data;
-using GraveDigger.Enemies;
 using GraveDigger.GraveSites;
 using GraveDigger.Items;
-using GraveDigger.Props;
-using GraveDigger.Systems;
 
 namespace Interfaces;
 
@@ -21,8 +17,8 @@ public interface IGameplayActions
     void BuyItem(ItemData itemData, int amount);
     void UseItem(ItemData itemData, int amount);
     void DiscardItem(ItemData itemData, int amount);
-    
-    void RecalculateReputation(IEnumerable<IReputationContributor> props);
+
     void ShowMarket(Merchant merchant);
     
+    void RecalculateReputation(IEnumerable<IReputationContributor> contributors);
 }

@@ -23,7 +23,8 @@ public class Prop : Sprite, IReputationContributor
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
-        UpdateSortingOrder();
+        if (Mode == SortingMode.Dynamic)
+            UpdateSortingOrder();
     }
 
     public virtual int GetReputationValue()

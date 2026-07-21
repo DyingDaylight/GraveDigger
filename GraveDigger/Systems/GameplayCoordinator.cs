@@ -18,9 +18,6 @@ public class GameplayCoordinator : IGameplayActions
     private readonly LootGenerator lootGenerator;
     private readonly TimeSystem timeSystem;
     private readonly Inventory inventory;
-    private readonly Player player;
-
-    private const int HungerPerDay = 10;
     
     private Merchant? currentMerchant;
     
@@ -30,15 +27,14 @@ public class GameplayCoordinator : IGameplayActions
     public event Action<GraveSite> OnGraveChanged;
     public event Action OnMarketClosed;
     public event Action<EnemyType, GraveSite> OnUndeadSpawned;
+    public event Action<int> OnNutritionReceived;
     
     public GameplayCoordinator(
-        Player player,
         TimeSystem timeSystem,
         IGameWindowService windowService, 
         ReputationSystem reputationSystem,
         RandomService randomService)
     {
-        this.player = player;
         this.timeSystem = timeSystem;
         this.windowService = windowService;
         this.reputationSystem = reputationSystem;
@@ -52,12 +48,6 @@ public class GameplayCoordinator : IGameplayActions
     public void RecalculateReputation(IEnumerable<IReputationContributor> contributors)
     {
         reputationSystem.Recalculate(contributors);
-    }
-
-    public void DayStarted(int currentDay)
-    {
-        Console.WriteLine("Day started: " + currentDay);
-        player.IncreaseHunger(HungerPerDay);
     }
     
     public void OpenTombstone(GraveSite graveSite)
@@ -78,10 +68,8 @@ public class GameplayCoordinator : IGameplayActions
             
             EnemyType enemyType = UndeadGenerator.Generate(graveSite.Tombstone.Data, randomService, 
                 timeSystem.CurrentDayTime == DayTime.Night);
-            if (enemyType == EnemyType.Ghost)
-            {
+            if (enemyType != EnemyType.None)
                 OnUndeadSpawned?.Invoke(enemyType, graveSite);
-            } 
         }
     }
 
@@ -138,11 +126,14 @@ public class GameplayCoordinator : IGameplayActions
         if (!inventory.Remove(food, amount))
             return;
 
-        player.DecreaseHunger(nutritionAmount);
+        OnNutritionReceived?.Invoke(nutritionAmount);
     }
     
     public void DiscardItem(ItemData itemData, int amount)
     {
+        if (amount <= 0)
+            return;
+        
         inventory.Remove(itemData, amount);
     }
 
@@ -157,8 +148,8 @@ public class GameplayCoordinator : IGameplayActions
             return;
         
         currentMerchant = merchant;
-        windowService.OpenTradeWindow(inventory, currentMerchant.Inventory);
         windowService.MarketClosed += CloseMarket;
+        windowService.OpenTradeWindow(inventory, currentMerchant.Inventory);
     }
 
     private void CloseMarket()
@@ -206,11 +197,11 @@ public class GameplayCoordinator : IGameplayActions
         int fullPrice = itemData.Price * amount;
 
         seller.Remove(itemData, amount);
-        seller.AddMoney(fullPrice);
-        
-        buyer.Add(itemData, amount);
         buyer.SpendMoney(fullPrice);
 
+        buyer.Add(itemData, amount);
+        seller.AddMoney(fullPrice);
+        
         AudioManager.Instance.PlaySFX("coins");
         OnTradeCompleted?.Invoke(result);
     }

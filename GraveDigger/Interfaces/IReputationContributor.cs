@@ -2,5 +2,5 @@
 
 public interface IReputationContributor
 {
-    public int GetReputationValue();
+    int GetReputationValue();
 }

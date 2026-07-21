@@ -5,18 +5,18 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace GraveDigger;
+namespace GraveDigger.Characters;
 
 public class Player : Animation
 {
-    private const float MovementSpeed = 300;
+    private const float MovementSpeed = 300f;
     private const int AnimationFps = 4;
-    
-    public Collider Collider;
 
-    private GameContext gameContext;
+    public Collider Collider { get; }
+
     private Vector2 previousPosition;
     
+    private Vector2 worldSize = Vector2.Zero;
     private int previousAnimationRow = -1;
     private bool isColliding = false;
     
@@ -26,9 +26,8 @@ public class Player : Animation
     
     public event Action<int, int, int> HungerChanged;
     
-    public Player(GameContext gameContext) : base("digger")
+    public Player() : base("digger")
     {
-        this.gameContext = gameContext;
         Collider = new Collider(this);
         Collider.IsTrigger = false;
     }
@@ -38,10 +37,9 @@ public class Player : Animation
         base.Start();
 
         CastShadow = true;
+        ShadowOffsetY = 0f;
         
-        Transform.Position = new Vector2(gameContext.ScreenSize.X * 0.5f, gameContext.ScreenSize.Y * 0.5f);
         previousPosition = Transform.Position;
-        
         Transform.Scale = new Vector2(0.21f, 0.21f);
         
         CurrentRow = 1; 
@@ -52,21 +50,23 @@ public class Player : Animation
     
     public override void Update(GameTime gameTime)
     {
-        base.Update(gameTime);
-
         // Collisions are not working
         if (isColliding)
         {
             Transform.Position = previousPosition;
             isColliding = false;
         }
+        
         previousPosition = Transform.Position;
         
         float dt = (float) gameTime.ElapsedGameTime.TotalSeconds;
+        
         UpdateMovement(dt);
         UpdateSortingOrder();
         
         Collider.Update(gameTime);
+        
+        base.Update(gameTime);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -101,6 +101,11 @@ public class Player : Animation
         HungerChanged?.Invoke(Hunger, 0, MaxHunger);
     }
     
+    public void SetWorldSize(Vector2 gameContextWorldSize)
+    {
+        worldSize = gameContextWorldSize;
+    }
+    
     private void UpdateSortingOrder()
     {
         SortingOrder = SortingUtility.CalculateByY(Bottom);
@@ -110,38 +115,24 @@ public class Player : Animation
     {
         KeyboardState keyboard = Keyboard.GetState();
         Vector2 direction = Vector2.Zero;
-        bool isMoving = false;
 
         if (keyboard.IsKeyDown(Keys.W))
-        {
             direction.Y -= 1;
-            CurrentRow = 0; 
-            isMoving = true;
-        }
-        else if (keyboard.IsKeyDown(Keys.S))
-        {
+        
+        if (keyboard.IsKeyDown(Keys.S))
             direction.Y += 1;
-            CurrentRow = 1; 
-            isMoving = true;
-        }
 
         if (keyboard.IsKeyDown(Keys.A))
-        {
             direction.X -= 1;
-            CurrentRow = 2; 
-            isMoving = true;
-        }
-        else if (keyboard.IsKeyDown(Keys.D))
-        {
+        
+        if (keyboard.IsKeyDown(Keys.D))
             direction.X += 1;
-            CurrentRow = 3; 
-            isMoving = true;
-        }
     
-        if (isMoving)
+        if (direction != Vector2.Zero)
         {
-            if (direction != Vector2.Zero)
-                direction.Normalize();
+            direction.Normalize();
+
+            UpdateMovementAnimation(direction);
             
             Systems.AudioManager.Instance.PlaySFX("steps", loop: true);
 
@@ -157,22 +148,38 @@ public class Player : Animation
         else
         {
             Systems.AudioManager.Instance.PauseSFX("steps");
+            
             Stop();
             previousAnimationRow = -1;
         }
     
         ClampToWorld();
     }
-    
+
+    private void UpdateMovementAnimation(Vector2 direction)
+    {
+        if (MathF.Abs(direction.X) > MathF.Abs(direction.Y))
+        {
+            CurrentRow = direction.X < 0 ? 2 : 3;
+        }
+        else
+        {
+            CurrentRow = direction.Y < 0 ? 0 : 1;
+        }
+    }
+
     private void ClampToWorld()
     {
+        if (worldSize == Vector2.Zero)
+            return;
+        
         Vector2 position = Transform.Position;
 
         float scaledOriginX = Origin.X * Transform.Scale.X;
         float scaledOriginY = Origin.Y * Transform.Scale.Y;
         
-        position.X = MathHelper.Clamp(position.X, scaledOriginX, gameContext.WorldSize.X - Width + scaledOriginX);
-        position.Y = MathHelper.Clamp(position.Y, scaledOriginY, gameContext.WorldSize.Y - Height + scaledOriginY);
+        position.X = MathHelper.Clamp(position.X, scaledOriginX, worldSize.X - Width + scaledOriginX);
+        position.Y = MathHelper.Clamp(position.Y, scaledOriginY, worldSize.Y - Height + scaledOriginY);
         
         Transform.Position = position;
     }

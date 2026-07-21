@@ -2481,6 +2481,12 @@
 /processorParam:Quality=Best
 /build:Sound/Effects/coins.wav;Sound/Effects/coins
 
+#begin Sound/Effects/ghost-spawn.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/Effects/ghost-spawn.wav;Sound/Effects/ghost-spawn
+
 #begin Sound/Effects/scratch.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

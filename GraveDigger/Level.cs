@@ -20,6 +20,8 @@ namespace GraveDigger;
 
 public class Level : IUpdatable, IDrawable
 {
+    private const int MaxGhosts = 10;
+    private const int HungerPerDay = 10;
     private const int MapTileTypesCount = 3;
     private readonly int[,] tileMapSchema =
     {
@@ -45,12 +47,15 @@ public class Level : IUpdatable, IDrawable
     private readonly GameContext gameContext;
     private readonly IGameplayActions gameplayActions;
     
+    private readonly PlayerTrail playerTrail;
+    
     private readonly List<GraveSite> graveSites = new();
     private readonly List<Ghost> ghosts = new();
     
     private Merchant merchant;
-    
-    public InteractionSystem InteractionSystem { get; private set; }
+    public Player Player { get; private set; }
+
+    public InteractionSystem InteractionSystem { get; }
 
     public Level(GameContext gameContext, IGameplayActions gameplayActions)
     {
@@ -58,6 +63,7 @@ public class Level : IUpdatable, IDrawable
         this.gameplayActions = gameplayActions;
         
         InteractionSystem = new InteractionSystem(gameContext.CoordinatesConverter);
+        playerTrail = new PlayerTrail();
     }
     
     public void LoadTextures()
@@ -77,6 +83,12 @@ public class Level : IUpdatable, IDrawable
         CreateTombstones();
 
         CreateMerchant();
+        
+        Player = CreateLevelCharacter<Player>();
+        Player.Transform.Position = new Vector2(gameContext.ScreenSize.X * 0.5f, 
+            gameContext.ScreenSize.Y * 0.5f);
+        Player.SetWorldSize(gameContext.WorldSize);
+        playerTrail.Record(Player.Transform.Position);
 
         foreach (IUpdatable updatable in updatables)
             updatable.Start();
@@ -87,6 +99,16 @@ public class Level : IUpdatable, IDrawable
     public void Update(GameTime gameTime)
     {
         map.Update(gameTime);
+
+        for (int i = 0; i < ghosts.Count; i++)
+        {
+            float offsetX = i % 2 == 0 ? -12f : 12f;
+            float offsetY = i % 2 == 0 ? -12f : 12f;
+            
+            ghosts[i].TargetPosition = playerTrail.GetFollowerPosition(i) 
+                                       + new Vector2(offsetX, offsetY);
+        }
+
         foreach (IUpdatable updatable in updatables)
             updatable.Update(gameTime);
         
@@ -94,6 +116,7 @@ public class Level : IUpdatable, IDrawable
             collider.Update(gameTime);
         
         InteractionSystem.Update(gameTime);
+        playerTrail.Record(Player.Transform.Position);
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -129,6 +152,7 @@ public class Level : IUpdatable, IDrawable
                 dailyUpdatable.AdvanceDay(day);
         }
         
+        Player.IncreaseHunger(HungerPerDay);
         gameplayActions.RecalculateReputation(contributors);
     }
     
@@ -276,10 +300,12 @@ public class Level : IUpdatable, IDrawable
 
     private void CreateGhost(Vector2 position)
     {
-        Console.WriteLine("Ghost appeared!");
+        if (ghosts.Count >= MaxGhosts)
+            return;
+        
         Ghost ghost = CreateLevelCharacter<Ghost>();
-        ghost.Transform.Position = new Vector2(position.X, position.Y);
-        ghost.Transform.Scale = new Vector2(0.7f, 0.7f);
+        ghost.Transform.Position = position;
+        ghost.Transform.Scale = new Vector2(0.6f, 0.6f);
         ghosts.Add(ghost);
     }
 
@@ -465,10 +491,14 @@ public class Level : IUpdatable, IDrawable
         {
             case EnemyType.Ghost:
                 CreateGhost(graveSite.Transform.Position);
+                AudioManager.Instance.PlaySFX("ghost-spawn");
                 gameplayActions.RecalculateReputation(contributors);
                 break;
         }
-        
-        
+    }
+
+    public void DecreaseHunger(int nutritionAmount)
+    {
+        Player.DecreaseHunger(nutritionAmount);
     }
 }
