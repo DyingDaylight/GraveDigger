@@ -158,7 +158,7 @@ public class Game1 : Game
     
     private void LoadCoreSprites()
     {
-        SpriteManager.AddSprite("digger", "Images/Characters/keeper_wasd2", columns: 4, rows: 4);
+        SpriteManager.AddSprite("digger", "Images/Characters/digger", columns: 4, rows: 4);
         SpriteManager.AddSprite("merchant", "Images/Characters/merchant", columns: 4, rows: 4);
         SpriteManager.AddSprite("ghost", "Images/Characters/ghost", columns: 4, rows: 4);
         SpriteManager.AddSprite("pixel", "Images/pixel");
