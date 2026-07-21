@@ -252,17 +252,22 @@ public class Game1 : Game
     
     private void UpdateGameplay(GameTime gameTime, KeyboardState keyboardState)
     {
-        timeSystem.Update(gameTime);
-        
         HandleWindowInput(keyboardState);
 
         if (gui.IsModalWindowOpen())
+        {
+            level.Player.StopMoving();
             return;
+        }
+        
+        if (WasKeyJustPressed(keyboardState, Keys.Escape))
+        {
+            SetGameState(GameState.Menu);
+            return;
+        }
 
         level.Update(gameTime);
-
-        if (WasKeyJustPressed(keyboardState, Keys.Escape))
-            SetGameState(GameState.Menu);
+        timeSystem.Update(gameTime);
     }
     
     private void HandleWindowInput(KeyboardState keyboardState)

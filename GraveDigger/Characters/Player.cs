@@ -1,5 +1,6 @@
 ﻿using System;
 using GraveDigger.Core;
+using GraveDigger.Systems;
 using GraveDigger.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -148,7 +149,7 @@ public class Player : Animation
         }
         else
         {
-            Systems.AudioManager.Instance.PauseSFX("steps");
+            AudioManager.Instance.PauseSFX("steps");
             
             Stop();
             previousAnimationRow = -1;
@@ -183,5 +184,10 @@ public class Player : Animation
         position.Y = MathHelper.Clamp(position.Y, scaledOriginY, worldSize.Y - Height + scaledOriginY);
         
         Transform.Position = position;
+    }
+
+    public void StopMoving()
+    {
+        AudioManager.Instance.StopSFX("steps");
     }
 }
