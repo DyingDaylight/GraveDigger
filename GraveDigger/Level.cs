@@ -105,6 +105,8 @@ public class Level : IUpdatable, IDrawable
     {
         map.Update(gameTime);
 
+        outlineTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+        
         for (int i = 0; i < ghosts.Count; i++)
         {
             float offsetX = i % 2 == 0 ? -12f : 12f;
@@ -656,5 +658,40 @@ public class Level : IUpdatable, IDrawable
         return decorations.Any(decoration =>
             decoration.DecorationType == decorationType &&
             !decoration.IsUnlocked);
+    }
+
+    private float outlineTime = 0;
+    public void DrawLockedDecorations(SpriteBatch spriteBatch, Effect effect, Camera camera)
+    {
+        if (effect == null)
+            throw new Exception("Effect is null");
+        
+        Console.WriteLine($"Effect instance: {effect.GetHashCode()}");
+        Console.WriteLine("Parameters:");
+
+        foreach (EffectParameter parameter in effect.Parameters)
+        {
+            Console.WriteLine($"'{parameter.Name}'");
+        }
+        
+        effect.Parameters["OutlineColor"].SetValue(Color.White.ToVector4());
+        
+        foreach (Decoration decoration in decorations)
+        {
+            if (decoration.IsUnlocked)
+                continue;
+
+            effect.Parameters["TextureSize"].SetValue(new Vector2(decoration.Width, decoration.Height));
+            
+            spriteBatch.Begin(
+                sortMode: SpriteSortMode.Deferred,
+                blendState: BlendState.AlphaBlend,
+                samplerState: SamplerState.PointClamp,
+                effect: effect,
+                transformMatrix: camera.TransformMatrix
+            );
+            decoration.DrawLocked(spriteBatch);
+            spriteBatch.End();
+        }
     }
 }

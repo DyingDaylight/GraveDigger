@@ -19,6 +19,7 @@ public class Decoration : Prop
             return;
         
         IsUnlocked = true;
+        CastShadow = true;
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -26,6 +27,12 @@ public class Decoration : Prop
         if (!IsUnlocked)
             return;
         
+        base.Draw(spriteBatch);
+    }
+    
+    public void DrawLocked(SpriteBatch spriteBatch)
+    {
+        CastShadow = false;
         base.Draw(spriteBatch);
     }
 }

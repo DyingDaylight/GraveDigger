@@ -48,6 +48,7 @@ public class Game1 : Game
     // Used to prevent closing the initial menu with the Escape key.
     private bool gameStarted = false;
     
+    private Effect tintEffect;
     
     public Game1()
     {
@@ -80,6 +81,7 @@ public class Game1 : Game
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
         cursorTexture = Content.Load<Texture2D>("Images/GUI/cursor"); // custom cursor
+        tintEffect = Content.Load<Effect>("Effects/outline");
         
         LoadCoreSprites();
         CreateGameObjects();
@@ -135,6 +137,8 @@ public class Game1 : Game
                 transformMatrix: camera.TransformMatrix);
             level.Draw(spriteBatch);
             spriteBatch.End();
+
+            level.DrawLockedDecorations(spriteBatch, tintEffect, camera);
             
             spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
             DrawDayNightOverlay(spriteBatch);

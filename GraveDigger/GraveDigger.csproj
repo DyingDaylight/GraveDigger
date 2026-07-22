@@ -27,6 +27,10 @@
         <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*"/>
     </ItemGroup>
     <ItemGroup>
+      <Folder Include="Content\bin\DesktopGL\Effects\" />
       <Folder Include="Content\Images\" />
+    </ItemGroup>
+    <ItemGroup>
+      <ClCompile Include="Content\Effects\outline.fx" />
     </ItemGroup>
 </Project>
