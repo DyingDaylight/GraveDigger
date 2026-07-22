@@ -43,12 +43,14 @@ public class Level : IUpdatable, IDrawable
     private readonly List<IDrawable> drawables = new();
     private readonly List<Collider> colliders = new();
     private readonly List<IReputationContributor> contributors = new();
+    private readonly List<ILightSource> lightSources = new();
 
     private readonly GameContext gameContext;
     private readonly IGameplayActions gameplayActions;
     
     private readonly PlayerTrail playerTrail;
     
+    private readonly List<Decoration> decorations = new();
     private readonly List<GraveSite> graveSites = new();
     private readonly List<Ghost> ghosts = new();
     
@@ -71,18 +73,20 @@ public class Level : IUpdatable, IDrawable
         LoadGroundTextures();
         LoadPropTextures();
         LoadTombstoneTextures();
+        LoadDecorationTextures();
         LoadLootTextures();
         LoadFoodTextures();
-        LoadChatacterTextures();
+        LoadDecorationIconsTextures();
+        LoadCharacterTextures();
     }
-
+    
     public void Start()
     { 
         CreateMap();
         CreateProps();
-        CreateLamps();
         CreateTombstones();
-
+        CreateDecorations();
+        
         CreateMerchant();
         
         Player = CreateLevelCharacter<Player>();
@@ -135,7 +139,7 @@ public class Level : IUpdatable, IDrawable
         if (dayTime == DayTime.Day)
         {
             Console.WriteLine("++ Day started ++");
-            merchant.RefreshInventory(gameContext.RandomService);
+            merchant.RefreshInventory(gameContext.RandomService, HasLockedDecorations);
             merchant.ChangeState(MerchantState.Arriving);
         } 
         else if (dayTime == DayTime.Night)
@@ -187,9 +191,15 @@ public class Level : IUpdatable, IDrawable
                                             && !colliders.Contains(hasCollider.Collider))
             colliders.Add(hasCollider.Collider);
         
-        if (obj is IReputationContributor contributor)
+        if (obj is IReputationContributor contributor && !contributors.Contains(contributor))
             contributors.Add(contributor);
+        
+        if (obj is Decoration decoration && !decorations.Contains(decoration))
+            decorations.Add(decoration);
 
+        if (obj is ILightSource lightSource && !lightSources.Contains(lightSource))
+            lightSources.Add(lightSource);
+        
         return obj;
     }
 
@@ -206,6 +216,12 @@ public class Level : IUpdatable, IDrawable
         
         if (obj is IReputationContributor contributor)
             contributors.Remove(contributor);
+        
+        if (obj is Decoration decoration)
+            decorations.Remove(decoration);
+
+        if (obj is ILightSource lightSource)
+            lightSources.Remove(lightSource);
     }
     
     private void CreateMap()
@@ -246,6 +262,10 @@ public class Level : IUpdatable, IDrawable
     
             case "grave_digged":
                 prop.Transform.Scale = new Vector2(0.08f, 0.08f);
+                break;
+            
+            case "tree":
+                prop.Transform.Scale = new Vector2(1f, 1f);
                 break;
 
             default:
@@ -288,8 +308,8 @@ public class Level : IUpdatable, IDrawable
     
     private void PickUpItem(ItemPickUp pickable)
     {
-        gameplayActions.PickupItem(pickable.ItemData);
-        RemovePickup(pickable);
+        if (gameplayActions.PickupItem(pickable.ItemData))
+            RemovePickup(pickable);
     }
     
     private void RemovePickup(ItemPickUp pickable)
@@ -323,19 +343,42 @@ public class Level : IUpdatable, IDrawable
         merchant.TraderInteraction = interaction;
         InteractionSystem.RegisterInteraction(interaction);
         
-        merchant.Inventory = InventoryGenerator.CreateInventory(gameContext.RandomService);
+        merchant.Inventory = InventoryGenerator.CreateMerchantInventory(
+            gameContext.RandomService, HasLockedDecorations);
     }
     
     private void CreateProps()
     {
         CreateLevelObject(PropFactory,"crypt",  new Vector2(1300, 350));
-        CreateLevelObject(PropFactory,"tree",  new Vector2(1600, 700));
-        CreateLevelObject(PropFactory,"tree",  new Vector2(800, 800));
         CreateLevelObject(PropFactory,"dirt",  new Vector2(500, 800));
         CreateLevelObject(PropFactory,"spade",  new Vector2(1300, 820));
         CreateLevelObject(PropFactory,"angel",  new Vector2(1600, 250));
     }
     
+    private void CreateDecorations()
+    {
+        CreateTrees();
+        CreateLamps();
+        CreateFences();
+        CreateBenches();
+        CreateFlowerbeds();
+    }
+
+    private void CreateTrees()
+    {
+        Vector2[] positions =
+        {
+            new Vector2(1600, 700),
+            new Vector2(800, 800),
+            new Vector2(1500, 1700),
+        };
+        foreach (Vector2 position in positions)
+        {
+            Decoration tree = CreateLevelObject(DecorationFactory,"tree", position);
+            tree.DecorationType = DecorationType.Tree;
+        }
+    }
+
     private void CreateLamps()
     {
         CreateLamp(new Vector2(890, 130), false);
@@ -346,8 +389,55 @@ public class Level : IUpdatable, IDrawable
     
     private void CreateLamp(Vector2 position, bool flip)
     {
-        Prop lamp = CreateLevelObject(PropFactory,"lampost", position);
+        Decoration lamp = CreateLevelObject(LamppostFactory,"lampost", position);
         lamp.SpriteEffect = flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+        lamp.DecorationType = DecorationType.Lamp;
+    }
+    
+    private void CreateFences()
+    {
+        Vector2[] positions =
+        {
+            new Vector2(1500, 1600),
+            new Vector2(1500, 1500),
+            new Vector2(1500, 1700),
+        };
+        foreach (Vector2 position in positions)
+        {
+            Decoration fence = CreateLevelObject(DecorationFactory,"fence", position);
+            fence.Transform.Scale = new Vector2(0.8f, 0.8f);
+            fence.DecorationType = DecorationType.Fence;
+        }
+    }
+    
+    private void CreateFlowerbeds()
+    {
+        Vector2[] positions =
+        {
+            new Vector2(1700, 1600),
+            new Vector2(1700, 1500),
+            new Vector2(1700, 1700),
+        };
+        foreach (Vector2 position in positions)
+        {
+            Decoration flowerbed = CreateLevelObject(DecorationFactory,"flowerbed1", position);
+            flowerbed.Transform.Scale = new Vector2(0.6f, 0.6f);
+            flowerbed.DecorationType = DecorationType.FlowerBed;
+        }
+    }
+
+    private void CreateBenches()
+    {
+        CreateBench(new Vector2(2000, 500));
+        CreateBench(new Vector2(1300, 350));
+        CreateBench(new Vector2(2400, 1000));
+    }
+
+    private void CreateBench(Vector2 position)
+    {
+        Decoration bench = CreateLevelObject(DecorationFactory,"bench", position);
+        bench.Transform.Scale = new Vector2(1f, 1f);
+        bench.DecorationType = DecorationType.Bench;
     }
     
     private void CreateTombstones()
@@ -408,6 +498,16 @@ public class Level : IUpdatable, IDrawable
         return new Prop(spriteName);
     }
 
+    private Decoration DecorationFactory(string spriteName)
+    {
+        return new Decoration(spriteName);
+    }
+    
+    private Decoration LamppostFactory(string spriteName)
+    {
+        return new Lamppost(spriteName);
+    }
+
     private Tombstone TombstoneFactory(string spriteName)
     {
         return new Tombstone(spriteName);
@@ -433,11 +533,19 @@ public class Level : IUpdatable, IDrawable
 
     private void LoadPropTextures()
     {
-        SpriteManager.AddSprite("tree", "Images/Props/Tombstone7");
         SpriteManager.AddSprite("crypt", "Images/Props/Crypt");
         SpriteManager.AddSprite("angel", "Images/Props/Angel");
         SpriteManager.AddSprite("dirt", "Images/Props/Dirt");
         SpriteManager.AddSprite("spade", "Images/Props/Spade");
+    }
+    
+    private void LoadDecorationTextures()
+    {
+        SpriteManager.AddSprite("tree", "Images/Props/Tree");
+        SpriteManager.AddSprite("bench", "Images/Props/Bench");
+        SpriteManager.AddSprite("flowerbed1", "Images/Props/Flowerbed1");
+        SpriteManager.AddSprite("flowerbed2", "Images/Props/Flowerbed2");
+        SpriteManager.AddSprite("fence", "Images/Props/Fence");
         SpriteManager.AddSprite("lampost", "Images/Props/Lampost");
     }
     
@@ -449,6 +557,8 @@ public class Level : IUpdatable, IDrawable
         SpriteManager.AddSprite("tombstone4", "Images/Props/Tombstone4");
         SpriteManager.AddSprite("tombstone5", "Images/Props/Tombstone5");
         SpriteManager.AddSprite("tombstone6", "Images/Props/Tombstone6");
+        SpriteManager.AddSprite("tombstone7", "Images/Props/Tombstone7");
+        SpriteManager.AddSprite("tombstone9", "Images/Props/Tombstone9");
 
         SpriteManager.AddSprite("grave_earth", "Images/Environment_New/grave_earth");
         SpriteManager.AddSprite("grave_digged", "Images/Environment_New/grave_digged");
@@ -474,7 +584,17 @@ public class Level : IUpdatable, IDrawable
         }
     }
     
-    private void LoadChatacterTextures()
+    private void LoadDecorationIconsTextures()
+    {
+        SpriteManager.AddSprite("treeIcon", "Images/Props/TreeIcon");
+        SpriteManager.AddSprite("benchIcon", "Images/Props/BenchIcon");
+        SpriteManager.AddSprite("flowerbedIcon", "Images/Props/FlowerbedIcon");
+        SpriteManager.AddSprite("fenceIcon", "Images/Props/FenceIcon");
+        SpriteManager.AddSprite("lampostIcon", "Images/Props/LampostIcon");
+        SpriteManager.AddSprite("houseIcon", "Images/Props/HouseIcon");
+    }
+    
+    private void LoadCharacterTextures()
     {
         SpriteManager.AddSprite("digger", "Images/Characters/digger", columns: 4, rows: 4);
         SpriteManager.AddSprite("merchant", "Images/Characters/merchant", columns: 4, rows: 4);
@@ -508,5 +628,33 @@ public class Level : IUpdatable, IDrawable
     public void DecreaseHunger(int nutritionAmount)
     {
         Player.DecreaseHunger(nutritionAmount);
+    }
+
+    public bool BuildDecoration(BlueprintItemData blueprint)
+    {
+        Decoration decoration = decorations.FirstOrDefault(
+            d => d.DecorationType == blueprint.DecorationType &&
+                 !d.IsUnlocked);
+
+        if (decoration == null)
+            return false;
+        
+        decoration.Unlock();
+        return true;
+    }
+
+    public void DrawLights(SpriteBatch spriteBatch)
+    {
+        foreach (ILightSource lightSource in lightSources)
+        {
+            lightSource.DrawLight(spriteBatch);
+        }
+    }
+
+    private bool HasLockedDecorations(DecorationType decorationType)
+    {
+        return decorations.Any(decoration =>
+            decoration.DecorationType == decorationType &&
+            !decoration.IsUnlocked);
     }
 }

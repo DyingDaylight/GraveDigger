@@ -93,7 +93,7 @@ public class InventoryWindow : Window
     {
         List<ContextMenuAction> actions = new();
         
-        if (entry.ItemData is FoodItemData)
+        if (entry.ItemData is FoodItemData or BlueprintItemData)
             actions.Add(new ContextMenuAction("Use", () => Use(entry)));
 
         actions.Add(new("Discard", () => Discard(entry)));

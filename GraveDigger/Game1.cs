@@ -133,14 +133,23 @@ public class Game1 : Game
             spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront, 
                 samplerState: SamplerState.PointClamp, 
                 transformMatrix: camera.TransformMatrix);
-            
             level.Draw(spriteBatch);
-            
             spriteBatch.End();
             
             spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
             DrawDayNightOverlay(spriteBatch);
             spriteBatch.End();
+
+            if (timeSystem.CurrentDayTime == DayTime.Night)
+            {
+                spriteBatch.Begin(
+                    blendState: BlendState.Additive,
+                    samplerState: SamplerState.LinearClamp,
+                    transformMatrix: camera.TransformMatrix
+                );
+                level.DrawLights(spriteBatch);
+                spriteBatch.End();    
+            }
         }
         
         spriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend); 
@@ -228,6 +237,7 @@ public class Game1 : Game
     private void LoadCoreSprites()
     {
         SpriteManager.AddSprite("pixel", "Images/pixel");
+        SpriteManager.AddSprite("light", "Images/Effects/Light");
     }
 
     private void CreateGameObjects()
@@ -239,11 +249,11 @@ public class Game1 : Game
         timeSystem = new TimeSystem(DayDuration, NightDuration);
         reputationSystem = new ReputationSystem();
         gameplayCoordinator = new GameplayCoordinator(timeSystem, gui, reputationSystem, randomService);
-        timeSystem.Start();
         
         level = new Level(gameContext, gameplayCoordinator);
         level.LoadTextures();
         level.Start();
+        timeSystem.Start();
     }
 
     private void SubscribeToEvents()
@@ -270,12 +280,14 @@ public class Game1 : Game
             
         level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
 
+        gameplayCoordinator.OnNotificationRequested += gui.ShowNotification;
         gameplayCoordinator.OnLootSpawn += level.SpawnLoot;
         gameplayCoordinator.OnGraveChanged += level.GraveChanged;
         gameplayCoordinator.OnTradeCompleted += gui.ShowTradeResult;
         gameplayCoordinator.OnMarketClosed += level.MarketClosed;
         gameplayCoordinator.OnUndeadSpawned += level.SpawnUndead;
         gameplayCoordinator.OnNutritionReceived += level.DecreaseHunger;
+        gameplayCoordinator.TryApplyBlueprint += level.BuildDecoration;
 
         timeSystem.DayTimeChanged += level.DayTimeChange;
         timeSystem.DayStarted += level.DayStart;
@@ -338,8 +350,6 @@ public class Game1 : Game
     
     private void HandleWindowInput(KeyboardState keyboardState)
     {
-        LogKeyStateChange(keyboardState, Keys.I);
-        
         if (WasKeyJustPressed(keyboardState, Keys.I))
         {
             if (gui.IsInventoryOpen())
@@ -352,7 +362,7 @@ public class Game1 : Game
         if (WasKeyJustPressed(keyboardState, Keys.T))
         {
             Merchant merchant = new Merchant();
-            merchant.Inventory = InventoryGenerator.CreateInventory(randomService);
+            merchant.Inventory = InventoryGenerator.CreateTestInventory();
             gameplayCoordinator.ShowMarket(merchant);
         }
     }
@@ -361,22 +371,5 @@ public class Game1 : Game
     {
         return currentKeyboardState.IsKeyDown(key) &&
                previousKeyboardState.IsKeyUp(key);
-    }
-    
-    private void LogKeyStateChange(
-        KeyboardState currentKeyboardState,
-        Keys key)
-    {
-        bool currentDown = currentKeyboardState.IsKeyDown(key);
-        bool previousDown = previousKeyboardState.IsKeyDown(key);
-
-        if (currentDown == previousDown)
-            return;
-
-        Console.WriteLine(
-            $"[KEY] {key}: " +
-            $"previous={(previousDown ? "DOWN" : "UP")}, " +
-            $"current={(currentDown ? "DOWN" : "UP")}, " +
-            $"justPressed={currentDown && !previousDown}");
     }
 }

@@ -1,6 +1,8 @@
-﻿using GraveDigger.Core;
+﻿using System;
+using GraveDigger.Core;
 using GraveDigger.Interactions;
 using GraveDigger.Items;
+using GraveDigger.Props;
 using GraveDigger.Systems;
 using GraveDigger.Utils;
 using Microsoft.Xna.Framework;
@@ -13,13 +15,18 @@ public class Merchant : Animation, IInteractionOwner
     private const float ArrivalThreshold = 10f;
     private const float MovementSpeed = 200f;
     
+    private const int MoveUpRow = 0;
+    private const int MoveDownRow = 1;
+    private const int MoveSidewaysRow = 2;
+    private const int IdleRow = 3;
+    
     private Vector2 offMapPosition = Vector2.Zero;
     private Vector2 onMapPosition = Vector2.Zero;
     
-    private MerchantState state = MerchantState.Idle;
+    private MerchantState state = MerchantState.Hidden;
     private Vector2 targetPosition = Vector2.Zero;
     
-    private bool leaveRequested = false;
+    private bool pendingLeave = false;
     
     public Rectangle InteractionArea => DestRectangle;
     public Inventory Inventory { get; set; }
@@ -51,7 +58,7 @@ public class Merchant : Animation, IInteractionOwner
         Transform.Scale = new Vector2(0.7f, 0.7f);
         
         CurrentRow = 1; 
-        Stop();
+        Play(3);
     }
     
     public override void Update(GameTime gameTime)
@@ -70,13 +77,13 @@ public class Merchant : Animation, IInteractionOwner
 
         if (state == MerchantState.Trading && newState == MerchantState.Leaving)
         {
-            leaveRequested = true;
+            pendingLeave = true;
             return;
         }
 
-        if (state == MerchantState.Trading && leaveRequested)
+        if (state == MerchantState.Trading && pendingLeave)
         {
-            leaveRequested = false;
+            pendingLeave = false;
             newState = MerchantState.Leaving;
         }
 
@@ -124,32 +131,22 @@ public class Merchant : Animation, IInteractionOwner
             return;
         
         Vector2 direction = targetPosition - Transform.Position;
+        float distance = direction.Length();
+        float movementDistance = MovementSpeed * dt;
         
-        if (direction.Length() <= ArrivalThreshold)
+        if (distance <= Math.Max(ArrivalThreshold, movementDistance))
         {
             Transform.Position = targetPosition;
             ReachDestination();
-            CurrentRow = 3;
+            CurrentRow = IdleRow;
             return;
         }
 
         direction.Normalize();
 
-        Transform.Position += direction * MovementSpeed * dt;
+        Transform.Position += direction * movementDistance;
 
-        if (direction.X != 0)
-        {
-            CurrentRow = 2;
-            SpriteEffect = direction.X > 0
-                ? SpriteEffects.FlipHorizontally
-                : SpriteEffects.None;
-        }
-        else
-        {
-            CurrentRow = direction.Y > 0 ? 1 : 0;
-        }
-
-        Play(3);
+        UpdateMovementAnimation(direction);
     }
 
     private void ReachDestination()
@@ -160,15 +157,28 @@ public class Merchant : Animation, IInteractionOwner
             ChangeState(MerchantState.Idle);
     }
 
-    public void RefreshInventory(RandomService randomService)
+    public void RefreshInventory(RandomService randomService,
+        Func<DecorationType, bool> hasLockedDecorations)
     {
         Inventory.ClearItemsByType<LootItemData>();
 
-        // TODO: add other items
-        int amount = randomService.Next(1, 6);
-        for (int i = 0; i < amount; i++)
+        InventoryGenerator.AddMerchantItems(
+            Inventory, randomService, hasLockedDecorations);
+    }
+    
+    private void UpdateMovementAnimation(Vector2 direction)
+    {
+        if (Math.Abs(direction.X) > Math.Abs(direction.Y))
         {
-            Inventory.Add(InventoryGenerator.GetRandomFood(randomService));
+            CurrentRow = MoveSidewaysRow;
+            SpriteEffect = direction.X > MoveUpRow
+                ? SpriteEffects.FlipHorizontally
+                : SpriteEffects.None;
+        }
+        else
+        {
+            CurrentRow = direction.Y > MoveUpRow ? MoveDownRow : MoveUpRow;
+            SpriteEffect = SpriteEffects.None;
         }
     }
 }

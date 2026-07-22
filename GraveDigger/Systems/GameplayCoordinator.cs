@@ -21,6 +21,8 @@ public class GameplayCoordinator : IGameplayActions
     
     private Merchant? currentMerchant;
     
+    public event Action<string> OnNotificationRequested;
+    
     public event Action<List<ItemData>, Tombstone> OnLootSpawn;
     public event Action<TradeResult> OnTradeCompleted;
 
@@ -28,6 +30,7 @@ public class GameplayCoordinator : IGameplayActions
     public event Action OnMarketClosed;
     public event Action<EnemyType, GraveSite> OnUndeadSpawned;
     public event Action<int> OnNutritionReceived;
+    public Func<BlueprintItemData, bool> TryApplyBlueprint { get; set; }
     
     public GameplayCoordinator(
         TimeSystem timeSystem,
@@ -42,7 +45,7 @@ public class GameplayCoordinator : IGameplayActions
 
         lootGenerator = new LootGenerator();
         
-        inventory = InventoryGenerator.CreateInventory(randomService);
+        inventory = InventoryGenerator.CreatePlayerInventory(randomService);
     }
 
     public void RecalculateReputation(IEnumerable<IReputationContributor> contributors)
@@ -92,9 +95,15 @@ public class GameplayCoordinator : IGameplayActions
         OnGraveChanged?.Invoke(graveSite);
     }
 
-    public void PickupItem(ItemData itemData)
+    public bool PickupItem(ItemData itemData)
     {
-        inventory.Add(itemData);
+        if (!inventory.Add(itemData))
+        {
+            OnNotificationRequested?.Invoke("Inventory is full.");
+            return false;
+        }
+
+        return true;
     }
 
     public void SellItem(ItemData itemData, int amount)
@@ -115,18 +124,45 @@ public class GameplayCoordinator : IGameplayActions
 
     public void UseItem(ItemData itemData, int amount)
     {
-        if (itemData is not FoodItemData food)
-            return;
-
         if (amount <= 0)
             return;
+        
+        switch (itemData)
+        {
+            case FoodItemData foodItemData:
+                int nutritionAmount = foodItemData.Nutrition * amount;
+                
+                if (!inventory.Remove(foodItemData, amount))
+                    return;
+                
+                OnNutritionReceived?.Invoke(nutritionAmount);
+                break;
+            
+            case BlueprintItemData blueprintItemData:
+                if (!inventory.HasItem(blueprintItemData, amount))
+                    return;
 
-        int nutritionAmount = food.Nutrition * amount;
-
-        if (!inventory.Remove(food, amount))
-            return;
-
-        OnNutritionReceived?.Invoke(nutritionAmount);
+                while (amount > 0)
+                {
+                    if (TryApplyBlueprint?.Invoke(blueprintItemData) != true)
+                    {
+                        OnNotificationRequested?.Invoke(
+                            $"There is no place for another {blueprintItemData.Product}.");
+                        return;
+                    }
+                    
+                    if (!inventory.Remove(blueprintItemData, 1))
+                        return;
+                    
+                    amount--;
+                    OnNotificationRequested?.Invoke(
+                        $"{blueprintItemData.Product} built.");
+                }
+                break;
+            
+            default:
+                break;
+        }
     }
     
     public void DiscardItem(ItemData itemData, int amount)

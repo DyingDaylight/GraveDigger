@@ -28,6 +28,9 @@ public class Tooltip : UIElement
 
     public override void Draw(SpriteBatch spriteBatch)
     {
+        if (!Visible)
+            return;
+        
         base.Draw(spriteBatch);
         label.Draw(spriteBatch);
     }
@@ -35,9 +38,8 @@ public class Tooltip : UIElement
     public void SetTooltip(string tooltip)
     {
         label.Text = tooltip;
-        
-        SetSize((int) (label.Size.X + padding.X),
-            (int) (label.Size.Y + padding.Y));
+        SetSize((int) (label.Size.X + padding.X * 2),
+            (int) (label.Size.Y + padding.Y * 2));
     }
     
     public void SetFont(SpriteFont font)

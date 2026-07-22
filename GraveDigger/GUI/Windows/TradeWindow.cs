@@ -230,7 +230,7 @@ public class TradeWindow : Window
         
         actions.Add(new("Sell", () => Sell(entry)));
         
-        if (entry.ItemData is FoodItemData)
+        if (entry.ItemData is FoodItemData or BlueprintItemData)
             actions.Add(new ContextMenuAction("Use", () => Use(entry)));
 
         actions.Add(new("Discard", () => Discard(entry)));

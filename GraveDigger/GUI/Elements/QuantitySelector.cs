@@ -47,7 +47,7 @@ public class QuantitySelector : UIContainer
         Texture = SpriteManager.GetSprite("background").Texture;
         
         titleLabel = CreateElement<Label>();
-        titleLabel.Scale = 1.5f;
+        titleLabel.Scale = 1.2f;
         
         quantityLabel = CreateElement<Label>();
         quantityLabel.Scale = 1.5f;

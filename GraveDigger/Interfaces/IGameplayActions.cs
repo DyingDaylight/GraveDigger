@@ -12,7 +12,7 @@ public interface IGameplayActions
     void DigGrave(GraveSite graveSite);
     void RepairGrave(GraveSite graveSite);
     
-    void PickupItem(ItemData itemData);
+    bool PickupItem(ItemData itemData);
     void SellItem(ItemData itemData, int amount);
     void BuyItem(ItemData itemData, int amount);
     void UseItem(ItemData itemData, int amount);

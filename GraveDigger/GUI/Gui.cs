@@ -18,7 +18,8 @@ namespace GUI;
 public class Gui: IUpdatable, IDrawable, IGameWindowService
 {
     private readonly GameContext gameContext;
-    
+    private NotificationPopup notificationPopup;
+
     private bool started;
     private GameState gameState;
 
@@ -68,8 +69,9 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         if (started)
             throw new InvalidOperationException("GUI has already been started.");
 
-        started = true;
-
+        notificationPopup = new NotificationPopup(new Rectangle(0, 0, 
+            (int) gameContext.ScreenSize.X, 
+            (int) gameContext.ScreenSize.Y));
         WindowManager = new WindowManager(gameContext);
         MenuUi = new MenuUI(gameContext.ScreenSize);
         InteractionTooltip = new InteractionTooltip(gameContext.CoordinatesConverter);
@@ -78,9 +80,12 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         Hud.Start();
         MenuUi.Start();
         WindowManager.Start();
+        notificationPopup.Start();
         InteractionTooltip.Start();
-        
+
         WindowManager.TradeWindow.OnCloseButton += HandleMarketClosed;
+        
+        started = true;
     }
 
     public void Update(GameTime gameTime)
@@ -91,6 +96,7 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
             return;
         }
 
+        notificationPopup.Update(gameTime);
         WindowManager.Update(gameTime);
         if (WindowManager.IsModalWindow)
             return;
@@ -110,6 +116,7 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
         Hud.Draw(spriteBatch);
         InteractionTooltip.Draw(spriteBatch);
         WindowManager.Draw(spriteBatch);
+        notificationPopup.Draw(spriteBatch);
     }
 
     public void SetGameState(GameState state) 
@@ -155,6 +162,11 @@ public class Gui: IUpdatable, IDrawable, IGameWindowService
     public bool IsInventoryOpen()
     {
         return WindowManager.IsInventoryOpen;
+    }
+    
+    public void ShowNotification(string message)
+    {
+        notificationPopup.Show(message);
     }
     
     private void HandleMarketClosed()
