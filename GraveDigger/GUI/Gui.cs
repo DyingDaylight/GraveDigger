@@ -15,7 +15,7 @@ using IDrawable = Interfaces.IDrawable;
 
 namespace GUI;
 
-public class Gui: IUpdatable, IDrawable, IGameWindowService
+public class Gui: IUpdatable, IDrawable
 {
     private readonly GameContext gameContext;
     private NotificationPopup notificationPopup;

@@ -6,6 +6,7 @@ using GraveDigger.GraveSites;
 using GraveDigger.Items;
 using GraveDigger.Props;
 using GraveDigger.Utils;
+using GUI;
 using Interfaces;
 
 namespace GraveDigger.Systems;
@@ -13,7 +14,7 @@ namespace GraveDigger.Systems;
 public class GameplayCoordinator
 {
     private readonly ReputationSystem reputationSystem;
-    private readonly IGameWindowService windowService;
+    private readonly Gui gui;
     private readonly RandomService randomService;
     private readonly LootGenerator lootGenerator;
     private readonly TimeSystem timeSystem;
@@ -35,12 +36,12 @@ public class GameplayCoordinator
     public GameplayCoordinator(
         Level level,
         TimeSystem timeSystem,
-        IGameWindowService windowService, 
+        Gui gui, 
         ReputationSystem reputationSystem,
         RandomService randomService)
     {
         this.timeSystem = timeSystem;
-        this.windowService = windowService;
+        this.gui = gui;
         this.reputationSystem = reputationSystem;
         this.randomService = randomService;
         this.level = level;
@@ -49,10 +50,45 @@ public class GameplayCoordinator
         
         inventory = InventoryGenerator.CreatePlayerInventory(randomService);
 
-        this.level.ReputationRecalculationRequested += RecalculateReputation;
-        this.level.ItemPickupRequested += OnItemPickupRequested;
-        this.level.GraveOpenRequested += OpenTombstone;
-        this.level.MarketOpenRequested += ShowMarket;
+        RegisterSubscriptions();
+    }
+
+    private void RegisterSubscriptions()
+    {
+        // Level -> Coordinator
+        level.ReputationRecalculationRequested += RecalculateReputation;
+        level.ItemPickupRequested += OnItemPickupRequested;
+        level.GraveOpenRequested += OpenTombstone;
+        level.MarketOpenRequested += ShowMarket;
+        
+        // GUI -> Coordinator
+        gui.WindowManager.TombstoneInfoWindow.OnDigButton += (tombstone) => DigGrave(tombstone.ParentSite);
+        gui.WindowManager.TombstoneInfoWindow.OnRepairButton += (tombstone) => RepairGrave(tombstone.ParentSite);
+        
+        gui.WindowManager.InventoryWindow.UseRequested += UseItem;
+        gui.WindowManager.InventoryWindow.DiscardRequested += DiscardItem;
+
+        gui.WindowManager.TradeWindow.SellRequested += SellItem;
+        gui.WindowManager.TradeWindow.BuyRequested += BuyItem;
+        gui.WindowManager.TradeWindow.UseRequested += UseItem;
+        gui.WindowManager.TradeWindow.DiscardRequested += DiscardItem;
+
+        gui.Hud.InventoryRequested += ShowInventory;
+        
+        // Coordinator -> GUI
+        OnNotificationRequested += gui.ShowNotification;
+        OnTradeCompleted += gui.ShowTradeResult;
+
+        // Coordinator -> Level
+        OnLootSpawn += level.SpawnLoot;
+        OnGraveChanged += level.GraveChanged;
+        OnMarketClosed += level.MarketClosed;
+        OnUndeadSpawned += level.SpawnUndead;
+        OnNutritionReceived += level.DecreaseHunger;
+        
+        // TimeSystem -> Level
+        timeSystem.DayTimeChanged += level.DayTimeChange;
+        timeSystem.DayStarted += level.DayStart;
     }
 
     public void RecalculateReputation()
@@ -64,7 +100,7 @@ public class GameplayCoordinator
     public void OpenTombstone(GraveSite graveSite)
     {
         bool hasEnoughMoney = inventory.HasEnoughMoney(graveSite.RepairCost);
-        windowService.OpenTombstoneWindow(graveSite, hasEnoughMoney);
+        gui.OpenTombstoneWindow(graveSite, hasEnoughMoney);
     }
 
     public void DigGrave(GraveSite graveSite)
@@ -74,7 +110,7 @@ public class GameplayCoordinator
             List<ItemData> itemsData = lootGenerator.Generate(graveSite.Tombstone.Data, randomService);
             OnLootSpawn?.Invoke(itemsData, graveSite.Tombstone);
             
-            windowService.CloseCurrentWindow();
+            gui.CloseCurrentWindow();
             OnGraveChanged?.Invoke(graveSite);
             
             EnemyType enemyType = UndeadGenerator.Generate(graveSite.Tombstone.Data, randomService, 
@@ -99,7 +135,7 @@ public class GameplayCoordinator
             return;
         
         inventory.SpendMoney(repairCost);
-        windowService.RefreshTombstoneWindow(inventory.HasEnoughMoney(graveSite.RepairCost));
+        gui.RefreshTombstoneWindow(inventory.HasEnoughMoney(graveSite.RepairCost));
         OnGraveChanged?.Invoke(graveSite);
     }
 
@@ -184,7 +220,7 @@ public class GameplayCoordinator
 
     public void ShowInventory()
     {
-        windowService.OpenInventoryWindow(inventory);
+        gui.OpenInventoryWindow(inventory);
     }
 
     public void ShowMarket(Merchant merchant)
@@ -193,13 +229,13 @@ public class GameplayCoordinator
             return;
         
         currentMerchant = merchant;
-        windowService.MarketClosed += CloseMarket;
-        windowService.OpenTradeWindow(inventory, currentMerchant.Inventory);
+        gui.MarketClosed += CloseMarket;
+        gui.OpenTradeWindow(inventory, currentMerchant.Inventory);
     }
 
     private void CloseMarket()
     {
-        windowService.MarketClosed -= CloseMarket;
+        gui.MarketClosed -= CloseMarket;
         OnMarketClosed?.Invoke();
         currentMerchant = null;
     }

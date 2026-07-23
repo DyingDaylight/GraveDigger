@@ -264,35 +264,11 @@ public class Game1 : Game
         gui.MenuUi.OnStartClicked += StartGame; 
         gui.MenuUi.OnSettingsClicked += OpenSettings; 
         gui.MenuUi.OnExitClicked += CloseGame;
-
-        gui.WindowManager.TombstoneInfoWindow.OnDigButton += (tombstone) => gameplayCoordinator.DigGrave(tombstone.ParentSite);
-        gui.WindowManager.TombstoneInfoWindow.OnRepairButton += (tombstone) => gameplayCoordinator.RepairGrave(tombstone.ParentSite);
-        
-        gui.WindowManager.InventoryWindow.UseRequested += gameplayCoordinator.UseItem;
-        gui.WindowManager.InventoryWindow.DiscardRequested += gameplayCoordinator.DiscardItem;
-
-        gui.WindowManager.TradeWindow.SellRequested += gameplayCoordinator.SellItem;
-        gui.WindowManager.TradeWindow.BuyRequested += gameplayCoordinator.BuyItem;
-        gui.WindowManager.TradeWindow.UseRequested += gameplayCoordinator.UseItem;
-        gui.WindowManager.TradeWindow.DiscardRequested += gameplayCoordinator.DiscardItem;
-
-        gui.Hud.InventoryRequested += gameplayCoordinator.ShowInventory;
         
         level.Player.HungerChanged += gui.Hud.UpdateHunger;
         reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
             
         level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
-
-        gameplayCoordinator.OnNotificationRequested += gui.ShowNotification;
-        gameplayCoordinator.OnLootSpawn += level.SpawnLoot;
-        gameplayCoordinator.OnGraveChanged += level.GraveChanged;
-        gameplayCoordinator.OnTradeCompleted += gui.ShowTradeResult;
-        gameplayCoordinator.OnMarketClosed += level.MarketClosed;
-        gameplayCoordinator.OnUndeadSpawned += level.SpawnUndead;
-        gameplayCoordinator.OnNutritionReceived += level.DecreaseHunger;
-
-        timeSystem.DayTimeChanged += level.DayTimeChange;
-        timeSystem.DayStarted += level.DayStart;
     }
 
     private void SetGameState(GameState gameState)
