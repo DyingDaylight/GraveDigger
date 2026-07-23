@@ -3,6 +3,7 @@ using GraveDigger.Characters;
 using GraveDigger.Core;
 using GraveDigger.Systems;
 using GraveDigger.Utils;
+using GraveDigger.Visuals;
 using GUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,36 +18,30 @@ public class Game1 : Game
     private const int NightDuration = 40;
     private static readonly Vector2 WorldSize = new(4520, 3960);
     
-    private const float TransitionDuration = 0.15f;
-    private readonly Color dawnColor = new(130, 92, 98, 28);
-    private readonly Color dayColor = Color.Transparent;
-    private readonly Color sunsetColor = new(110, 85, 95, 55);
-    private readonly Color duskColor = new(50, 45, 70, 90);
-    private readonly Color nightColor = new(20, 30, 70, 130);
-    
-    private GameContext gameContext;
-    private GameplayCoordinator gameplayCoordinator;
-    private ReputationSystem reputationSystem;
-    private RandomService randomService;
-    private TimeSystem timeSystem;
-    
     private readonly GraphicsDeviceManager graphics;
+    
     private SpriteBatch spriteBatch;
     
+    private GameplayCoordinator gameplayCoordinator;
+    private ReputationSystem reputationSystem;
+    private DayNightOverlay dayNightOverlay;
+    private RandomService randomService;
+    private GameContext gameContext;
+    private TimeSystem timeSystem;
+
     private Camera camera;
     private Level level;
-    
     private Gui gui;
 
     private Texture2D cursorTexture;
-    private Texture2D dayNightOverlay;
+   
     private GameState currentGameState = GameState.Menu;
 
     private KeyboardState previousKeyboardState;
     
     // Indicates whether the game has been started.
     // Used to prevent closing the initial menu with the Escape key.
-    private bool gameStarted = false;
+    private bool gameStarted;
     
     
     public Game1()
@@ -85,8 +80,6 @@ public class Game1 : Game
         CreateGameObjects();
         SubscribeToEvents();
         
-        dayNightOverlay = SpriteManager.GetSprite("pixel").Texture;
-        
         SetGameState(GameState.Menu);
         gui.Hud.UpdateReputation(reputationSystem.Value,
             ReputationSystem.MinValue, ReputationSystem.MaxValue);
@@ -97,6 +90,7 @@ public class Game1 : Game
     {
         if (!IsActive)
         {
+            // TODO: investigate missed short key presses after restoring focus.
             //previousKeyboardState = Keyboard.GetState();
             base.Update(gameTime);
             return;
@@ -137,7 +131,7 @@ public class Game1 : Game
             spriteBatch.End();
             
             spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
-            DrawDayNightOverlay(spriteBatch);
+            dayNightOverlay.Draw(spriteBatch);
             spriteBatch.End();
 
             if (timeSystem.CurrentDayTime == DayTime.Night)
@@ -162,62 +156,6 @@ public class Game1 : Game
         
     }
     
-    private void DrawDayNightOverlay(SpriteBatch spriteBatch)
-    {
-        Color overlayColor = GetDayNightOverlayColor();
-        
-        spriteBatch.Draw(
-            dayNightOverlay,
-            GraphicsDevice.Viewport.Bounds,
-            overlayColor);
-    }
-
-    private Color GetDayNightOverlayColor()
-    {
-        float progress = MathHelper.Clamp(timeSystem.PhaseProgress, 0f, 1f);
-
-        if (timeSystem.CurrentDayTime == DayTime.Day)
-        {
-            // 0.00–0.15: dawn -> day
-            if (progress < TransitionDuration)
-            {
-                float t = progress / TransitionDuration;
-                return Color.Lerp(dawnColor, dayColor, t);
-            }
-
-            // 0.15–0.85: day
-            if (progress < 1f - TransitionDuration)
-                return dayColor;
-
-            // 0.85–1.00: day -> sunset
-            float tSunset = (progress - (1f - TransitionDuration)) / TransitionDuration;
-            return Color.Lerp(dayColor, sunsetColor, tSunset);
-        }
-
-        // 0.00–0.15: sunset -> dusk
-        if (progress < TransitionDuration)
-        {
-            float t = progress / TransitionDuration;
-            return Color.Lerp(sunsetColor, duskColor, t);
-        }
-
-        // 0.15–0.30: dusk -> night
-        if (progress < TransitionDuration * 2f)
-        {
-            float t = (progress - TransitionDuration) / TransitionDuration;
-            return Color.Lerp(duskColor, nightColor, t);
-        }
-
-        // 0.30–0.85: night
-        if (progress < 1f - TransitionDuration)
-            return nightColor;
-
-        // 0.85–1.00: night -> dawn
-        float tDawn = (progress - (1f - TransitionDuration)) / TransitionDuration;
-
-        return Color.Lerp(nightColor, dawnColor, tDawn);
-    }
-
     private void StartGame()
     {
         gameStarted = true;
@@ -226,6 +164,7 @@ public class Game1 : Game
 
     private void OpenSettings()
     {
+        // TODO: implement settings or remove button
         Console.WriteLine("Settings");
     }
     
@@ -244,6 +183,8 @@ public class Game1 : Game
     {
         timeSystem = new TimeSystem(DayDuration, NightDuration);
         reputationSystem = new ReputationSystem();
+
+        dayNightOverlay = new DayNightOverlay(timeSystem, gameContext.ScreenSize);
         
         gui = new Gui(gameContext);
         gui.LoadContent(Content);
