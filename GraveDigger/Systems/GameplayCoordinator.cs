@@ -10,7 +10,7 @@ using Interfaces;
 
 namespace GraveDigger.Systems;
 
-public class GameplayCoordinator : IGameplayActions
+public class GameplayCoordinator
 {
     private readonly ReputationSystem reputationSystem;
     private readonly IGameWindowService windowService;
@@ -18,6 +18,7 @@ public class GameplayCoordinator : IGameplayActions
     private readonly LootGenerator lootGenerator;
     private readonly TimeSystem timeSystem;
     private readonly Inventory inventory;
+    private readonly Level level;
     
     private Merchant? currentMerchant;
     
@@ -30,9 +31,9 @@ public class GameplayCoordinator : IGameplayActions
     public event Action OnMarketClosed;
     public event Action<EnemyType, GraveSite> OnUndeadSpawned;
     public event Action<int> OnNutritionReceived;
-    public Func<BlueprintItemData, bool> TryApplyBlueprint { get; set; }
     
     public GameplayCoordinator(
+        Level level,
         TimeSystem timeSystem,
         IGameWindowService windowService, 
         ReputationSystem reputationSystem,
@@ -42,14 +43,21 @@ public class GameplayCoordinator : IGameplayActions
         this.windowService = windowService;
         this.reputationSystem = reputationSystem;
         this.randomService = randomService;
+        this.level = level;
 
         lootGenerator = new LootGenerator();
         
         inventory = InventoryGenerator.CreatePlayerInventory(randomService);
+
+        this.level.ReputationRecalculationRequested += RecalculateReputation;
+        this.level.ItemPickupRequested += OnItemPickupRequested;
+        this.level.GraveOpenRequested += OpenTombstone;
+        this.level.MarketOpenRequested += ShowMarket;
     }
 
-    public void RecalculateReputation(IEnumerable<IReputationContributor> contributors)
+    public void RecalculateReputation()
     {
+        IEnumerable<IReputationContributor> contributors = level.GetReputationContributors();
         reputationSystem.Recalculate(contributors);
     }
     
@@ -95,15 +103,16 @@ public class GameplayCoordinator : IGameplayActions
         OnGraveChanged?.Invoke(graveSite);
     }
 
-    public bool PickupItem(ItemData itemData)
+    public void OnItemPickupRequested(ItemPickUp itemPickUp)
     {
+        ItemData itemData = itemPickUp.ItemData;
         if (!inventory.Add(itemData))
         {
             OnNotificationRequested?.Invoke("Inventory is full.");
-            return false;
+            return;
         }
 
-        return true;
+        level.RemovePickup(itemPickUp);
     }
 
     public void SellItem(ItemData itemData, int amount)
@@ -144,7 +153,7 @@ public class GameplayCoordinator : IGameplayActions
 
                 while (amount > 0)
                 {
-                    if (TryApplyBlueprint?.Invoke(blueprintItemData) != true)
+                    if (level.BuildDecoration(blueprintItemData) != true)
                     {
                         OnNotificationRequested?.Invoke(
                             $"There is no place for another {blueprintItemData.Product}.");

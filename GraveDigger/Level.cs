@@ -46,7 +46,7 @@ public class Level : IUpdatable, IDrawable
     private readonly List<ILightSource> lightSources = new();
 
     private readonly GameContext gameContext;
-    private readonly IGameplayActions gameplayActions;
+    //private readonly IGameplayActions gameplayActions;
     
     private readonly PlayerTrail playerTrail;
     
@@ -59,10 +59,14 @@ public class Level : IUpdatable, IDrawable
 
     public InteractionSystem InteractionSystem { get; }
 
-    public Level(GameContext gameContext, IGameplayActions gameplayActions)
+    public event Action ReputationRecalculationRequested;
+    public event Action<GraveSite> GraveOpenRequested;
+    public event Action<Merchant> MarketOpenRequested;
+    public event Action<ItemPickUp> ItemPickupRequested;
+    
+    public Level(GameContext gameContext)
     {
         this.gameContext = gameContext;
-        this.gameplayActions = gameplayActions;
         
         InteractionSystem = new InteractionSystem(gameContext.CoordinatesConverter);
         playerTrail = new PlayerTrail();
@@ -98,7 +102,7 @@ public class Level : IUpdatable, IDrawable
         foreach (IUpdatable updatable in updatables)
             updatable.Start();
         
-        gameplayActions.RecalculateReputation(contributors);
+        ReputationRecalculationRequested?.Invoke();
     }
 
     public void Update(GameTime gameTime)
@@ -158,7 +162,7 @@ public class Level : IUpdatable, IDrawable
         }
         
         Player.IncreaseHunger(HungerPerDay);
-        gameplayActions.RecalculateReputation(contributors);
+        ReputationRecalculationRequested?.Invoke();
     }
     
     public void SpawnLoot(List<ItemData> loot, Tombstone tombstone)
@@ -176,7 +180,12 @@ public class Level : IUpdatable, IDrawable
     
     public void GraveChanged(GraveSite graveSite)
     {
-        gameplayActions.RecalculateReputation(contributors);
+        ReputationRecalculationRequested?.Invoke();
+    }
+    
+    public IEnumerable<IReputationContributor> GetReputationContributors()
+    {
+        return props.OfType<IReputationContributor>();
     }
     
     private T RegisterObject<T>(T obj)
@@ -308,15 +317,16 @@ public class Level : IUpdatable, IDrawable
     
     private void PickUpItem(ItemPickUp pickable)
     {
-        if (gameplayActions.PickupItem(pickable.ItemData))
-            RemovePickup(pickable);
+        ItemPickupRequested?.Invoke(pickable);
     }
     
-    private void RemovePickup(ItemPickUp pickable)
+    public void RemovePickup(ItemPickUp pickable)
     {
+        if (!props.Remove(pickable))
+            return;
+
         InteractionSystem.UnregisterInteraction(pickable.Interaction);
         UnregisterObject(pickable);
-        props.Remove(pickable);
     }
 
     private void CreateGhost(Vector2 position)
@@ -487,10 +497,10 @@ public class Level : IUpdatable, IDrawable
         graveSites.Add(graveSite);
     }
 
-    private void OpenTombstone(Tombstone obj)
+    private void OpenTombstone(Tombstone tombstone)
     {
         InteractionSystem.ClearState();
-        gameplayActions.OpenTombstone(obj.ParentSite);
+        GraveOpenRequested?.Invoke(tombstone.ParentSite);
     }
 
     private Prop PropFactory(string spriteName)
@@ -605,7 +615,7 @@ public class Level : IUpdatable, IDrawable
     {
         InteractionSystem.ClearState();
         merchant.ChangeState(MerchantState.Trading);
-        gameplayActions.ShowMarket(merchant);
+        MarketOpenRequested?.Invoke(merchant);
     }
 
     public void MarketClosed()
@@ -620,7 +630,7 @@ public class Level : IUpdatable, IDrawable
             case EnemyType.Ghost:
                 CreateGhost(graveSite.Transform.Position);
                 AudioManager.Instance.PlaySFX("ghost-spawn");
-                gameplayActions.RecalculateReputation(contributors);
+                ReputationRecalculationRequested?.Invoke();
                 break;
         }
     }

@@ -248,12 +248,15 @@ public class Game1 : Game
         
         timeSystem = new TimeSystem(DayDuration, NightDuration);
         reputationSystem = new ReputationSystem();
-        gameplayCoordinator = new GameplayCoordinator(timeSystem, gui, reputationSystem, randomService);
         
-        level = new Level(gameContext, gameplayCoordinator);
+        level = new Level(gameContext);
         level.LoadTextures();
         level.Start();
         timeSystem.Start();
+        
+        gameplayCoordinator = new GameplayCoordinator(level, 
+            timeSystem, gui, 
+            reputationSystem, randomService);
     }
 
     private void SubscribeToEvents()
@@ -287,7 +290,6 @@ public class Game1 : Game
         gameplayCoordinator.OnMarketClosed += level.MarketClosed;
         gameplayCoordinator.OnUndeadSpawned += level.SpawnUndead;
         gameplayCoordinator.OnNutritionReceived += level.DecreaseHunger;
-        gameplayCoordinator.TryApplyBlueprint += level.BuildDecoration;
 
         timeSystem.DayTimeChanged += level.DayTimeChange;
         timeSystem.DayStarted += level.DayStart;
