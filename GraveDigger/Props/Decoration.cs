@@ -28,4 +28,14 @@ public class Decoration : Prop
         
         base.Draw(spriteBatch);
     }
+    
+    public override int GetReputationValue()
+    {
+        // TODO: depend on decoration type?
+        if (IsUnlocked)
+        {
+            return 10;    
+        }
+        return 0;
+    }
 }

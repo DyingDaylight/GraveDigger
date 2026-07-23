@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GraveDigger.Characters;
 using GraveDigger.Enemies;
 using GraveDigger.GraveSites;
@@ -43,8 +44,12 @@ public class GameplayCoordinator
         lootGenerator = new LootGenerator();
         
         inventory = InventoryGenerator.CreatePlayerInventory(randomService);
+    }
 
+    public void Start()
+    {
         RegisterSubscriptions();
+        RecalculateReputation();
     }
     
     public void ToggleInventory()
@@ -210,6 +215,7 @@ public class GameplayCoordinator
                     amount--;
                     NotificationRequested?.Invoke(
                         $"{blueprintItemData.Product} built.");
+                    RecalculateReputation();
                 }
                 break;
         }

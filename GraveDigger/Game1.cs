@@ -78,6 +78,7 @@ public class Game1 : Game
         
         LoadCoreSprites();
         CreateGameObjects();
+        StartObjects();
         SubscribeToEvents();
         
         SetGameState(GameState.Menu);
@@ -192,10 +193,6 @@ public class Game1 : Game
         level = new Level(gameContext);
         level.LoadContent();
         
-        gui.Start();
-        level.Start();
-        timeSystem.Start();
-        
         // Call after systems' start
         gameplayCoordinator = new GameplayCoordinator(gui, level, 
             timeSystem, reputationSystem, randomService);
@@ -211,6 +208,16 @@ public class Game1 : Game
         reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
             
         level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
+    }
+    
+    private void StartObjects()
+    {
+        gui.Start();
+        level.Start();
+        
+        gameplayCoordinator.Start();
+        
+        timeSystem.Start();
     }
 
     private void SetGameState(GameState gameState)
