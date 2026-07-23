@@ -29,8 +29,8 @@ public class TombstoneInfoWindow : Window
     private GraveSite? graveSite;
     private bool hasEnoughMoney;
     
-    public event Action<Tombstone> OnDigButton;
-    public event Action<Tombstone> OnRepairButton;
+    public event Action<Tombstone> DigButtonPressed;
+    public event Action<Tombstone> RepairButtonPressed;
     public event Action OnCloseButton;
     
     public TombstoneInfoWindow(Rectangle parentBounds) : base(parentBounds)
@@ -137,7 +137,7 @@ public class TombstoneInfoWindow : Window
         if (tombstone == null)
             return;
         
-        OnDigButton?.Invoke(tombstone);
+        DigButtonPressed?.Invoke(tombstone);
     }
     
     private void HandleRepairClick()
@@ -145,7 +145,7 @@ public class TombstoneInfoWindow : Window
         if (tombstone == null || !hasEnoughMoney)
             return;
         
-        OnRepairButton?.Invoke(tombstone);
+        RepairButtonPressed?.Invoke(tombstone);
     }
 
     private void HandleCloseButton()

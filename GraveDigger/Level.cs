@@ -177,12 +177,7 @@ public class Level : IUpdatable, IDrawable
             itemPickUp.Start();
         }
     }
-    
-    public void GraveChanged(GraveSite graveSite)
-    {
-        ReputationRecalculationRequested?.Invoke();
-    }
-    
+
     public IEnumerable<IReputationContributor> GetReputationContributors()
     {
         return props.OfType<IReputationContributor>();
