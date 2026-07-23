@@ -25,14 +25,8 @@ public class GameplayCoordinator
     
     public event Action<string> OnNotificationRequested;
     
-    public event Action<List<ItemData>, Tombstone> OnLootSpawn;
     public event Action<TradeResult> OnTradeCompleted;
 
-    public event Action<GraveSite> OnGraveChanged;
-    public event Action OnMarketClosed;
-    public event Action<EnemyType, GraveSite> OnUndeadSpawned;
-    public event Action<int> OnNutritionReceived;
-    
     public GameplayCoordinator(
         Level level,
         TimeSystem timeSystem,
@@ -79,13 +73,6 @@ public class GameplayCoordinator
         OnNotificationRequested += gui.ShowNotification;
         OnTradeCompleted += gui.ShowTradeResult;
 
-        // Coordinator -> Level
-        OnLootSpawn += level.SpawnLoot;
-        OnGraveChanged += level.GraveChanged;
-        OnMarketClosed += level.MarketClosed;
-        OnUndeadSpawned += level.SpawnUndead;
-        OnNutritionReceived += level.DecreaseHunger;
-        
         // TimeSystem -> Level
         timeSystem.DayTimeChanged += level.DayTimeChange;
         timeSystem.DayStarted += level.DayStart;
@@ -108,15 +95,15 @@ public class GameplayCoordinator
         if (graveSite != null && graveSite.Dig())
         {
             List<ItemData> itemsData = lootGenerator.Generate(graveSite.Tombstone.Data, randomService);
-            OnLootSpawn?.Invoke(itemsData, graveSite.Tombstone);
+            level.SpawnLoot(itemsData, graveSite.Tombstone);
             
             gui.CloseCurrentWindow();
-            OnGraveChanged?.Invoke(graveSite);
+            level.GraveChanged(graveSite);
             
             EnemyType enemyType = UndeadGenerator.Generate(graveSite.Tombstone.Data, randomService, 
                 timeSystem.CurrentDayTime == DayTime.Night);
             if (enemyType != EnemyType.None)
-                OnUndeadSpawned?.Invoke(enemyType, graveSite);
+                level.SpawnUndead(enemyType, graveSite);
         }
     }
 
@@ -136,7 +123,7 @@ public class GameplayCoordinator
         
         inventory.SpendMoney(repairCost);
         gui.RefreshTombstoneWindow(inventory.HasEnoughMoney(graveSite.RepairCost));
-        OnGraveChanged?.Invoke(graveSite);
+        level.GraveChanged(graveSite);
     }
 
     public void OnItemPickupRequested(ItemPickUp itemPickUp)
@@ -180,7 +167,7 @@ public class GameplayCoordinator
                 if (!inventory.Remove(foodItemData, amount))
                     return;
                 
-                OnNutritionReceived?.Invoke(nutritionAmount);
+                level.DecreaseHunger(nutritionAmount);
                 break;
             
             case BlueprintItemData blueprintItemData:
@@ -236,7 +223,7 @@ public class GameplayCoordinator
     private void CloseMarket()
     {
         gui.MarketClosed -= CloseMarket;
-        OnMarketClosed?.Invoke();
+        level.MarketClosed();
         currentMerchant = null;
     }
     
