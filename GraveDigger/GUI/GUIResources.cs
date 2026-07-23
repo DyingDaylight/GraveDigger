@@ -26,8 +26,6 @@ public static class GUIResources
         loaded = true;
         
         ButtonDefaultTexture = content.Load<Texture2D>("Images/GUI/Button");
-        
-        ButtonDefaultTexture = content.Load<Texture2D>("Images/GUI/Button");
         DefaultFont = content.Load<SpriteFont>("Fonts/File");
         LargeFont = content.Load<SpriteFont>("Fonts/LargeFile");
     }

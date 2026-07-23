@@ -242,21 +242,22 @@ public class Game1 : Game
 
     private void CreateGameObjects()
     {
-        gui = new Gui(gameContext);
-        gui.LoadContent(Content);
-        gui.Start();
-        
         timeSystem = new TimeSystem(DayDuration, NightDuration);
         reputationSystem = new ReputationSystem();
         
+        gui = new Gui(gameContext);
+        gui.LoadContent(Content);
+        
         level = new Level(gameContext);
-        level.LoadTextures();
+        level.LoadContent();
+        
+        gui.Start();
         level.Start();
         timeSystem.Start();
         
-        gameplayCoordinator = new GameplayCoordinator(level, 
-            timeSystem, gui, 
-            reputationSystem, randomService);
+        // Call after systems' start
+        gameplayCoordinator = new GameplayCoordinator(gui, level, 
+            timeSystem, reputationSystem, randomService);
     }
 
     private void SubscribeToEvents()
@@ -330,10 +331,7 @@ public class Game1 : Game
     {
         if (WasKeyJustPressed(keyboardState, Keys.I))
         {
-            if (gui.IsInventoryOpen())
-                gui.CloseCurrentWindow();
-            else if (!gui.IsModalWindowOpen())
-                gameplayCoordinator.ShowInventory();
+            gameplayCoordinator.ToggleInventory();
         }
 
         // TODO: not a real mechant, testing purposes only!!

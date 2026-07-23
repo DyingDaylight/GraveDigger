@@ -72,7 +72,7 @@ public class Level : IUpdatable, IDrawable
         playerTrail = new PlayerTrail();
     }
     
-    public void LoadTextures()
+    public void LoadContent()
     {
         LoadGroundTextures();
         LoadPropTextures();

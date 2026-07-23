@@ -28,9 +28,9 @@ public class GameplayCoordinator
 
     
     public GameplayCoordinator(
+        Gui gui, 
         Level level,
         TimeSystem timeSystem,
-        Gui gui, 
         ReputationSystem reputationSystem,
         RandomService randomService)
     {
@@ -45,6 +45,18 @@ public class GameplayCoordinator
         inventory = InventoryGenerator.CreatePlayerInventory(randomService);
 
         RegisterSubscriptions();
+    }
+    
+    public void ToggleInventory()
+    {
+        if (gui.IsInventoryOpen())
+        {
+            gui.CloseCurrentWindow();
+            return;
+        }
+
+        if (!gui.IsModalWindowOpen())
+            ShowInventory();
     }
     
     public void ShowInventory()
