@@ -11,6 +11,7 @@ using GraveDigger.Items;
 using GraveDigger.Props;
 using GraveDigger.Systems;
 using GraveDigger.Utils;
+using GraveDigger.Visuals;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -46,13 +47,16 @@ public class Level : IUpdatable, IDrawable
     private readonly List<ILightSource> lightSources = new();
 
     private readonly GameContext gameContext;
-    //private readonly IGameplayActions gameplayActions;
     
     private readonly PlayerTrail playerTrail;
     
     private readonly List<Decoration> decorations = new();
     private readonly List<GraveSite> graveSites = new();
     private readonly List<Ghost> ghosts = new();
+    
+    private readonly DayNightOverlay dayNightOverlay;
+
+    private bool isNight = false;
     
     private Merchant merchant;
     public Player Player { get; private set; }
@@ -64,9 +68,10 @@ public class Level : IUpdatable, IDrawable
     public event Action<Merchant> MarketOpenRequested;
     public event Action<ItemPickUp> ItemPickupRequested;
     
-    public Level(GameContext gameContext)
+    public Level(GameContext gameContext, DayNightOverlay dayNightOverlay)
     {
         this.gameContext = gameContext;
+        this.dayNightOverlay = dayNightOverlay;
         
         InteractionSystem = new InteractionSystem(gameContext.CoordinatesConverter);
         playerTrail = new PlayerTrail();
@@ -138,6 +143,22 @@ public class Level : IUpdatable, IDrawable
             collider.Draw(spriteBatch);
     }
     
+    public void DrawLights(SpriteBatch spriteBatch)
+    {
+        if (!isNight)
+            return;
+        
+        foreach (ILightSource lightSource in lightSources)
+        {
+            lightSource.DrawLight(spriteBatch);
+        }
+    }
+    
+    public void DrawOverlay(SpriteBatch spriteBatch)
+    {
+        dayNightOverlay.Draw(spriteBatch);
+    }
+    
     public void DayTimeChange(DayTime dayTime)
     {
         if (dayTime == DayTime.Day)
@@ -145,11 +166,13 @@ public class Level : IUpdatable, IDrawable
             Console.WriteLine("++ Day started ++");
             merchant.RefreshInventory(gameContext.RandomService, HasLockedDecorations);
             merchant.ChangeState(MerchantState.Arriving);
+            isNight = false;
         } 
         else if (dayTime == DayTime.Night)
         {
             Console.WriteLine("++ Night started ++");
             merchant.ChangeState(MerchantState.Leaving);
+            isNight = true;
         }
     }
 
@@ -177,10 +200,49 @@ public class Level : IUpdatable, IDrawable
             itemPickUp.Start();
         }
     }
+    
+    public void SpawnUndead(EnemyType enemyType, GraveSite graveSite)
+    {
+        switch (enemyType)
+        {
+            case EnemyType.Ghost:
+                CreateGhost(graveSite.Transform.Position);
+                AudioManager.Instance.PlaySFX("ghost-spawn");
+                ReputationRecalculationRequested?.Invoke();
+                break;
+        }
+    }
+    
+    public bool BuildDecoration(BlueprintItemData blueprint)
+    {
+        Decoration decoration = decorations.FirstOrDefault(
+            d => d.DecorationType == blueprint.DecorationType &&
+                 !d.IsUnlocked);
+
+        if (decoration == null)
+            return false;
+        
+        decoration.Unlock();
+        return true;
+    }
+    
+    public void RemovePickup(ItemPickUp pickable)
+    {
+        if (!props.Remove(pickable))
+            return;
+
+        InteractionSystem.UnregisterInteraction(pickable.Interaction);
+        UnregisterObject(pickable);
+    }
+    
+    public void DecreaseHunger(int nutritionAmount)
+    {
+        Player.DecreaseHunger(nutritionAmount);
+    }
 
     public IEnumerable<IReputationContributor> GetReputationContributors()
     {
-        return props.OfType<IReputationContributor>();
+        return contributors;
     }
     
     private T RegisterObject<T>(T obj)
@@ -313,15 +375,6 @@ public class Level : IUpdatable, IDrawable
     private void PickUpItem(ItemPickUp pickable)
     {
         ItemPickupRequested?.Invoke(pickable);
-    }
-    
-    public void RemovePickup(ItemPickUp pickable)
-    {
-        if (!props.Remove(pickable))
-            return;
-
-        InteractionSystem.UnregisterInteraction(pickable.Interaction);
-        UnregisterObject(pickable);
     }
 
     private void CreateGhost(Vector2 position)
@@ -616,44 +669,6 @@ public class Level : IUpdatable, IDrawable
     public void MarketClosed()
     {
         merchant.ChangeState(MerchantState.Idle);
-    }
-
-    public void SpawnUndead(EnemyType enemyType, GraveSite graveSite)
-    {
-        switch (enemyType)
-        {
-            case EnemyType.Ghost:
-                CreateGhost(graveSite.Transform.Position);
-                AudioManager.Instance.PlaySFX("ghost-spawn");
-                ReputationRecalculationRequested?.Invoke();
-                break;
-        }
-    }
-
-    public void DecreaseHunger(int nutritionAmount)
-    {
-        Player.DecreaseHunger(nutritionAmount);
-    }
-
-    public bool BuildDecoration(BlueprintItemData blueprint)
-    {
-        Decoration decoration = decorations.FirstOrDefault(
-            d => d.DecorationType == blueprint.DecorationType &&
-                 !d.IsUnlocked);
-
-        if (decoration == null)
-            return false;
-        
-        decoration.Unlock();
-        return true;
-    }
-
-    public void DrawLights(SpriteBatch spriteBatch)
-    {
-        foreach (ILightSource lightSource in lightSources)
-        {
-            lightSource.DrawLight(spriteBatch);
-        }
     }
 
     private bool HasLockedDecorations(DecorationType decorationType)

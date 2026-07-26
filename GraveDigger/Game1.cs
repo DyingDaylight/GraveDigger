@@ -23,11 +23,8 @@ public class Game1 : Game
     private SpriteBatch spriteBatch;
     
     private GameplayCoordinator gameplayCoordinator;
-    private ReputationSystem reputationSystem;
-    private DayNightOverlay dayNightOverlay;
     private RandomService randomService;
     private GameContext gameContext;
-    private TimeSystem timeSystem;
 
     private Camera camera;
     private Level level;
@@ -82,8 +79,7 @@ public class Game1 : Game
         SubscribeToEvents();
         
         SetGameState(GameState.Menu);
-        gui.Hud.UpdateReputation(reputationSystem.Value,
-            ReputationSystem.MinValue, ReputationSystem.MaxValue);
+        
         gui.Hud.UpdateHunger(level.Player.Hunger, 0, level.Player.MaxHunger);
     }
 
@@ -132,29 +128,24 @@ public class Game1 : Game
             spriteBatch.End();
             
             spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
-            dayNightOverlay.Draw(spriteBatch);
+            level.DrawOverlay(spriteBatch);
             spriteBatch.End();
-
-            if (timeSystem.CurrentDayTime == DayTime.Night)
-            {
-                spriteBatch.Begin(
-                    blendState: BlendState.Additive,
-                    samplerState: SamplerState.LinearClamp,
-                    transformMatrix: camera.TransformMatrix
-                );
-                level.DrawLights(spriteBatch);
-                spriteBatch.End();    
-            }
+            
+            spriteBatch.Begin(
+                blendState: BlendState.Additive,
+                samplerState: SamplerState.LinearClamp,
+                transformMatrix: camera.TransformMatrix
+            );
+            level.DrawLights(spriteBatch);
+            spriteBatch.End();    
         }
         
-        spriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend); 
-        
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp, 
+            blendState: BlendState.AlphaBlend); 
         gui.Draw(spriteBatch);
-        
         MouseState mouseState = Mouse.GetState();
         spriteBatch.Draw(cursorTexture, new Vector2(mouseState.X, mouseState.Y), Color.White);
         spriteBatch.End();
-        
     }
     
     private void StartGame()
@@ -182,20 +173,16 @@ public class Game1 : Game
 
     private void CreateGameObjects()
     {
-        timeSystem = new TimeSystem(DayDuration, NightDuration);
-        reputationSystem = new ReputationSystem();
-
-        dayNightOverlay = new DayNightOverlay(timeSystem, gameContext.ScreenSize);
-        
         gui = new Gui(gameContext);
         gui.LoadContent(Content);
         
-        level = new Level(gameContext);
+        TimeSystem timeSystem = new TimeSystem(DayDuration, NightDuration);
+        DayNightOverlay dayNightOverlay = new DayNightOverlay(timeSystem, gameContext.ScreenSize);
+        
+        level = new Level(gameContext, dayNightOverlay);
         level.LoadContent();
         
-        // Call after systems' start
-        gameplayCoordinator = new GameplayCoordinator(gui, level, 
-            timeSystem, reputationSystem, randomService);
+        gameplayCoordinator = new GameplayCoordinator(gui, level, timeSystem, randomService);
     }
 
     private void SubscribeToEvents()
@@ -205,7 +192,6 @@ public class Game1 : Game
         gui.MenuUi.OnExitClicked += CloseGame;
         
         level.Player.HungerChanged += gui.Hud.UpdateHunger;
-        reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
             
         level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
     }
@@ -216,8 +202,6 @@ public class Game1 : Game
         level.Start();
         
         gameplayCoordinator.Start();
-        
-        timeSystem.Start();
     }
 
     private void SetGameState(GameState gameState)
@@ -272,7 +256,7 @@ public class Game1 : Game
         }
 
         level.Update(gameTime);
-        timeSystem.Update(gameTime);
+        gameplayCoordinator.Update(gameTime);
     }
     
     private void HandleWindowInput(KeyboardState keyboardState)

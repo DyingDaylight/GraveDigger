@@ -186,6 +186,7 @@ public class Player : Animation
         Transform.Position = position;
     }
 
+    // If game is paused by modal window, stop step sounds
     public void StopMoving()
     {
         AudioManager.Instance.StopSFX("steps");

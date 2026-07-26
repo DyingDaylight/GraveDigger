@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using GraveDigger.Data;
-using GraveDigger.Items;
 using GraveDigger.Utils;
 
 namespace GraveDigger.Enemies;

@@ -1,5 +1,4 @@
-﻿using System;
-using GraveDigger.Core;
+﻿using GraveDigger.Core;
 using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

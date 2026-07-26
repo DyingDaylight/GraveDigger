@@ -9,10 +9,11 @@ using GraveDigger.Props;
 using GraveDigger.Utils;
 using GUI;
 using Interfaces;
+using Microsoft.Xna.Framework;
 
 namespace GraveDigger.Systems;
 
-public class GameplayCoordinator
+public class GameplayCoordinator : IUpdatable
 {
     private readonly ReputationSystem reputationSystem;
     private readonly RandomService randomService;
@@ -32,26 +33,31 @@ public class GameplayCoordinator
         Gui gui, 
         Level level,
         TimeSystem timeSystem,
-        ReputationSystem reputationSystem,
         RandomService randomService)
     {
         this.gui = gui;
         this.level = level;
         this.timeSystem = timeSystem;
         this.randomService = randomService;
-        this.reputationSystem = reputationSystem;
 
         lootGenerator = new LootGenerator();
-        
+        reputationSystem = new ReputationSystem();
+
         inventory = InventoryGenerator.CreatePlayerInventory(randomService);
     }
 
     public void Start()
     {
+        timeSystem.Start();
         RegisterSubscriptions();
         RecalculateReputation();
     }
-    
+
+    public void Update(GameTime gameTime)
+    {
+        timeSystem.Update(gameTime);
+    }
+
     public void ToggleInventory()
     {
         if (gui.IsInventoryOpen())
@@ -62,11 +68,6 @@ public class GameplayCoordinator
 
         if (!gui.IsModalWindowOpen())
             ShowInventory();
-    }
-    
-    public void ShowInventory()
-    {
-        gui.OpenInventoryWindow(inventory);
     }
 
     public void ShowMarket(Merchant merchant)
@@ -90,6 +91,11 @@ public class GameplayCoordinator
         level.MarketClosed();
     }
 
+    private void ShowInventory()
+    {
+        gui.OpenInventoryWindow(inventory);
+    }
+    
     private void RecalculateReputation()
     {
         IEnumerable<IReputationContributor> contributors = level.GetReputationContributors();
@@ -305,5 +311,8 @@ public class GameplayCoordinator
         // TimeSystem -> Level
         timeSystem.DayTimeChanged += level.DayTimeChange;
         timeSystem.DayStarted += level.DayStart;
+        
+        // ReputationSystem -> GUI
+        reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
     }
 }

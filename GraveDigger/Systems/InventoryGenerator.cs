@@ -80,11 +80,6 @@ public static class InventoryGenerator
             DecorationType.HouseUpgrade)
     };
     
-    public static ItemData GetRandomFood(RandomService randomService)
-    {
-        return randomService.Pick(foodPool);
-    }
-    
     public static Inventory CreatePlayerInventory(RandomService randomService)
     {
         Inventory inventory = new Inventory();
@@ -129,23 +124,6 @@ public static class InventoryGenerator
             hasLockedDecorations, 2);
     }
     
-    private static void AddRandomBlueprints(
-        Inventory inventory, RandomService randomService,
-        Func<DecorationType, bool> hasLockedDecorations, int count)
-    {
-        List<BlueprintItemData> availableBlueprints = blueprintsPool
-            .Where(blueprint => hasLockedDecorations(blueprint.DecorationType))
-            .ToList();
-
-        for (int i = 0; i < count && availableBlueprints.Count > 0; i++)
-        {
-            BlueprintItemData blueprint = randomService.Pick(availableBlueprints);
-
-            inventory.Add(blueprint);
-            availableBlueprints.Remove(blueprint);
-        }
-    }
-    
     public static Inventory CreateTestInventory()
     {
         Inventory inventory = new Inventory();
@@ -164,5 +142,27 @@ public static class InventoryGenerator
         inventory.Add(blueprintsPool[5], 2);
 
         return inventory;
+    }
+    
+    private static void AddRandomBlueprints(
+        Inventory inventory, RandomService randomService,
+        Func<DecorationType, bool> hasLockedDecorations, int count)
+    {
+        List<BlueprintItemData> availableBlueprints = blueprintsPool
+            .Where(blueprint => hasLockedDecorations(blueprint.DecorationType))
+            .ToList();
+
+        for (int i = 0; i < count && availableBlueprints.Count > 0; i++)
+        {
+            BlueprintItemData blueprint = randomService.Pick(availableBlueprints);
+
+            inventory.Add(blueprint);
+            availableBlueprints.Remove(blueprint);
+        }
+    }
+    
+    private static ItemData GetRandomFood(RandomService randomService)
+    {
+        return randomService.Pick(foodPool);
     }
 }
