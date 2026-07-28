@@ -164,7 +164,7 @@ public class Level : IUpdatable, IDrawable
         if (dayTime == DayTime.Day)
         {
             Console.WriteLine("++ Day started ++");
-            merchant.RefreshInventory(gameContext.RandomService, HasLockedDecorations);
+            merchant.RefreshInventory(gameContext.RandomService, HasBlueprintTarget);
             merchant.ChangeState(MerchantState.Arriving);
             isNight = false;
         } 
@@ -217,13 +217,12 @@ public class Level : IUpdatable, IDrawable
     {
         Decoration decoration = decorations.FirstOrDefault(
             d => d.DecorationType == blueprint.DecorationType &&
-                 !d.IsUnlocked);
+                 d.CanApplyBlueprint);
 
         if (decoration == null)
             return false;
-        
-        decoration.Unlock();
-        return true;
+
+        return decoration.ApplyBlueprint();
     }
     
     public void RemovePickup(ItemPickUp pickable)
@@ -402,7 +401,7 @@ public class Level : IUpdatable, IDrawable
         InteractionSystem.RegisterInteraction(interaction);
         
         merchant.Inventory = InventoryGenerator.CreateMerchantInventory(
-            gameContext.RandomService, HasLockedDecorations);
+            gameContext.RandomService, HasBlueprintTarget);
     }
     
     private void CreateProps()
@@ -415,11 +414,21 @@ public class Level : IUpdatable, IDrawable
     
     private void CreateDecorations()
     {
+        CreateHouse();
         CreateTrees();
         CreateLamps();
         CreateFences();
         CreateBenches();
         CreateFlowerbeds();
+    }
+
+    private void CreateHouse()
+    {
+        DiggerHouse house = CreateLevelObject(HouseFactory, "", new Vector2(1260, 1080));
+        house.DecorationType = DecorationType.HouseUpgrade;
+        house.Transform.Scale = new Vector2(1f, 1f);
+        house.Pivot = new Vector2(0.5f, 1f);
+        house.ShadowOffsetY = -60;
     }
 
     private void CreateTrees()
@@ -565,6 +574,11 @@ public class Level : IUpdatable, IDrawable
     {
         return new Lamppost(spriteName);
     }
+    
+    private DiggerHouse HouseFactory(string spriteName)
+    {
+        return new DiggerHouse();
+    }
 
     private Tombstone TombstoneFactory(string spriteName)
     {
@@ -605,6 +619,9 @@ public class Level : IUpdatable, IDrawable
         SpriteManager.AddSprite("flowerbed2", "Images/Props/Flowerbed2");
         SpriteManager.AddSprite("fence", "Images/Props/Fence");
         SpriteManager.AddSprite("lampost", "Images/Props/Lampost");
+        SpriteManager.AddSprite("House1", "Images/Props/House1");
+        SpriteManager.AddSprite("House2", "Images/Props/House2");
+        SpriteManager.AddSprite("House3", "Images/Props/House3");
     }
     
     private void LoadTombstoneTextures()
@@ -671,10 +688,10 @@ public class Level : IUpdatable, IDrawable
         merchant.ChangeState(MerchantState.Idle);
     }
 
-    private bool HasLockedDecorations(DecorationType decorationType)
+    private bool HasBlueprintTarget(DecorationType decorationType)
     {
         return decorations.Any(decoration =>
             decoration.DecorationType == decorationType &&
-            !decoration.IsUnlocked);
+            decoration.CanApplyBlueprint);
     }
 }

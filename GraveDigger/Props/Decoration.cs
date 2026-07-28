@@ -6,19 +6,37 @@ public class Decoration : Prop
 {
     public DecorationType DecorationType { get; set; }
     
-    public bool IsUnlocked { get; private set; }
-    
+    public bool IsUnlocked { get; protected set; }
+    public virtual bool IsFullyUpgraded => true;
+    public bool CanApplyBlueprint => !IsUnlocked || !IsFullyUpgraded;
+
     public Decoration(string name) : base(name)
     {
-        IsUnlocked = false;
+    }
+
+    public bool ApplyBlueprint()
+    {
+        if (!IsUnlocked)
+            return Unlock();
+        
+        if (!IsFullyUpgraded) 
+            return Upgrade();
+        
+        return false;
     }
     
-    public void Unlock()
+    private bool Unlock()
     {
         if (IsUnlocked)
-            return;
+            return false;
         
         IsUnlocked = true;
+        return true;
+    }
+
+    protected virtual bool Upgrade()
+    {
+        return false;
     }
 
     public override void Draw(SpriteBatch spriteBatch)

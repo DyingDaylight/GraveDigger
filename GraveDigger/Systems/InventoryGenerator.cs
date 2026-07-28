@@ -92,6 +92,7 @@ public static class InventoryGenerator
 
         inventory.Add(blueprintsPool[2], 5);
         inventory.Add(blueprintsPool[1], 5);
+        inventory.Add(blueprintsPool[5], 5);
         
         return inventory;
     }
