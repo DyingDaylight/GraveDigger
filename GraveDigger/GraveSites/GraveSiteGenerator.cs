@@ -5,6 +5,18 @@ namespace GraveDigger.Data;
 
 public class GraveSiteGenerator
 {
+    private static readonly string[] tombstoneSprites =
+    {
+        "tombstone1",
+        "tombstone2",
+        "tombstone3",
+        "tombstone4",
+        "tombstone5",
+        "tombstone6",
+        "tombstone7",
+        "tombstone9"
+    };
+    
     private static readonly string[] FirstNames =
     {
         "Eleanor",
@@ -134,6 +146,11 @@ public class GraveSiteGenerator
         [Personality.Cruel]      = [5, 15, 35, 45]
     };
     
+    public static string GetRandomTombstoneSprite(RandomService randomService)
+    {
+        return randomService.Pick(tombstoneSprites);
+    }
+    
     public static GraveSiteData Generate(RandomService randomService)
     {
         GraveSiteData graveSiteData = new GraveSiteData();
@@ -178,4 +195,5 @@ public class GraveSiteGenerator
 
         return (Wealth)(weights.Length - 1);
     }
+    
 }

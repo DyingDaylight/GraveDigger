@@ -64,9 +64,10 @@ public class Level : IUpdatable, IDrawable
     public InteractionSystem InteractionSystem { get; }
 
     public event Action ReputationRecalculationRequested;
-    public event Action<GraveSite> GraveOpenRequested;
+    public event Action<GraveSite> GraveInteractionRequested;
     public event Action<Merchant> MarketOpenRequested;
     public event Action<ItemPickUp> ItemPickupRequested;
+    public event Action<GraveSite> GraveOccupied;
     
     public Level(GameContext gameContext, DayNightOverlay dayNightOverlay)
     {
@@ -93,7 +94,8 @@ public class Level : IUpdatable, IDrawable
     { 
         CreateMap();
         CreateProps();
-        CreateTombstones();
+        CreateOccupiedGraveSites();
+        CreateLockedGraveSites();
         CreateDecorations();
         
         CreateMerchant();
@@ -183,11 +185,17 @@ public class Level : IUpdatable, IDrawable
             if (prop is IDailyUpdatable dailyUpdatable)
                 dailyUpdatable.AdvanceDay(day);
         }
+
+        foreach (GraveSite graveSite in graveSites)
+        {
+            graveSite.AdvanceDay(day);
+        }
         
         Player.IncreaseHunger(HungerPerDay);
+        OccupyPreparedGraveSite();
         ReputationRecalculationRequested?.Invoke();
     }
-    
+
     public void SpawnLoot(List<ItemData> loot, Tombstone tombstone)
     {
         List<Rectangle> occupiedAreas = props.Where(prop => prop.Visible)
@@ -507,57 +515,82 @@ public class Level : IUpdatable, IDrawable
         bench.DecorationType = DecorationType.Bench;
     }
     
-    private void CreateTombstones()
+    private void CreateOccupiedGraveSites()
     {
-        CreateGraveSite("tombstone5", new Vector2(200, 1500));
-        CreateGraveSite("tombstone1", new Vector2(550, 1500));
-        CreateGraveSite("tombstone2", new Vector2(900, 1500));
+        CreateOccupiedGraveSite("tombstone5", new Vector2(200, 1500));
+        CreateOccupiedGraveSite("tombstone1", new Vector2(550, 1500));
+        CreateOccupiedGraveSite("tombstone2", new Vector2(900, 1500));
     
-        CreateGraveSite("tombstone1", new Vector2(200, 600));
-        CreateGraveSite("tombstone4", new Vector2(550, 600));
-        CreateGraveSite("tombstone5", new Vector2(900, 600));
+        CreateOccupiedGraveSite("tombstone1", new Vector2(200, 600));
+        CreateOccupiedGraveSite("tombstone4", new Vector2(550, 600));
+        CreateOccupiedGraveSite("tombstone5", new Vector2(900, 600));
     
-        CreateGraveSite("tombstone6", new Vector2(200, 1000));
-        CreateGraveSite("tombstone3", new Vector2(550, 1000));
+        CreateOccupiedGraveSite("tombstone6", new Vector2(200, 1000));
+        CreateOccupiedGraveSite("tombstone3", new Vector2(550, 1000));
     
-        CreateGraveSite("tombstone2", new Vector2(200, 350));
-        CreateGraveSite("tombstone6", new Vector2(550, 350));
-        CreateGraveSite("tombstone1", new Vector2(900, 350));
+        CreateOccupiedGraveSite("tombstone2", new Vector2(200, 350));
+        CreateOccupiedGraveSite("tombstone6", new Vector2(550, 350));
+        CreateOccupiedGraveSite("tombstone1", new Vector2(900, 350));
+    }
+
+    private void CreateLockedGraveSites()
+    {
+        CreateLockedGraveSite(new Vector2(1900, 450));    
+    }
+
+    private void CreateLockedGraveSite(Vector2 position)
+    {
+        GraveSite graveSite = CreateGraveSite(GraveSiteStatus.Locked, "sign", "grave_locked", position);
     }
     
-    private void CreateGraveSite(string name, Vector2 position)
+    private void CreateOccupiedGraveSite(string name, Vector2 position)
     {
-        GraveSiteData graveSiteData = GraveSiteGenerator.Generate(gameContext.RandomService);
-        GraveSiteState randomState = gameContext.RandomService.RandomEnum<GraveSiteState>();
+        GraveState randomState = gameContext.RandomService.RandomEnum<GraveState>();
 
-        Tombstone tombstone = CreateLevelObject(TombstoneFactory, name, position);
-        
-        GraveTile graveTile = CreateLevelObject(GraveFactory, name, position);
-        graveTile.DecayInterval = gameContext.RandomService.Next(2, 5);
-        graveTile.State = randomState;
+        GraveSite graveSite = CreateGraveSite(GraveSiteStatus.Occupied,name, name, position, randomState);
 
+        GraveSiteData data = GraveSiteGenerator.Generate(gameContext.RandomService);
+        graveSite.Tombstone.SetData(data);
+    }
+    
+    private GraveSite CreateGraveSite(GraveSiteStatus status,
+        string tombstoneName, string graveName, Vector2 position,
+        GraveState? state = null)
+    {
+        Tombstone tombstone = CreateLevelObject(TombstoneFactory, tombstoneName, position);
+        Prop grave = CreateLevelObject(PropFactory, graveName, position);
         Prop dirt = CreateLevelObject(PropFactory, "dirt", position);
+
+        GraveSite graveSite = state.HasValue
+            ? new GraveSite(status, state.Value)
+            : new GraveSite(status);
         
-        GraveSite graveSite = new GraveSite();
+        graveSite.DecayInterval = gameContext.RandomService.Next(2, 5);
         graveSite.Transform.Position = position;
         graveSite.SetTombstone(tombstone);
-        graveSite.SetGrave(graveTile);
+        graveSite.SetGrave(grave);
         graveSite.SetDirt(dirt);
-        
-        graveSite.Tombstone.SetData(graveSiteData);
-        
-        TombstoneInteraction interaction = new TombstoneInteraction(tombstone);
-        interaction.OnTombstoneRead += OpenTombstone;
-        tombstone.Interaction = interaction;
-        InteractionSystem.RegisterInteraction(interaction);
+
+        RegisterGraveSiteInteraction(tombstone);
 
         graveSites.Add(graveSite);
+
+        return graveSite;
+    }
+    
+    private void RegisterGraveSiteInteraction(Tombstone tombstone)
+    {
+        TombstoneInteraction interaction = new TombstoneInteraction(tombstone);
+
+        interaction.OnTombstoneRead += InteractWithGravesite;
+        tombstone.Interaction = interaction;
+        InteractionSystem.RegisterInteraction(interaction);
     }
 
-    private void OpenTombstone(Tombstone tombstone)
+    private void InteractWithGravesite(Tombstone tombstone)
     {
         InteractionSystem.ClearState();
-        GraveOpenRequested?.Invoke(tombstone.ParentSite);
+        GraveInteractionRequested?.Invoke(tombstone.ParentSite);
     }
 
     private Prop PropFactory(string spriteName)
@@ -583,11 +616,6 @@ public class Level : IUpdatable, IDrawable
     private Tombstone TombstoneFactory(string spriteName)
     {
         return new Tombstone(spriteName);
-    }
-    
-    private GraveTile GraveFactory(string spriteName)
-    {
-        return new GraveTile(spriteName);
     }
 
     private ItemPickUp LootFactory(string spriteName)
@@ -634,10 +662,13 @@ public class Level : IUpdatable, IDrawable
         SpriteManager.AddSprite("tombstone6", "Images/Props/Tombstone6");
         SpriteManager.AddSprite("tombstone7", "Images/Props/Tombstone7");
         SpriteManager.AddSprite("tombstone9", "Images/Props/Tombstone9");
+        SpriteManager.AddSprite("sign", "Images/Props/Sign");
 
         SpriteManager.AddSprite("grave_earth", "Images/Environment_New/grave_earth");
         SpriteManager.AddSprite("grave_digged", "Images/Environment_New/grave_digged");
         SpriteManager.AddSprite("grave_broken", "Images/Environment_New/grave_broken");
+        SpriteManager.AddSprite("grave_locked", "Images/Environment_New/grave_locked");
+        SpriteManager.AddSprite("grave_prepared", "Images/Environment_New/grave_prepared");
     }
     
     private void LoadLootTextures()
@@ -687,11 +718,30 @@ public class Level : IUpdatable, IDrawable
     {
         merchant.ChangeState(MerchantState.Idle);
     }
+    
+    private void OccupyPreparedGraveSite()
+    {
+        GraveSite preparedGraveSite = GetPreparedGraveSite();
+        if (preparedGraveSite == null)
+            return;
+
+        string tombstoneName = GraveSiteGenerator.GetRandomTombstoneSprite(gameContext.RandomService);
+        GraveSiteData data = GraveSiteGenerator.Generate(gameContext.RandomService);
+        if (!preparedGraveSite.Occupy(data, tombstoneName))
+            return;
+        
+        GraveOccupied?.Invoke(preparedGraveSite);
+    }
 
     private bool HasBlueprintTarget(DecorationType decorationType)
     {
         return decorations.Any(decoration =>
             decoration.DecorationType == decorationType &&
             decoration.CanApplyBlueprint);
+    }
+    
+    private GraveSite GetPreparedGraveSite()
+    {
+        return graveSites.FirstOrDefault(graveSite => graveSite.Status == GraveSiteStatus.Prepared);
     }
 }

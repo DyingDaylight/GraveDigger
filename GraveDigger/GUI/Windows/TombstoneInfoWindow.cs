@@ -106,10 +106,10 @@ public class TombstoneInfoWindow : Window
         natureLabel.Text = $"Nature: {tombstone.Data.Inscription}";
         stateLabel.Text = $"State: {graveSite.State}";
         
-        digButton.SetDisabled(graveSite.State == GraveSiteState.DugOut);
+        digButton.SetDisabled(graveSite.State == GraveState.DugOut);
         
-        repairButton.SetDisabled(graveSite.State == GraveSiteState.Intact || !hasEnoughMoney);
-        if (graveSite.State != GraveSiteState.Intact)
+        repairButton.SetDisabled(graveSite.State == GraveState.Intact || !hasEnoughMoney);
+        if (graveSite.State != GraveState.Intact)
         {
             repairButton.SetText($"Repair ({graveSite.RepairCost})");
             if (!hasEnoughMoney)

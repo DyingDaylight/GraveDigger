@@ -100,6 +100,38 @@ public class GameplayCoordinator : IUpdatable
         reputationSystem.Recalculate(contributors);
     }
     
+    private void InteractWithGraveSite(GraveSite graveSite)
+    {
+        switch (graveSite.Status)
+        {
+            case GraveSiteStatus.Locked:
+                OpenGravePurchase(graveSite);
+                break;
+
+            case GraveSiteStatus.Prepared:
+                gui.ShowNotification("This grave plot is waiting for its guest.");
+                break;
+
+            case GraveSiteStatus.Occupied:
+                OpenTombstone(graveSite);
+                break;
+        }
+    }
+
+    private void OpenGravePurchase(GraveSite graveSite)
+    {
+        if (!graveSite.Prepare())
+            return;
+
+        RecalculateReputation();
+    }
+    
+    private void OnGraveOccupied(GraveSite graveSite)
+    {
+        RecalculateReputation();
+        NotificationRequested?.Invoke("A new burial has arrived.");
+    }
+
     private void OpenTombstone(GraveSite graveSite)
     {
         bool hasEnoughMoney = inventory.HasEnoughMoney(graveSite.RepairCost);
@@ -285,8 +317,9 @@ public class GameplayCoordinator : IUpdatable
         // Level -> Coordinator
         level.ReputationRecalculationRequested += RecalculateReputation;
         level.ItemPickupRequested += OnItemPickupRequested;
-        level.GraveOpenRequested += OpenTombstone;
+        level.GraveInteractionRequested += InteractWithGraveSite;
         level.MarketOpenRequested += ShowMarket;
+        level.GraveOccupied += OnGraveOccupied;
         
         // GUI -> Coordinator
         gui.WindowManager.TombstoneInfoWindow.DigButtonPressed += DigRequested;

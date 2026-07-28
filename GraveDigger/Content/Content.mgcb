@@ -219,6 +219,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Environment_New/grave_inprocess.png
 
+#begin Images/Environment_New/grave_locked.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Environment_New/grave_locked.png;Images/Environment_New/grave_locked
+
 #begin Images/Environment_New/grave_new.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -230,6 +242,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Environment_New/grave_new.png
+
+#begin Images/Environment_New/grave_prepared.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Environment_New/grave_prepared.png;Images/Environment_New/grave_prepared
 
 #begin Images/Environment_New/house.png
 /importer:TextureImporter
@@ -1454,6 +1478,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Props/LampostIcon.png;Images/Props/LampostIcon
+
+#begin Images/Props/Sign.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/Props/Sign.png;Images/Props/Sign
 
 #begin Images/Props/Spade.png
 /importer:TextureImporter

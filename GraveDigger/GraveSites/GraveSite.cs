@@ -1,60 +1,120 @@
 ﻿using GraveDigger.Core;
+using GraveDigger.Data;
 using Microsoft.Xna.Framework;
 using GraveDigger.Props;
+using Interfaces;
 
 namespace GraveDigger.GraveSites;
 
-public class GraveSite
+public class GraveSite : IDailyUpdatable
 {
     private const int BaseRepairCost = 10;
     private const int AdditionalDugOutRepairCost = 5;
     
+    private int daysSinceConditionChange = 0;
+
+    public int DecayInterval { get; set; }
+    
     public Transform Transform { get; } = new Transform();
     
     public Tombstone Tombstone { get; private set; }
-    public GraveTile GraveTile { get; private set; }
+    public Prop GraveTile { get; private set; }
     public Prop DirtPile { get; private set; }
+    
+    public GraveSiteStatus Status { get; private set; }
 
     public int RepairCost => State switch
     {
-        GraveSiteState.DugOut => BaseRepairCost + AdditionalDugOutRepairCost,
-        GraveSiteState.Broken => BaseRepairCost,
+        GraveState.DugOut => BaseRepairCost + AdditionalDugOutRepairCost,
+        GraveState.Broken => BaseRepairCost,
         _ => 0
     };
 
-    public GraveSiteState State
+    public GraveState State
     {
-        get => GraveTile.State;
-        set => GraveTile?.State = value;
+        get;
+        private set
+        {
+            if (field == value)
+                return;
+
+            field = value;
+            daysSinceConditionChange = 0;
+            UpdateVisuals();
+        }
+    } = GraveState.Intact;
+
+    public GraveSite(GraveSiteStatus status, GraveState state = GraveState.Intact)
+    {
+        Status = status;
+        State = state;
+    }
+    
+    public bool Prepare()
+    {
+        if (Status != GraveSiteStatus.Locked)
+            return false;
+
+        Status = GraveSiteStatus.Prepared;
+        UpdateVisuals();
+        
+        return true;
+    }
+    
+    public bool Occupy(GraveSiteData data, string tombstoneName)
+    {
+        if (Status != GraveSiteStatus.Prepared)
+            return false;
+
+        Status = GraveSiteStatus.Occupied;
+        State = GraveState.Intact;
+
+        Tombstone.ChangeSprite(tombstoneName);
+        Tombstone.SetData(data);
+
+        UpdateVisuals();
+        return true;
     }
     
     public bool Dig() 
     {
-        if (State == GraveSiteState.DugOut) 
+        if (Status != GraveSiteStatus.Occupied)
             return false;
         
-        State = GraveSiteState.DugOut;
-        DirtPile?.Visible = true;
+        if (State == GraveState.DugOut) 
+            return false;
+        
+        State = GraveState.DugOut;
+        UpdateVisuals();
         return true;
     }
 
     public bool Repair() 
     {
-        if (State == GraveSiteState.Intact) 
+        if (Status != GraveSiteStatus.Occupied)
             return false;
         
-        State = GraveSiteState.Intact;
-        DirtPile?.Visible = false;
+        if (State == GraveState.Intact) 
+            return false;
+        
+        State = GraveState.Intact;
+        UpdateVisuals();
         return true;
     }
     
     public int GetReputationValue()
     {
+        if (Status == GraveSiteStatus.Locked)
+            return 0;
+        
+        if (Status == GraveSiteStatus.Prepared)
+            return -5;
+        
         return State switch
         {
-            GraveSiteState.DugOut => -10,
-            GraveSiteState.Broken => -3,
-            GraveSiteState.Intact => +2,
+            GraveState.DugOut => -10,
+            GraveState.Broken => -3,
+            GraveState.Intact => +2,
             _ => 0
         };
     }
@@ -65,13 +125,16 @@ public class GraveSite
         Tombstone?.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y - 200);
         Tombstone?.Transform.Scale = new Vector2(0.3f, 0.3f);
         Tombstone?.ParentSite = this;
+        UpdateVisuals();
     }
 
-    public void SetGrave(GraveTile graveTile)
+    public void SetGrave(Prop graveTile)
     {
         GraveTile = graveTile;
         GraveTile?.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y);
         GraveTile?.Transform.Scale = new Vector2(0.08f, 0.08f);
+        GraveTile?.Mode = SortingMode.Fixed;
+        UpdateVisuals();
     }
 
     public void SetDirt(Prop dirt)
@@ -79,6 +142,70 @@ public class GraveSite
         DirtPile = dirt;
         DirtPile?.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y + 120);
         DirtPile?.Transform.Scale = new Vector2(0.05f, 0.05f);
-        DirtPile?.Visible = State == GraveSiteState.DugOut;
+        DirtPile?.Visible = State == GraveState.DugOut;
+        UpdateVisuals();
+    }
+
+    public void AdvanceDay(int day)
+    {
+        if (Status != GraveSiteStatus.Occupied)
+            return;
+        
+        if (DecayInterval <= 0)
+            return;
+        
+        daysSinceConditionChange++;
+
+        if (daysSinceConditionChange < DecayInterval)
+            return;
+
+        daysSinceConditionChange = 0;
+        DecreaseCondition();
+        UpdateVisuals();
+    }
+    
+
+    private void DecreaseCondition()
+    {
+        if (State == GraveState.Intact)
+            State = GraveState.Broken;
+    }
+    
+    private void UpdateVisuals()
+    {
+        switch (Status)
+        {
+            case GraveSiteStatus.Locked:
+                GraveTile?.ChangeSprite("grave_locked");    
+                GraveTile?.Transform.Scale = new Vector2(0.35f, 0.35f);
+                break;
+
+            case GraveSiteStatus.Prepared:
+                GraveTile?.ChangeSprite("grave_prepared");
+                GraveTile?.Transform.Scale = new Vector2(0.18f, 0.18f);
+                break;
+
+            case GraveSiteStatus.Occupied:
+                GraveTile?.ChangeSprite(State switch
+                {
+                    GraveState.Intact => "grave_earth",
+                    GraveState.Broken => "grave_broken",
+                    GraveState.DugOut => "grave_digged"
+                });
+                GraveTile?.Transform.Scale = new Vector2(0.08f, 0.08f);
+                break;
+        }
+        
+        GraveTile?.CastShadow = false;
+        
+        if (DirtPile != null)
+        {
+            DirtPile.Visible =
+                Status == GraveSiteStatus.Prepared ||
+                Status == GraveSiteStatus.Occupied &&
+                State == GraveState.DugOut;
+        }
+        
+        // TODO: Apply tombstone
     }
 }
