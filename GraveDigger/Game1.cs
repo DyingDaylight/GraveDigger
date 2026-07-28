@@ -106,6 +106,10 @@ public class Game1 : Game
             case GameState.Playing:
                 UpdateGameplay(gameTime, currentKeyboardState);
                 break;
+            
+            case GameState.GameOver:
+                UpdateGameOver(gameTime);
+                break;
         }
         
         gui.Update(gameTime);
@@ -119,41 +123,69 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.Black); 
         
-        if (currentGameState == GameState.Playing)
+        switch (currentGameState)
         {
-            spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront, 
-                samplerState: SamplerState.PointClamp, 
-                transformMatrix: camera.TransformMatrix);
-            level.Draw(spriteBatch);
-            spriteBatch.End();
-            
-            spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
-            level.DrawOverlay(spriteBatch);
-            spriteBatch.End();
-            
-            spriteBatch.Begin(
-                blendState: BlendState.Additive,
-                samplerState: SamplerState.LinearClamp,
-                transformMatrix: camera.TransformMatrix
-            );
-            level.DrawLights(spriteBatch);
-            spriteBatch.End();    
+            case GameState.Menu:
+                DrawGUI();
+                break;
+
+            case GameState.Playing:
+            case GameState.GameOver:
+                DrawGameplay();
+                DrawGUI();
+                break;
         }
-        
-        spriteBatch.Begin(samplerState: SamplerState.PointClamp, 
-            blendState: BlendState.AlphaBlend); 
+
+        base.Draw(gameTime);
+    }
+
+    private void DrawGameplay()
+    {
+        spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront, 
+            samplerState: SamplerState.PointClamp, 
+            transformMatrix: camera.TransformMatrix);
+        level.Draw(spriteBatch);
+        spriteBatch.End();
+            
+        spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
+        level.DrawOverlay(spriteBatch);
+        spriteBatch.End();
+            
+        spriteBatch.Begin(
+            blendState: BlendState.Additive,
+            samplerState: SamplerState.LinearClamp,
+            transformMatrix: camera.TransformMatrix
+        );
+        level.DrawLights(spriteBatch);
+        spriteBatch.End();    
+    }
+
+    private void DrawGUI()
+    {
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend); 
         gui.Draw(spriteBatch);
         MouseState mouseState = Mouse.GetState();
         spriteBatch.Draw(cursorTexture, new Vector2(mouseState.X, mouseState.Y), Color.White);
         spriteBatch.End();
     }
-    
+
     private void StartGame()
     {
         gameStarted = true;
         SetGameState(GameState.Playing);
     }
+    
+    private void RestartGame()
+    {
+        Console.WriteLine("Restarting game... Maybe...");
+    }
 
+    private void EndGame(GameResult gameResult)
+    {
+        gui.ShowGameOver(gameResult);
+        SetGameState(GameState.GameOver);
+    }
+    
     private void OpenSettings()
     {
         // TODO: implement settings or remove button
@@ -191,11 +223,14 @@ public class Game1 : Game
         gui.MenuUi.OnSettingsClicked += OpenSettings; 
         gui.MenuUi.OnExitClicked += CloseGame;
         
-        level.Player.HungerChanged += gui.Hud.UpdateHunger;
+        gui.WindowManager.GameOverWindow.RestartButtonPressed += RestartGame;
+        gui.WindowManager.GameOverWindow.ExitButtonPressed += CloseGame;
+        
+        gameplayCoordinator.GameEnded += EndGame;
             
         level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
     }
-    
+
     private void StartObjects()
     {
         gui.Start();
@@ -257,6 +292,12 @@ public class Game1 : Game
 
         level.Update(gameTime);
         gameplayCoordinator.Update(gameTime);
+    }
+    
+    private void UpdateGameOver(GameTime gameTime)
+    {
+        // TODO: see if need anything
+        // GameOverWindow is updated through gui.Update().
     }
     
     private void HandleWindowInput(KeyboardState keyboardState)

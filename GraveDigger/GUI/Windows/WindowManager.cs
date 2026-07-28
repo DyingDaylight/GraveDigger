@@ -1,4 +1,5 @@
-﻿using GraveDigger.Core;
+﻿using System;
+using GraveDigger.Core;
 using GraveDigger.GraveSites;
 using GraveDigger.Items;
 using GraveDigger.Props;
@@ -18,6 +19,7 @@ public class WindowManager : IUpdatable, IDrawable
     public GravePreparationWindow GravePreparationWindow { get; }
     public TombstoneInfoWindow TombstoneInfoWindow { get; }
     public InventoryWindow InventoryWindow { get; }
+    public GameOverWindow GameOverWindow { get; }
     public TradeWindow TradeWindow { get; }
     
     public bool IsModalWindow => currentWindow != null;
@@ -38,6 +40,8 @@ public class WindowManager : IUpdatable, IDrawable
         
         TradeWindow = new TradeWindow(bounds);
         TradeWindow.OnCloseButton += CloseCurrentWindow;
+        
+        GameOverWindow = new GameOverWindow(bounds);
     }
     
     public void Start()
@@ -45,6 +49,7 @@ public class WindowManager : IUpdatable, IDrawable
         GravePreparationWindow.Start();
         TombstoneInfoWindow.Start();
         InventoryWindow.Start();
+        GameOverWindow.Start();
         TradeWindow.Start();
     }
 
@@ -109,5 +114,11 @@ public class WindowManager : IUpdatable, IDrawable
     {
         if (currentWindow != null && currentWindow == TradeWindow)
             TradeWindow.ShowTradeResult(result);
+    }
+
+    public void OpenGameOverWindow(GameResult result)
+    {
+        GameOverWindow.SetResult(result);
+        currentWindow = GameOverWindow;
     }
 }

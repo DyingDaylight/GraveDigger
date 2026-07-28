@@ -21,6 +21,9 @@ public abstract class UIContainer : UIElement
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
+        
+        if (!IsEnabled)
+            return;
 
         foreach (var element in elements)
         {

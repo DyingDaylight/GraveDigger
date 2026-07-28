@@ -61,6 +61,18 @@ public class Gui: IUpdatable, IDrawable
 
         SpriteManager.AddSprite("Coin", "Images/Icons/Coin");
         SpriteManager.AddSprite("Hunger", "Images/Gui/hunger");
+        
+        SpriteManager.AddSprite("hungerResult1", "Images/Results/HungerResult1");
+        SpriteManager.AddSprite("hungerResult2", "Images/Results/HungerResult2");
+        SpriteManager.AddSprite("hungerResult3", "Images/Results/HungerResult3");
+        
+        SpriteManager.AddSprite("reputationResult1", "Images/Results/ReputationResult1");
+        SpriteManager.AddSprite("reputationResult2", "Images/Results/ReputationResult2");
+        SpriteManager.AddSprite("reputationResult3", "Images/Results/ReputationResult3");
+        
+        SpriteManager.AddSprite("winResult1", "Images/Results/WinResult1");
+        SpriteManager.AddSprite("winResult2", "Images/Results/WinResult2");
+        SpriteManager.AddSprite("winResult3", "Images/Results/WinResult3");
     }
     
     public void Start()
@@ -114,9 +126,11 @@ public class Gui: IUpdatable, IDrawable
         }
 
         Hud.Draw(spriteBatch);
-        InteractionTooltip.Draw(spriteBatch);
         WindowManager.Draw(spriteBatch);
         notificationPopup.Draw(spriteBatch);
+        
+        if (gameState == GameState.Playing)
+            InteractionTooltip.Draw(spriteBatch);
     }
 
     public void SetGameState(GameState state) 
@@ -177,5 +191,15 @@ public class Gui: IUpdatable, IDrawable
     private void HandleMarketClosed()
     {
         MarketClosed?.Invoke();
+    }
+
+    public void ShowGameOver(GameResult result)
+    {
+        CloseCurrentWindow();
+        
+        Hud.IsEnabled = false;
+        
+        WindowManager.OpenGameOverWindow(result);
+
     }
 }

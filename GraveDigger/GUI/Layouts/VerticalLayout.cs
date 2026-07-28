@@ -6,6 +6,15 @@ namespace GraveDigger.GUI.Layouts;
 
 public class VerticalLayout : Layout
 {
+    
+    public enum HorizontalAlignment
+    {
+        Left,
+        Center,
+        Right
+    } 
+    
+    public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Center; 
 
     public VerticalLayout(Rectangle bounds) : base(bounds)
     {
@@ -30,7 +39,20 @@ public class VerticalLayout : Layout
         
         foreach (ILayoutElement element in visibleElements)
         {
-            int x = (int) (contentBounds.Center.X - element.Size.X * 0.5f);
+            int x = 0;
+            switch (Alignment)
+            {
+                case HorizontalAlignment.Left:
+                    x = (int) (contentBounds.Left);
+                    break;
+                case HorizontalAlignment.Center:
+                    x = (int) (contentBounds.Center.X - element.Size.X * 0.5f);
+                    break;
+                case HorizontalAlignment.Right:
+                    x = (int) (contentBounds.Right - element.Size.X);
+                    break;
+                    
+            }
             element.SetPosition(x, y);
             
             y += (int) element.Size.Y + VerticalPadding;

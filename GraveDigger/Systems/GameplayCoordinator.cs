@@ -25,9 +25,11 @@ public class GameplayCoordinator : IUpdatable
     private Merchant currentMerchant;
     private int previousReputation;
     private bool reputationInitialized;
+    private bool gameEnded;
     
     public event Action<TradeResult> TradeCompleted;
     public event Action<string> NotificationRequested;
+    public event Action<GameResult> GameEnded;
     
     public GameplayCoordinator(
         Gui gui, 
@@ -327,6 +329,8 @@ public class GameplayCoordinator : IUpdatable
         level.MarketOpenRequested += ShowMarket;
         level.GraveOccupied += OnGraveOccupied;
         
+        level.Player.HungerChanged += OnHungerChanged;
+        
         // GUI -> Coordinator
         gui.WindowManager.GravePreparationWindow.PrepareButtonPressed += PrepareRequested;
         gui.WindowManager.TombstoneInfoWindow.DigButtonPressed += DigRequested;
@@ -357,6 +361,13 @@ public class GameplayCoordinator : IUpdatable
         reputationSystem.ReputationChanged += OnReputationChanged;
     }
 
+    private void OnHungerChanged(int value, int min, int max)
+    {
+        gui.Hud.UpdateHunger(value, min, max);
+        
+        CheckGameOver();
+    }
+
     private void OnReputationChanged(int value, int min, int max)
     {
         gui.Hud.UpdateReputation(value, min, max);
@@ -376,6 +387,8 @@ public class GameplayCoordinator : IUpdatable
         
         NotificationRequested?.Invoke($"Reputation {(delta > 0 ? "+" : "")}{delta}");
         AudioManager.Instance.PlaySFX("ding");
+
+        CheckGameOver();
     }
     
     private void OnDayStart(int day)
@@ -391,5 +404,34 @@ public class GameplayCoordinator : IUpdatable
             return;
         
         level.OccupyPreparedGraveSite();
+    }
+    
+    private void CheckGameOver()
+    {
+        if (reputationSystem.Value <= ReputationSystem.MinValue)
+        {
+            EndGame(GameResult.LoseReputation);
+            return;
+        }
+
+        if (level.Player.IsStarving)
+        {
+            EndGame(GameResult.LoseHunger);
+            return;
+        }
+
+        if (reputationSystem.Value >= ReputationSystem.MaxValue)
+        {
+            EndGame(GameResult.Win);
+        }
+    }
+
+    private void EndGame(GameResult result)
+    {
+        if (gameEnded)
+            return;
+
+        gameEnded = true;
+        GameEnded?.Invoke(result);
     }
 }

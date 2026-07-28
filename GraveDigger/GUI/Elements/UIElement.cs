@@ -14,6 +14,7 @@ public abstract class UIElement : IUpdatable, IDrawable, ILayoutElement
     public Color Color { get; set; } = Color.White;
     
     public bool Visible { get; set; } = true;
+    public bool IsEnabled { get; set; } = true;
     
     public virtual Vector2 Size => new(Bounds.Width, Bounds.Height);
 
