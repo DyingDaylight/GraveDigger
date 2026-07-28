@@ -14,7 +14,8 @@ namespace GraveDigger.GUI.Windows;
 public class WindowManager : IUpdatable, IDrawable
 { 
     private Window? currentWindow;
-    
+
+    public GravePreparationWindow GravePreparationWindow { get; }
     public TombstoneInfoWindow TombstoneInfoWindow { get; }
     public InventoryWindow InventoryWindow { get; }
     public TradeWindow TradeWindow { get; }
@@ -25,6 +26,9 @@ public class WindowManager : IUpdatable, IDrawable
     public WindowManager(GameContext gameContext)
     {
         Rectangle bounds = new Rectangle(0, 0, (int)gameContext.ScreenSize.X, (int) gameContext.ScreenSize.Y);
+        
+        GravePreparationWindow = new GravePreparationWindow(bounds);
+        GravePreparationWindow.OnCloseButton += CloseCurrentWindow;
         
         TombstoneInfoWindow = new TombstoneInfoWindow(bounds);
         TombstoneInfoWindow.OnCloseButton += CloseCurrentWindow;
@@ -38,6 +42,7 @@ public class WindowManager : IUpdatable, IDrawable
     
     public void Start()
     {
+        GravePreparationWindow.Start();
         TombstoneInfoWindow.Start();
         InventoryWindow.Start();
         TradeWindow.Start();
@@ -51,6 +56,15 @@ public class WindowManager : IUpdatable, IDrawable
     public void Draw(SpriteBatch spriteBatch)
     {
         currentWindow?.Draw(spriteBatch);
+    }
+
+    public void OpenGravePreparationWindow(GraveSite graveSite)
+    {
+        if (IsModalWindow)
+            return;
+        
+        GravePreparationWindow.SetData(graveSite);
+        currentWindow = GravePreparationWindow;
     }
     
     public void OpenTombstoneInfoWindow(GraveSite graveSite, bool hasEnoughMoney)

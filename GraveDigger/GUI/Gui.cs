@@ -124,6 +124,11 @@ public class Gui: IUpdatable, IDrawable
         gameState = state; 
     }
 
+    public void OpenGravePreparationWindow(GraveSite graveSite)
+    {
+        WindowManager.OpenGravePreparationWindow(graveSite);
+    }
+    
     public void OpenTombstoneWindow(GraveSite graveSite, bool hasEnoughMoney)
     {
         WindowManager.OpenTombstoneInfoWindow(graveSite, hasEnoughMoney);

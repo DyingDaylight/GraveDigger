@@ -105,7 +105,7 @@ public class GameplayCoordinator : IUpdatable
         switch (graveSite.Status)
         {
             case GraveSiteStatus.Locked:
-                OpenGravePurchase(graveSite);
+                OpenGravePreparation(graveSite);
                 break;
 
             case GraveSiteStatus.Prepared:
@@ -118,12 +118,9 @@ public class GameplayCoordinator : IUpdatable
         }
     }
 
-    private void OpenGravePurchase(GraveSite graveSite)
+    private void OpenGravePreparation(GraveSite graveSite)
     {
-        if (!graveSite.Prepare())
-            return;
-
-        RecalculateReputation();
+        gui.OpenGravePreparationWindow(graveSite);
     }
     
     private void OnGraveOccupied(GraveSite graveSite)
@@ -136,6 +133,14 @@ public class GameplayCoordinator : IUpdatable
     {
         bool hasEnoughMoney = inventory.HasEnoughMoney(graveSite.RepairCost);
         gui.OpenTombstoneWindow(graveSite, hasEnoughMoney);
+    }
+    
+    private void PrepareRequested(GraveSite graveSite)
+    {
+        if (!graveSite.Prepare())
+            return;
+
+        RecalculateReputation();
     }
     
     private void DigRequested(Tombstone tombstone)
@@ -322,6 +327,7 @@ public class GameplayCoordinator : IUpdatable
         level.GraveOccupied += OnGraveOccupied;
         
         // GUI -> Coordinator
+        gui.WindowManager.GravePreparationWindow.PrepareButtonPressed += PrepareRequested;
         gui.WindowManager.TombstoneInfoWindow.DigButtonPressed += DigRequested;
         gui.WindowManager.TombstoneInfoWindow.RepairButtonPressed += RepairRequested;
         
