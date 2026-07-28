@@ -1641,6 +1641,12 @@
 /processorParam:Quality=Best
 /build:Sound/Effects/coins.wav;Sound/Effects/coins
 
+#begin Sound/Effects/ding.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/Effects/ding.wav;Sound/Effects/ding
+
 #begin Sound/Effects/ghost-spawn.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -1658,6 +1664,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sound/Effects/steps.wav
+
+#begin Sound/Effects/tap.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/Effects/tap.wav;Sound/Effects/tap
 
 #begin Sound/Music/theme1.ogg
 /importer:OggImporter

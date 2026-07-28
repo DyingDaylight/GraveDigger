@@ -23,10 +23,11 @@ public class GameplayCoordinator : IUpdatable
     private readonly Gui gui;
     
     private Merchant currentMerchant;
+    private int previousReputation;
+    private bool reputationInitialized;
     
     public event Action<TradeResult> TradeCompleted;
     public event Action<string> NotificationRequested;
-
     
     public GameplayCoordinator(
         Gui gui, 
@@ -352,10 +353,31 @@ public class GameplayCoordinator : IUpdatable
         // TimeSystem -> Coordinator
         timeSystem.DayStarted += OnDayStart;
         
-        // ReputationSystem -> GUI
-        reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
+        // ReputationSystem -> Coordinator
+        reputationSystem.ReputationChanged += OnReputationChanged;
     }
 
+    private void OnReputationChanged(int value, int min, int max)
+    {
+        gui.Hud.UpdateReputation(value, min, max);
+
+        if (!reputationInitialized)
+        {
+            previousReputation = value;
+            reputationInitialized = true;
+            return;
+        }
+
+        int delta = value - previousReputation;
+        previousReputation = value;
+
+        if (delta == 0)
+            return;
+        
+        NotificationRequested?.Invoke($"Reputation {(delta > 0 ? "+" : "")}{delta}");
+        AudioManager.Instance.PlaySFX("ding");
+    }
+    
     private void OnDayStart(int day)
     {
         TryOccupyGrave();

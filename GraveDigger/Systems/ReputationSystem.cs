@@ -30,8 +30,6 @@ public class ReputationSystem
         if (newValue == Value)
             return;
 
-        Console.WriteLine($"Reputation changed: {Value} -> {newValue}");
-
         Value = newValue;
         ReputationChanged?.Invoke(Value, MinValue, MaxValue);
     }
