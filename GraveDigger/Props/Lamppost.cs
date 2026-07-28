@@ -10,7 +10,7 @@ public class Lamppost : Decoration, ILightSource
     private Texture2D light;
     private readonly Color lightColor = new(255, 160, 60);
     
-    public Vector2 LightOffset { get; set; } = new(10, -30);
+    public Vector2 LightAnchorUV { get; set; } = new(0.77f, 0.30f);
     
     public Lamppost(string name) : base(name)
     {
@@ -26,10 +26,18 @@ public class Lamppost : Decoration, ILightSource
     {
         if (!IsUnlocked)
             return;
+        
+        Vector2 offset = new(
+            LightAnchorUV.X * light.Width,
+            LightAnchorUV.Y * light.Height);
+        offset *= Transform.Scale;
 
-        spriteBatch.Draw(light,
-            new Vector2(Transform.Position.X - light.Bounds.Width * 0.5f + LightOffset.X,
-                Transform.Position.Y - light.Bounds.Height * 0.5f + LightOffset.Y),
-             lightColor);
+        if (SpriteEffect == SpriteEffects.FlipHorizontally)
+            offset.X = -offset.X;
+
+        Vector2 lightPosition = Transform.Position - new Vector2(light.Width, light.Height) * 0.5f
+            + offset;
+        
+        spriteBatch.Draw(light, lightPosition, lightColor);
     }
 }

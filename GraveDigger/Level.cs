@@ -192,7 +192,6 @@ public class Level : IUpdatable, IDrawable
         }
         
         Player.IncreaseHunger(HungerPerDay);
-        OccupyPreparedGraveSite();
         ReputationRecalculationRequested?.Invoke();
     }
 
@@ -719,7 +718,12 @@ public class Level : IUpdatable, IDrawable
         merchant.ChangeState(MerchantState.Idle);
     }
     
-    private void OccupyPreparedGraveSite()
+    public bool HasPreparedGraveSites()
+    {
+        return graveSites.Any(graveSite => graveSite.Status == GraveSiteStatus.Prepared);
+    }
+    
+    public void OccupyPreparedGraveSite()
     {
         GraveSite preparedGraveSite = GetPreparedGraveSite();
         if (preparedGraveSite == null)

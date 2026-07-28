@@ -349,7 +349,25 @@ public class GameplayCoordinator : IUpdatable
         timeSystem.DayTimeChanged += level.DayTimeChange;
         timeSystem.DayStarted += level.DayStart;
         
+        // TimeSystem -> Coordinator
+        timeSystem.DayStarted += OnDayStart;
+        
         // ReputationSystem -> GUI
         reputationSystem.ReputationChanged += gui.Hud.UpdateReputation;
+    }
+
+    private void OnDayStart(int day)
+    {
+        TryOccupyGrave();
+    }
+
+    private void TryOccupyGrave()
+    {
+        float chance = BurialChanceCalculator.Calculate(reputationSystem.Value);
+
+        if (!randomService.Chance(chance))
+            return;
+        
+        level.OccupyPreparedGraveSite();
     }
 }
