@@ -31,7 +31,6 @@ public class Prop : Sprite, IReputationContributor
     {
         return 0;
     }
-    
     // Use the sprite's bottom position to determine its draw order.
     // Objects lower on the screen are drawn in front of higher ones.
     private void UpdateSortingOrder()

@@ -7,7 +7,7 @@ using GraveDigger.Utils;
 
 namespace GraveDigger.Systems;
 
-public class LootGenerator
+public static class LootGenerator
 {
 
     private static readonly List<LootItemData> pool = new()
@@ -56,7 +56,7 @@ public class LootGenerator
     };
     
     
-    public List<ItemData> Generate(GraveSiteData graveSite, RandomService random)
+    public static List<ItemData> Generate(GraveSiteData graveSite, RandomService random)
     {
         var wealthRange = BudgetRangesByWealth[graveSite.Wealth];
         int budget = random.Next(wealthRange.Min, wealthRange.Max + 1);
@@ -105,7 +105,7 @@ public class LootGenerator
         return lootItems;
     }
 
-    public ItemData GetRandomItem(RandomService random)
+    public static ItemData GetRandomItem(RandomService random)
     {
         return random.Pick(pool);
     }

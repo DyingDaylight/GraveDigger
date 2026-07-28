@@ -17,7 +17,6 @@ public class GameplayCoordinator : IUpdatable
 {
     private readonly ReputationSystem reputationSystem;
     private readonly RandomService randomService;
-    private readonly LootGenerator lootGenerator;
     private readonly TimeSystem timeSystem;
     private readonly Inventory inventory;
     private readonly Level level;
@@ -40,7 +39,6 @@ public class GameplayCoordinator : IUpdatable
         this.timeSystem = timeSystem;
         this.randomService = randomService;
 
-        lootGenerator = new LootGenerator();
         reputationSystem = new ReputationSystem();
 
         inventory = InventoryGenerator.CreatePlayerInventory(randomService);
@@ -127,7 +125,7 @@ public class GameplayCoordinator : IUpdatable
         if (!isDug)
             return;
         
-        List<ItemData> itemsData = lootGenerator.Generate(graveSite.Tombstone.Data, randomService);
+        List<ItemData> itemsData = LootGenerator.Generate(graveSite.Tombstone.Data, randomService);
         level.SpawnLoot(itemsData, graveSite.Tombstone);
         
         gui.CloseCurrentWindow();
