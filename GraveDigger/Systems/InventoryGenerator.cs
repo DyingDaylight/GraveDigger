@@ -13,14 +13,14 @@ public static class InventoryGenerator
     {
         new FoodItemData("bread",      "Village Bread",   "Freshly baked and wonderfully filling.",      "Food1",  6, 10, 20),
         new FoodItemData("stew",       "Hearty Stew",     "A warm bowl of meat and vegetables.",          "Food2", 18, 10, 50),
-        new FoodItemData("cheese",     "Aged Cheese",     "Rich flavor with a pleasantly sharp taste.",   "Food3", 14, 10, 30),
+        new FoodItemData("cheese",     "Aged Cheese",     "Rich flavor with a pleasantly sharp taste.",   "Food3", 13, 10, 30),
         new FoodItemData("jerky",      "Dried Meat",      "Salted meat that lasts for weeks.",            "Food4", 16, 10, 40),
         new FoodItemData("apple",      "Red Apple",       "Sweet, juicy and freshly picked.",             "Food5",  5, 10, 15),
-        new FoodItemData("pie",        "Berry Pie",       "A homemade pie packed with forest berries.",   "Food6", 20, 10, 45),
+        new FoodItemData("pie",        "Berry Pie",       "A homemade pie packed with forest berries.",   "Food6", 19, 10, 45),
         new FoodItemData("milk",       "Fresh Milk",      "A bottle of creamy fresh milk.",               "Food7",  8, 10, 25),
         new FoodItemData("mushrooms",  "Roasted Mushrooms","Earthy mushrooms cooked over a fire.",        "Food8", 12, 10, 35),
         new FoodItemData("fish",       "Dried Fish",      "Simple but nourishing trail food.",            "Food9", 15, 10, 35),
-        new FoodItemData("honey",      "Jar of Honey",    "Golden honey with a naturally sweet taste.",   "Food10",22, 10, 30),
+        new FoodItemData("honey",      "Jar of Honey",    "Golden honey with a naturally sweet taste.",   "Food10",20, 10, 45),
     };
 
     private static readonly List<BlueprintItemData> blueprintsPool = new()
@@ -39,7 +39,7 @@ public static class InventoryGenerator
             "Flower Bed Blueprint",
             "A splash of color among the weathered stones.",
             "flowerbedIcon",
-            20,
+            15,
             1,
             DecorationType.FlowerBed),
 
@@ -48,7 +48,7 @@ public static class InventoryGenerator
             "Lamppost Blueprint",
             "A warm light to guide visitors after sunset.",
             "lampostIcon",
-            35,
+            20,
             1,
             DecorationType.Lamp),
 
@@ -57,7 +57,7 @@ public static class InventoryGenerator
             "Fence Blueprint",
             "A gentle boundary for all that has been entrusted to our care.",
             "fenceIcon",
-            30,
+            10,
             1,
             DecorationType.Fence),
 
@@ -66,7 +66,7 @@ public static class InventoryGenerator
             "Tree Blueprint",
             "A young tree that will watch over the cemetery for years to come.",
             "treeIcon",
-            40,
+             30,
             1,
             DecorationType.Tree),
 
@@ -75,7 +75,7 @@ public static class InventoryGenerator
             "House Upgrade Blueprint",
             "Every caretaker deserves a place that feels like home.",
             "houseIcon",
-            80,
+            45,
             1,
             DecorationType.HouseUpgrade),
         
@@ -84,7 +84,7 @@ public static class InventoryGenerator
             "Fountain Blueprint",
             "A peaceful fountain where visitors can pause, reflect, and remember.",
             "fountainIcon",
-            70,
+            40,
             1,
             DecorationType.FountainUpgrade)
     };
@@ -93,16 +93,17 @@ public static class InventoryGenerator
     {
         Inventory inventory = new Inventory();
 
-        inventory.AddMoney(50);
+        inventory.AddMoney(100);
 
-        inventory.Add(GetRandomFood(randomService));
-        inventory.Add(GetRandomFood(randomService));
-        inventory.Add(GetRandomFood(randomService));
+        inventory.Add(foodPool[0]);
 
+        /*
+        // For test only
         inventory.Add(blueprintsPool[2], 5);
         inventory.Add(blueprintsPool[1], 5);
         inventory.Add(blueprintsPool[5], 5);
         inventory.Add(blueprintsPool[6], 5);
+        */
         
         return inventory;
     }

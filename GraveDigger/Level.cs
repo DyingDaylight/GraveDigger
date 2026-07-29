@@ -21,8 +21,9 @@ namespace GraveDigger;
 
 public class Level : IUpdatable, IDrawable
 {
-    private const int MaxGhosts = 10;
-    private const int HungerPerDay = 10;
+    private const int MaxGhosts = 2;
+    private const int HungerPerDay = 15;
+    private const int InitialHunger = 20;
     private const int MapTileTypesCount = 3;
     private readonly int[,] tileMapSchema =
     {
@@ -97,6 +98,7 @@ public class Level : IUpdatable, IDrawable
         Player = CreateLevelCharacter<Player>();
         Player.Transform.Position = new Vector2(746, 3463);
         Player.SetWorldSize(gameContext.WorldSize);
+        Player.IncreaseHunger(InitialHunger);
         playerTrail.Record(Player.Transform.Position);
 
         foreach (IUpdatable updatable in updatables)
@@ -206,9 +208,12 @@ public class Level : IUpdatable, IDrawable
         switch (enemyType)
         {
             case EnemyType.Ghost:
-                CreateGhost(graveSite.Transform.Position);
-                AudioManager.Instance.PlaySFX("ghost-spawn");
-                ReputationRecalculationRequested?.Invoke();
+                bool isCreated = CreateGhost(graveSite.Transform.Position);
+                if (isCreated)
+                {
+                    AudioManager.Instance.PlaySFX("ghost-spawn");
+                    ReputationRecalculationRequested?.Invoke();
+                }
                 break;
         }
     }
@@ -413,15 +418,16 @@ public class Level : IUpdatable, IDrawable
         ItemPickupRequested?.Invoke(pickable);
     }
 
-    private void CreateGhost(Vector2 position)
+    private bool CreateGhost(Vector2 position)
     {
         if (ghosts.Count >= MaxGhosts)
-            return;
+            return false;
         
         Ghost ghost = CreateLevelCharacter<Ghost>();
         ghost.Transform.Position = position;
         ghost.Transform.Scale = new Vector2(0.6f, 0.6f);
         ghosts.Add(ghost);
+        return true;
     }
 
     private void CreateMerchant()
@@ -698,7 +704,7 @@ public class Level : IUpdatable, IDrawable
     
     private void CreateOccupiedGraveSite(string name, Vector2 position)
     {
-        GraveState randomState = gameContext.RandomService.RandomEnum<GraveState>();
+        GraveState randomState = GraveSiteGenerator.GetRandomState(gameContext.RandomService);
 
         GraveSite graveSite = CreateGraveSite(GraveSiteStatus.Occupied,name, name, position, randomState);
 

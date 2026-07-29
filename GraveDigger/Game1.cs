@@ -14,8 +14,8 @@ namespace GraveDigger;
 
 public class Game1 : Game
 {
-    private const int DayDuration = 20;
-    private const int NightDuration = 20;
+    private const int DayDuration = 30;
+    private const int NightDuration = 30;
     private static readonly Vector2 WorldSize = new(4480, 3840);
     
     private readonly GraphicsDeviceManager graphics;

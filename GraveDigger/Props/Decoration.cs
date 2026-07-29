@@ -86,12 +86,24 @@ public class Decoration : Prop, IInteractionOwner
     
     public override int GetReputationValue()
     {
-        // TODO: depend on decoration type?
-        if (IsUnlocked)
+        if (!IsUnlocked)
+            return 0;
+        
+        switch (DecorationType)
         {
-            return 10;    
+            case DecorationType.Fence:
+                return 1;
+            case DecorationType.FlowerBed:
+                return 2;
+            case DecorationType.Lamp:
+                return 3;
+            case DecorationType.Bench:
+                return 4;
+            case DecorationType.Tree:
+                return 5;
         }
-        return 0;
+
+        return base.GetReputationValue();
     }
     
     public void SetHighlighted(bool highlighted)

@@ -64,4 +64,20 @@ public class RandomService
 
         throw new InvalidOperationException();
     }
+    
+    public T PickWeightedItem<T>(IReadOnlyList<WeightedItem<T>> items)
+    {
+        int totalWeight = items.Sum(item => item.Weight);
+        int roll = Next(0, totalWeight);
+
+        foreach (WeightedItem<T> item in items)
+        {
+            if (roll < item.Weight)
+                return item.Value;
+
+            roll -= item.Weight;
+        }
+
+        throw new InvalidOperationException();
+    }
 }

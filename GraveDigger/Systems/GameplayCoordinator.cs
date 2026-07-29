@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraveDigger.Characters;
+using GraveDigger.Data;
 using GraveDigger.Enemies;
 using GraveDigger.GraveSites;
 using GraveDigger.Items;
@@ -128,6 +129,7 @@ public class GameplayCoordinator : IUpdatable
     
     private void OnGraveOccupied(GraveSite graveSite)
     {
+        inventory.AddMoney(GraveSiteGenerator.GetRewardForBurial(graveSite.Tombstone.Data.Wealth));
         RecalculateReputation();
         NotificationRequested?.Invoke("A new burial has arrived.");
     }

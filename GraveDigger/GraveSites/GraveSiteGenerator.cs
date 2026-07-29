@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GraveDigger.Props;
 using GraveDigger.Utils;
 
 namespace GraveDigger.Data;
@@ -147,9 +148,34 @@ public class GraveSiteGenerator
         [Personality.Cruel]      = [5, 15, 35, 45]
     };
     
+    private static readonly List<WeightedItem<GraveState>> InitialStateProbability =
+    [
+        new(GraveState.Intact, 60),
+        new(GraveState.Broken, 30),
+        new(GraveState.DugOut, 10)
+    ];
+
+    private static readonly Dictionary<Wealth, int> PaymentForBurial = new()
+    {
+        [Wealth.Poor] = 25,
+        [Wealth.Average] = 35,
+        [Wealth.Rich] = 45,
+        [Wealth.Wealthy] = 55,
+    };
+    
+    public static int GetRewardForBurial(Wealth wealth)
+    {
+        return PaymentForBurial[wealth];
+    }
+    
     public static string GetRandomTombstoneSprite(RandomService randomService)
     {
         return randomService.Pick(tombstoneSprites);
+    }
+
+    public static GraveState GetRandomState(RandomService randomService)
+    {
+        return randomService.PickWeightedItem(InitialStateProbability);
     }
     
     public static GraveSiteData Generate(RandomService randomService)
