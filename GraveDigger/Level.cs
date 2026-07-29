@@ -26,15 +26,10 @@ public class Level : IUpdatable, IDrawable
     private const int MapTileTypesCount = 3;
     private readonly int[,] tileMapSchema =
     {
-        { 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2 },
-        { 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2 },
-        { 1, 2, 2, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 1, 1 },
-        { 1, 2, 2, 2, 0, 2, 2, 1, 0, 0, 0, 0, 0, 1, 1 },
-        { 1, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1, 2, 2, 2, 2 },
-        { 1, 2, 0, 2, 1, 2, 2, 1, 0, 0, 0, 1, 0, 0, 0 },
-        { 0, 2, 2, 2, 0, 2, 2, 1, 0, 0, 0, 0, 1, 0, 0 },
-        { 0, 1, 2, 2, 2, 2, 2, 1, 0, 0, 0, 2, 0, 1, 1 },
-        { 0, 2, 2, 2, 0, 2, 2, 1, 1, 1, 1, 0, 0, 0, 2 },
+        { 1, 0, 0, 1, 1, },
+        { 0, 2, 2, 0, 0, },
+        { 0, 2, 2, 0, 0, },
+        { 1, 2, 2, 1, 1, },
     };
     
     private readonly List<Prop> props = new();
@@ -94,15 +89,13 @@ public class Level : IUpdatable, IDrawable
     { 
         CreateMap();
         CreateProps();
-        CreateOccupiedGraveSites();
-        CreateLockedGraveSites();
+        CreateGraveSites();
         CreateDecorations();
         
         CreateMerchant();
         
         Player = CreateLevelCharacter<Player>();
-        Player.Transform.Position = new Vector2(gameContext.ScreenSize.X * 0.5f, 
-            gameContext.ScreenSize.Y * 0.5f);
+        Player.Transform.Position = new Vector2(746, 3463);
         Player.SetWorldSize(gameContext.WorldSize);
         playerTrail.Record(Player.Transform.Position);
 
@@ -300,6 +293,41 @@ public class Level : IUpdatable, IDrawable
     {
         map.TileMap = tileMapSchema;
         map.Start();
+
+        Vector2[] roadTiles =
+        {
+            // height - 294
+            // From House Up
+            new Vector2(1133, 3717),
+            new Vector2(1133, 3423),
+            new Vector2(1133, 3129),
+            new Vector2(1133, 2835),
+
+            // House <--> Merchant
+            new Vector2(1413, 2835),
+
+            // From Merchant Up
+            new Vector2(3093, 3717),
+            new Vector2(3093, 3423),
+            new Vector2(3093, 3129),
+            new Vector2(3093, 2835),
+            
+            // Center Up
+            new Vector2(2093, 2870),
+            new Vector2(2093, 2576),
+            new Vector2(2093, 2282),
+            new Vector2(2093, 1988),
+            new Vector2(2093, 1694),
+        };
+        
+
+        foreach (Vector2 roadTile in roadTiles)
+        {
+            Prop road = CreateLevelObject(PropFactory, $"road{gameContext.RandomService.Next(1,4)}", roadTile);
+            road.Transform.Scale = new Vector2(1f, 1f);
+            road.Mode = SortingMode.Fixed;
+            road.CastShadow = false;
+        }
     }
 
     private T CreateLevelCharacter<T>() where T : new()
@@ -344,6 +372,8 @@ public class Level : IUpdatable, IDrawable
                 prop.Transform.Scale = new Vector2(0.3f, 0.3f);
                 break;
         }
+        if (prop is Decoration decoration)
+            InteractionSystem.RegisterInteraction(decoration.HintInteraction);
         RegisterObject(prop);
         props.Add(prop);
         return prop;
@@ -400,7 +430,7 @@ public class Level : IUpdatable, IDrawable
         merchant.SetOffMapPosition(new Vector2(
             gameContext.WorldSize.X + merchant.Width,
             gameContext.WorldSize.Y + merchant.Height));
-        merchant.SetOnMapPosition(new Vector2(1920, 1080));
+        merchant.SetOnMapPosition(new Vector2(3859, 3549));
         
         TraderInteraction interaction = new TraderInteraction(merchant);
         interaction.OnTradeRequested += ShowMarket;
@@ -413,10 +443,13 @@ public class Level : IUpdatable, IDrawable
     
     private void CreateProps()
     {
-        CreateLevelObject(PropFactory,"crypt",  new Vector2(1300, 350));
+        CreateLevelObject(PropFactory,"crypt",  new Vector2(337, 1900));
         CreateLevelObject(PropFactory,"dirt",  new Vector2(500, 800));
-        CreateLevelObject(PropFactory,"spade",  new Vector2(1300, 820));
-        CreateLevelObject(PropFactory,"angel",  new Vector2(1600, 250));
+        Prop spade = CreateLevelObject(PropFactory,"spade",  new Vector2(550, 800));
+        spade.Transform.Scale = new Vector2(0.16f, 0.16f);
+        Prop angel = CreateLevelObject(PropFactory,"angel",  new Vector2(4194, 2061));
+        angel.Transform.Scale = new Vector2(0.6f, 0.6f);
+        angel.SpriteEffect = SpriteEffects.FlipHorizontally;
     }
     
     private void CreateDecorations()
@@ -426,12 +459,22 @@ public class Level : IUpdatable, IDrawable
         CreateLamps();
         CreateFences();
         CreateBenches();
+        CreateFountain();
         CreateFlowerbeds();
+    }
+
+    private void CreateFountain()
+    {
+        UpgradableDecoration fountain = CreateLevelObject(UpgradableDecorationFactory, "Fountain", new Vector2(2074, 1636));
+        fountain.DecorationType = DecorationType.FountainUpgrade;
+        fountain.Transform.Scale = new Vector2(1f, 1f);
+        fountain.Pivot = new Vector2(0.5f, 1f);
+        //fountain.ShadowOffsetY = -60;
     }
 
     private void CreateHouse()
     {
-        DiggerHouse house = CreateLevelObject(HouseFactory, "", new Vector2(1260, 1080));
+        UpgradableDecoration house = CreateLevelObject(UpgradableDecorationFactory, "House", new Vector2(470, 3560));
         house.DecorationType = DecorationType.HouseUpgrade;
         house.Transform.Scale = new Vector2(1f, 1f);
         house.Pivot = new Vector2(0.5f, 1f);
@@ -442,9 +485,19 @@ public class Level : IUpdatable, IDrawable
     {
         Vector2[] positions =
         {
-            new Vector2(1600, 700),
-            new Vector2(800, 800),
-            new Vector2(1500, 1700),
+            // House
+            new Vector2(69, 3340),
+            
+            // Crypt
+            new Vector2(86, 1925),
+            new Vector2(720, 2425),
+            
+            // Angel
+            new Vector2(4279, 1241),
+            
+            // Top
+            new Vector2(259, 420),
+            new Vector2(4362, 772),
         };
         foreach (Vector2 position in positions)
         {
@@ -455,32 +508,77 @@ public class Level : IUpdatable, IDrawable
 
     private void CreateLamps()
     {
-        CreateLamp(new Vector2(890, 130), false);
-        CreateLamp(new Vector2(1030, 380), true);
-        CreateLamp(new Vector2(890, 690), false);
-        CreateLamp(new Vector2(1030, 940), true);
+        // Entrance
+        CreateLamp(new Vector2(2278, 3059), false, true);
+        CreateLamp(new Vector2(1911, 3059), true);
+        
+        // House
+        CreateLamp(new Vector2(875, 3209), false);
+        
+        // Merchant
+        CreateLamp(new Vector2(3439, 3230), false);
+        CreateLamp(new Vector2(4287, 3230), true, true);
+        
+        // Fountain
+        CreateLamp(new Vector2(1561, 1246), false);
+        CreateLamp(new Vector2(1561, 1812), false);
+        CreateLamp(new Vector2(2650, 1246), true);
+        CreateLamp(new Vector2(2650, 1812), true);
     }
     
-    private void CreateLamp(Vector2 position, bool flip)
+    private void CreateLamp(Vector2 position, bool flip, bool IsUnlocked = false)
     {
         Decoration lamp = CreateLevelObject(LamppostFactory,"lampost", position);
         lamp.SpriteEffect = flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
         lamp.DecorationType = DecorationType.Lamp;
+        if (IsUnlocked)
+            lamp.ApplyBlueprint();
     }
     
     private void CreateFences()
     {
+        // 170
         Vector2[] positions =
         {
-            new Vector2(1500, 1600),
-            new Vector2(1500, 1500),
-            new Vector2(1500, 1700),
+            // House
+            new Vector2(85, 3074),
+            new Vector2(265, 3074),
+            new Vector2(440, 3074),
+            new Vector2(625, 3074),
+            new Vector2(800, 3074),
+            
+            // Merchant
+            new Vector2(3385, 3074),
+            new Vector2(3565, 3074),
+            new Vector2(3740, 3074),
+            new Vector2(3925, 3074),
+            new Vector2(4100, 3074),
+            new Vector2(4280, 3074),
+            new Vector2(4460, 3074),
+            
+            // Above House
+            new Vector2(85, 1000),
+            new Vector2(265, 1000),
+            new Vector2(440, 1000),
+            new Vector2(625, 1000),
+            new Vector2(800, 1000),
+            
+            // Above Merchant
+            new Vector2(3385, 1000),
+            new Vector2(3565, 1000),
+            new Vector2(3740, 1000),
+            new Vector2(3925, 1000),
+            new Vector2(4100, 1000),
+            new Vector2(4280, 1000),
+            new Vector2(4460, 1000),
         };
         foreach (Vector2 position in positions)
         {
             Decoration fence = CreateLevelObject(DecorationFactory,"fence", position);
             fence.Transform.Scale = new Vector2(0.8f, 0.8f);
             fence.DecorationType = DecorationType.Fence;
+            if (gameContext.RandomService.Chance(0.15f))
+                fence.ApplyBlueprint();
         }
     }
     
@@ -488,55 +586,111 @@ public class Level : IUpdatable, IDrawable
     {
         Vector2[] positions =
         {
-            new Vector2(1700, 1600),
-            new Vector2(1700, 1500),
-            new Vector2(1700, 1700),
+            // Entrance
+            new Vector2(2106, 3530),
+            
+            // House
+            new Vector2(281, 3583),
+            new Vector2(641, 3583),
+            
+            // Merchant
+            new Vector2(3438, 3725),
+            new Vector2(4267, 3725),
+            
+            // Main
+            new Vector2(1816, 2513),
+            new Vector2(1816, 2019),
+            new Vector2(2335, 2513),
+            new Vector2(2335, 2019),
+            
+            // Crypt
+            new Vector2(364, 1364),
+            new Vector2(625, 2033),
+            new Vector2(357, 2551),
+            
+            // Angel
+            new Vector2(3947, 2154),
+            new Vector2(4322, 2356),
+            new Vector2(3666, 1228),
         };
+        
         foreach (Vector2 position in positions)
         {
             Decoration flowerbed = CreateLevelObject(DecorationFactory,"flowerbed1", position);
             flowerbed.Transform.Scale = new Vector2(0.6f, 0.6f);
             flowerbed.DecorationType = DecorationType.FlowerBed;
+            if (gameContext.RandomService.Chance(0.05f))
+                flowerbed.ApplyBlueprint();
         }
     }
 
     private void CreateBenches()
     {
-        CreateBench(new Vector2(2000, 500));
-        CreateBench(new Vector2(1300, 350));
-        CreateBench(new Vector2(2400, 1000));
+        // Entrance
+        CreateBench(new Vector2(1606, 3154), true);
+        CreateBench(new Vector2(2615, 3154));
+        
+        // Merchant
+        CreateBench(new Vector2(3875, 3292));
+        
+        // Crypy
+        CreateBench(new Vector2(1020, 2002));
+        
+        // Angel
+        CreateBench(new Vector2(3570, 2161), true);
+        
+        // Fountain
+        CreateBench(new Vector2(2082, 1037));
     }
 
-    private void CreateBench(Vector2 position)
+    private void CreateBench(Vector2 position, bool isUnlocked = false)
     {
         Decoration bench = CreateLevelObject(DecorationFactory,"bench", position);
         bench.Transform.Scale = new Vector2(1f, 1f);
         bench.DecorationType = DecorationType.Bench;
+        if (isUnlocked)
+            bench.ApplyBlueprint();
     }
     
-    private void CreateOccupiedGraveSites()
+    private void CreateGraveSites()
     {
+        // Above crypt
         CreateOccupiedGraveSite("tombstone5", new Vector2(200, 1500));
         CreateOccupiedGraveSite("tombstone1", new Vector2(550, 1500));
         CreateOccupiedGraveSite("tombstone2", new Vector2(900, 1500));
-    
-        CreateOccupiedGraveSite("tombstone1", new Vector2(200, 600));
-        CreateOccupiedGraveSite("tombstone4", new Vector2(550, 600));
-        CreateOccupiedGraveSite("tombstone5", new Vector2(900, 600));
-    
-        CreateOccupiedGraveSite("tombstone6", new Vector2(200, 1000));
-        CreateOccupiedGraveSite("tombstone3", new Vector2(550, 1000));
-    
-        CreateOccupiedGraveSite("tombstone2", new Vector2(200, 350));
-        CreateOccupiedGraveSite("tombstone6", new Vector2(550, 350));
-        CreateOccupiedGraveSite("tombstone1", new Vector2(900, 350));
+        CreateLockedGraveSite(new Vector2(1250, 1500));    
+        
+        // Above house
+        CreateOccupiedGraveSite("tombstone2", new Vector2(200, 2800));
+        CreateOccupiedGraveSite("tombstone6", new Vector2(550, 2800));
+        CreateOccupiedGraveSite("tombstone1", new Vector2(900, 2800));
+        
+        // Above Merchant
+        CreateOccupiedGraveSite("tombstone1", new Vector2(3400, 2800));
+        CreateOccupiedGraveSite("tombstone4", new Vector2(3700, 2800));
+        CreateOccupiedGraveSite("tombstone5", new Vector2(4000, 2800));
+        CreateOccupiedGraveSite("tombstone7", new Vector2(4300, 2800));
+        
+        // Above Angel
+        CreateOccupiedGraveSite("tombstone8", new Vector2(3400, 1655));
+        CreateOccupiedGraveSite("tombstone1", new Vector2(3700, 1655));
+        CreateOccupiedGraveSite("tombstone3", new Vector2(4000, 1655));
+        CreateOccupiedGraveSite("tombstone2", new Vector2(4300, 1655));
+        
+        // Top
+        CreateOccupiedGraveSite("tombstone6", new Vector2(1578, 755));
+        CreateOccupiedGraveSite("tombstone3", new Vector2(2646, 755));
+        
+        CreateLockedGraveSite(new Vector2(4098, 400)); 
+        CreateLockedGraveSite(new Vector2(3598, 400)); 
+        CreateLockedGraveSite(new Vector2(3098, 400)); 
+        CreateLockedGraveSite(new Vector2(2598, 400)); 
+        CreateLockedGraveSite(new Vector2(2098, 400));   
+        CreateLockedGraveSite(new Vector2(1598, 400));   
+        CreateLockedGraveSite(new Vector2(1098, 400));   
+        CreateLockedGraveSite(new Vector2(598, 400));   
     }
-
-    private void CreateLockedGraveSites()
-    {
-        CreateLockedGraveSite(new Vector2(1900, 450));    
-    }
-
+    
     private void CreateLockedGraveSite(Vector2 position)
     {
         GraveSite graveSite = CreateGraveSite(GraveSiteStatus.Locked, "sign", "grave_locked", position);
@@ -607,9 +761,9 @@ public class Level : IUpdatable, IDrawable
         return new Lamppost(spriteName);
     }
     
-    private DiggerHouse HouseFactory(string spriteName)
+    private UpgradableDecoration UpgradableDecorationFactory(string spriteName)
     {
-        return new DiggerHouse();
+        return new UpgradableDecoration(spriteName);
     }
 
     private Tombstone TombstoneFactory(string spriteName)
@@ -628,6 +782,10 @@ public class Level : IUpdatable, IDrawable
         {
             SpriteManager.AddSprite($"ground{i}", $"Images/Environment_New/earth_tile{i}");
         }
+        SpriteManager.AddSprite($"road", $"Images/Environment_New/road");
+        SpriteManager.AddSprite($"road1", $"Images/Environment_New/road1");
+        SpriteManager.AddSprite($"road2", $"Images/Environment_New/road2");
+        SpriteManager.AddSprite($"road3", $"Images/Environment_New/road3");
     }
 
     private void LoadPropTextures()
@@ -649,6 +807,10 @@ public class Level : IUpdatable, IDrawable
         SpriteManager.AddSprite("House1", "Images/Props/House1");
         SpriteManager.AddSprite("House2", "Images/Props/House2");
         SpriteManager.AddSprite("House3", "Images/Props/House3");
+        SpriteManager.AddSprite("Fountain1", "Images/Props/Fountain1");
+        SpriteManager.AddSprite("Fountain2", "Images/Props/Fountain2");
+        SpriteManager.AddSprite("Fountain3", "Images/Props/Fountain3");
+        SpriteManager.AddSprite("DecorPlaceholder", "Images/Props/DecorPlaceholder");
     }
     
     private void LoadTombstoneTextures()
@@ -660,6 +822,7 @@ public class Level : IUpdatable, IDrawable
         SpriteManager.AddSprite("tombstone5", "Images/Props/Tombstone5");
         SpriteManager.AddSprite("tombstone6", "Images/Props/Tombstone6");
         SpriteManager.AddSprite("tombstone7", "Images/Props/Tombstone7");
+        SpriteManager.AddSprite("tombstone8", "Images/Props/Tombstone8");
         SpriteManager.AddSprite("tombstone9", "Images/Props/Tombstone9");
         SpriteManager.AddSprite("sign", "Images/Props/Sign");
 
@@ -697,6 +860,7 @@ public class Level : IUpdatable, IDrawable
         SpriteManager.AddSprite("fenceIcon", "Images/Props/FenceIcon");
         SpriteManager.AddSprite("lampostIcon", "Images/Props/LampostIcon");
         SpriteManager.AddSprite("houseIcon", "Images/Props/HouseIcon");
+        SpriteManager.AddSprite("fountainIcon", "Images/Props/FountainIcon");
     }
     
     private void LoadCharacterTextures()

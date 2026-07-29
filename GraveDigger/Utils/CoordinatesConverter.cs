@@ -22,4 +22,9 @@ public class CoordinatesConverter
         Matrix inverseViewMatrix = Matrix.Invert(camera.TransformMatrix);
         return Vector2.Transform(screenPosition, inverseViewMatrix);
     }
+
+    public Vector2 ScreenToWorld(Point screenPosition)
+    {
+        return ScreenToWorld(new Vector2(screenPosition.X, screenPosition.Y));
+    }
 }

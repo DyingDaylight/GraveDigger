@@ -1,19 +1,18 @@
 ﻿namespace GraveDigger.Props;
 
-public class DiggerHouse : Decoration
+public class UpgradableDecoration : Decoration
 {
     private const int ReputationMultiplier = 10;
-    private static readonly string[] HouseSprites =
-    {
-        "House1", "House2", "House3"
-    };
 
     private int upgradeLevel;
+    private int maxUpgrades = 3;
+    private string spriteName;
     
-    public override bool IsFullyUpgraded => upgradeLevel >= HouseSprites.Length - 1;
+    public override bool IsFullyUpgraded => upgradeLevel >= maxUpgrades - 1;
     
-    public DiggerHouse() : base(HouseSprites[0])
+    public UpgradableDecoration(string name) : base($"{name}1")
     {
+        spriteName = name;
         upgradeLevel = 0;
         IsUnlocked = true;
     }
@@ -24,7 +23,7 @@ public class DiggerHouse : Decoration
             return false;
         
         upgradeLevel++;
-        ChangeSprite(HouseSprites[upgradeLevel]);
+        ChangeSprite($"{spriteName}{upgradeLevel + 1}");
         return true;
     }
 

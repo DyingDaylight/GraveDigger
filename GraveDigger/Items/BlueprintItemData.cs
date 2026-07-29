@@ -10,6 +10,7 @@ public class BlueprintItemData : ItemData
     {
         DecorationType.FlowerBed => "Flower Bed",
         DecorationType.HouseUpgrade => "House Upgrade",
+        DecorationType.FountainUpgrade => "Fountain Upgrade",
         _ => DecorationType.ToString()
     };
     

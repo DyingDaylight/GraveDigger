@@ -14,6 +14,7 @@ public class GraveSiteGenerator
         "tombstone5",
         "tombstone6",
         "tombstone7",
+        "tombstone8",
         "tombstone9"
     };
     

@@ -7,5 +7,6 @@ public enum DecorationType
     Lamp,
     Fence,
     Tree,
-    HouseUpgrade
+    HouseUpgrade,
+    FountainUpgrade,
 }

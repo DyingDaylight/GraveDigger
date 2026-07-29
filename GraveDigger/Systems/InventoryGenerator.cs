@@ -77,7 +77,16 @@ public static class InventoryGenerator
             "houseIcon",
             80,
             1,
-            DecorationType.HouseUpgrade)
+            DecorationType.HouseUpgrade),
+        
+        new BlueprintItemData(
+            "fountain_upgrade_blueprint",
+            "Fountain Blueprint",
+            "A peaceful fountain where visitors can pause, reflect, and remember.",
+            "fountainIcon",
+            70,
+            1,
+            DecorationType.FountainUpgrade)
     };
     
     public static Inventory CreatePlayerInventory(RandomService randomService)
@@ -93,6 +102,7 @@ public static class InventoryGenerator
         inventory.Add(blueprintsPool[2], 5);
         inventory.Add(blueprintsPool[1], 5);
         inventory.Add(blueprintsPool[5], 5);
+        inventory.Add(blueprintsPool[6], 5);
         
         return inventory;
     }

@@ -1,17 +1,39 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using GraveDigger.Interactions;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace GraveDigger.Props;
 
-public class Decoration : Prop
+public class Decoration : Prop, IInteractionOwner
 {
+    private const string PlaceholderName = "DecorPlaceholder";
+    private readonly string spriteName;
+    private readonly Prop placeholder;
+    
     public DecorationType DecorationType { get; set; }
     
     public bool IsUnlocked { get; protected set; }
     public virtual bool IsFullyUpgraded => true;
     public bool CanApplyBlueprint => !IsUnlocked || !IsFullyUpgraded;
-
+    
+    public HintInteraction HintInteraction { get; private set; }
+    public Rectangle InteractionArea {
+        get
+        {
+            if (IsUnlocked)
+                return Rectangle.Empty;
+            return placeholder.DestRectangle;
+        }
+    }
+    
     public Decoration(string name) : base(name)
     {
+        spriteName = name;
+        placeholder = new Prop(PlaceholderName);
+        placeholder.Transform.Scale = new Vector2(0.3f, 0.3f);
+        placeholder.Opacity = 0.3f;
+        
+        HintInteraction = new HintInteraction(this);
     }
 
     public bool ApplyBlueprint()
@@ -31,6 +53,7 @@ public class Decoration : Prop
             return false;
         
         IsUnlocked = true;
+        ChangeSprite(spriteName);
         return true;
     }
 
@@ -39,11 +62,25 @@ public class Decoration : Prop
         return false;
     }
 
+    public override void Update(GameTime gameTime)
+    {
+        if (!IsUnlocked)
+        {
+            placeholder.Transform.Position = Transform.Position;
+            placeholder.Update(gameTime);
+            return;
+        }
+        base.Update(gameTime);
+    }
+
     public override void Draw(SpriteBatch spriteBatch)
     {
         if (!IsUnlocked)
+        {
+            placeholder.Draw(spriteBatch);
             return;
-        
+        }
+
         base.Draw(spriteBatch);
     }
     
@@ -55,5 +92,10 @@ public class Decoration : Prop
             return 10;    
         }
         return 0;
+    }
+    
+    public void SetHighlighted(bool highlighted)
+    {
+        // do not highlight
     }
 }
