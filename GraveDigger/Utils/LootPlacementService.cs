@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
@@ -6,37 +7,39 @@ namespace GraveDigger.Utils;
 
 public class LootPlacementService
 {
-    private const int SearchWidth = 360;
-    private const int SearchHeight = 220;
-    private const int StartOffsetY = 30;
+    public readonly record struct LootPlacement(
+        Vector2 Position,
+        Rectangle Bounds
+    );
     
-    public static Vector2? FindFreePosition(Vector2 origin, Point itemSize, 
-        IReadOnlyList<Rectangle> occupiedAreas, int padding = 10)
+    private const int SearchWidth = 700;
+    private const int SearchHeight = 700;
+    private const int SearchStep = 20;
+    private const int StartOffsetY = 30;
+
+    public static LootPlacement? FindFreePosition(
+        Vector2 origin,
+        Point itemSize,
+        IReadOnlyList<Rectangle> occupiedAreas,
+        int padding = 10)
     {
-        int stepX = itemSize.X + padding;
-        int stepY = itemSize.Y + padding;
-
         int maxOffsetX = SearchWidth / 2;
-        int maxOffsetY = SearchHeight;
+        int startOffsetY = itemSize.Y / 2 + padding;
 
-        for (int offsetY = StartOffsetY; offsetY <= maxOffsetY; offsetY += stepY)
+        for (int offsetY = startOffsetY;
+             offsetY <= SearchHeight;
+             offsetY += SearchStep)
         {
-            foreach (int offsetX in GetHorizontalOffsets(maxOffsetX, stepX))
+            foreach (int offsetX in GetHorizontalOffsets(maxOffsetX, SearchStep))
             {
                 Vector2 position = origin + new Vector2(offsetX, offsetY);
-
-                Rectangle candidateBounds = CreateBounds(
-                    position,
-                    itemSize,
-                    padding
-                );
+                Rectangle bounds = CreateBounds(position, itemSize, padding);
 
                 bool isOccupied = occupiedAreas.Any(
-                    area => candidateBounds.Intersects(area)
-                );
+                    area => bounds.Intersects(area));
 
                 if (!isOccupied)
-                    return position;
+                    return new LootPlacement(position, bounds);
             }
         }
 

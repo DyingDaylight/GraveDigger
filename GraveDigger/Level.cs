@@ -388,18 +388,18 @@ public class Level : IUpdatable, IDrawable
             itemPickUp.DestRectangle.Width,
             itemPickUp.DestRectangle.Height
         );
+        
+        LootPlacementService.LootPlacement? placement =
+            LootPlacementService.FindFreePosition(origin, itemSize, occupiedAreas);
 
-        Vector2? position = LootPlacementService.FindFreePosition(origin, itemSize, occupiedAreas);
-
-        Console.WriteLine($"Loot position found: {position.HasValue}");
-        if (!position.HasValue)
+        if (!placement.HasValue)
         {
             RemovePickup(itemPickUp);
             return null;
         }
-        
-        itemPickUp.Transform.Position = position.Value;
-        occupiedAreas.Add(itemPickUp.GetDestRectangle(itemPickUp.SourceRectangle));
+
+        itemPickUp.Transform.Position = placement.Value.Position;
+        occupiedAreas.Add(placement.Value.Bounds);
         
         PickUpInteraction interaction = new PickUpInteraction(itemPickUp);
         interaction.OnItemPickedUp += PickUpItem;

@@ -222,5 +222,4 @@ public class GraveSiteGenerator
 
         return (Wealth)(weights.Length - 1);
     }
-    
 }
