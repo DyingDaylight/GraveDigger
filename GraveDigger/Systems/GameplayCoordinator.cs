@@ -17,6 +17,7 @@ namespace GraveDigger.Systems;
 public class GameplayCoordinator : IUpdatable
 {
     private readonly ReputationSystem reputationSystem;
+    private readonly GraveDecaySystem decaySystem;
     private readonly RandomService randomService;
     private readonly TimeSystem timeSystem;
     private readonly Inventory inventory;
@@ -43,6 +44,7 @@ public class GameplayCoordinator : IUpdatable
         this.timeSystem = timeSystem;
         this.randomService = randomService;
 
+        decaySystem = new GraveDecaySystem(randomService);
         reputationSystem = new ReputationSystem();
 
         inventory = InventoryGenerator.CreatePlayerInventory(randomService);
@@ -176,7 +178,10 @@ public class GameplayCoordinator : IUpdatable
         EnemyType enemyType = UndeadGenerator.Generate(graveSite.Tombstone.Data, randomService, 
             timeSystem.CurrentDayTime == DayTime.Night);
         if (enemyType != EnemyType.None)
+        {
             level.SpawnUndead(enemyType, graveSite);
+        }
+
     }
 
     private void RepairGrave(GraveSite graveSite)
@@ -395,6 +400,7 @@ public class GameplayCoordinator : IUpdatable
     
     private void OnDayStart(int day)
     {
+        decaySystem.DecayGraves(level.GraveSites);
         TryOccupyGrave();
     }
 

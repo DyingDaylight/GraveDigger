@@ -6,14 +6,10 @@ using Interfaces;
 
 namespace GraveDigger.GraveSites;
 
-public class GraveSite : IDailyUpdatable
+public class GraveSite
 {
     private const int BaseRepairCost = 10;
     private const int AdditionalDugOutRepairCost = 5;
-    
-    private int daysSinceConditionChange = 0;
-
-    public int DecayInterval { get; set; }
     
     public Transform Transform { get; } = new Transform();
     
@@ -39,7 +35,6 @@ public class GraveSite : IDailyUpdatable
                 return;
 
             field = value;
-            daysSinceConditionChange = 0;
             UpdateVisuals();
         }
     } = GraveState.Intact;
@@ -85,7 +80,6 @@ public class GraveSite : IDailyUpdatable
             return false;
         
         State = GraveState.DugOut;
-        UpdateVisuals();
         return true;
     }
 
@@ -98,7 +92,18 @@ public class GraveSite : IDailyUpdatable
             return false;
         
         State = GraveState.Intact;
-        UpdateVisuals();
+        return true;
+    }
+    
+    public bool DecreaseCondition()
+    {
+        if (Status != GraveSiteStatus.Occupied)
+            return false;
+
+        if (State != GraveState.Intact)
+            return false;
+
+        State = GraveState.Broken;
         return true;
     }
     
@@ -145,31 +150,6 @@ public class GraveSite : IDailyUpdatable
         DirtPile?.Visible = State == GraveState.DugOut;
         UpdateVisuals();
     }
-
-    public void AdvanceDay(int day)
-    {
-        if (Status != GraveSiteStatus.Occupied)
-            return;
-        
-        if (DecayInterval <= 0)
-            return;
-        
-        daysSinceConditionChange++;
-
-        if (daysSinceConditionChange < DecayInterval)
-            return;
-
-        daysSinceConditionChange = 0;
-        DecreaseCondition();
-        UpdateVisuals();
-    }
-    
-
-    private void DecreaseCondition()
-    {
-        if (State == GraveState.Intact)
-            State = GraveState.Broken;
-    }
     
     private void UpdateVisuals()
     {
@@ -206,6 +186,5 @@ public class GraveSite : IDailyUpdatable
                 State == GraveState.DugOut;
         }
         
-        // TODO: Apply tombstone
     }
 }

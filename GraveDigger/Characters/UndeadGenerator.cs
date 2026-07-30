@@ -7,28 +7,30 @@ namespace GraveDigger.Enemies;
 
 public class UndeadGenerator
 {
-    private static readonly Dictionary<Personality, int> GhostChances = new()
+    private static readonly Dictionary<Personality, float> GhostDayChances = new()
     {
-        [Personality.Peaceful]   = 1,
-        [Personality.Mysterious] = 2,
-        [Personality.Restless]   = 3,
-        [Personality.Greedy]     = 6,
-        [Personality.Bitter]     = 8,
-        [Personality.Cruel]      = 12
+        [Personality.Peaceful]   = 0,
+        [Personality.Mysterious] = 0.01f,
+        [Personality.Restless]   = 0.05f,
+        [Personality.Greedy]     = 0.10f,
+        [Personality.Bitter]     = 0.15f,
+        [Personality.Cruel]      = 0.20f
+    };
+    
+    private static readonly Dictionary<Personality, float> GhostNightChances = new()
+    {
+        [Personality.Peaceful]   = 0.01f,
+        [Personality.Mysterious] = 0.04f,
+        [Personality.Restless]   = 0.1f,
+        [Personality.Greedy]     = 0.15f,
+        [Personality.Bitter]     = 0.20f,
+        [Personality.Cruel]      = 0.25f
     };
 
     public static EnemyType Generate(GraveSiteData graveSite, RandomService random, bool isNight)
     {
-        int ghostChance = GhostChances[graveSite.Personality];
-        
-        bool spawned = random.Chance(ghostChance);
-        if (isNight && !spawned)
-        {
-            spawned = random.Chance(ghostChance);
-        }
-        
-        return spawned
-            ? EnemyType.Ghost
-            : EnemyType.None;
+        float ghostChance = isNight ? GhostNightChances[graveSite.Personality] : GhostDayChances[graveSite.Personality];
+
+        return random.Chance(ghostChance) ? EnemyType.Ghost : EnemyType.None;
     }
 }

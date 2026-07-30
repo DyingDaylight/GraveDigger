@@ -9,7 +9,7 @@ namespace GraveDigger.Characters;
 
 public class Ghost : Animation, IReputationContributor
 {
-    private const int ReputationModifier = -15;
+    private const int ReputationModifier = -7;
     private const float StopDistance = 30f;
     private const float MoveSpeed = 120f;
     private const int AnimationFps = 5;

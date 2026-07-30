@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraveDigger.Characters;
@@ -21,7 +22,7 @@ namespace GraveDigger;
 
 public class Level : IUpdatable, IDrawable
 {
-    private const int MaxGhosts = 2;
+    private const int MaxGhosts = 5;
     private const int HungerPerDay = 15;
     private const int InitialHunger = 20;
     private const int MapTileTypesCount = 3;
@@ -58,6 +59,7 @@ public class Level : IUpdatable, IDrawable
     public Player Player { get; private set; }
 
     public InteractionSystem InteractionSystem { get; }
+    public IReadOnlyList<GraveSite> GraveSites => graveSites;
 
     public event Action ReputationRecalculationRequested;
     public event Action<GraveSite> GraveInteractionRequested;
@@ -175,17 +177,6 @@ public class Level : IUpdatable, IDrawable
 
     public void DayStart(int day)
     {
-        foreach (Prop prop in props)
-        {
-            if (prop is IDailyUpdatable dailyUpdatable)
-                dailyUpdatable.AdvanceDay(day);
-        }
-
-        foreach (GraveSite graveSite in graveSites)
-        {
-            graveSite.AdvanceDay(day);
-        }
-        
         Player.IncreaseHunger(HungerPerDay);
         ReputationRecalculationRequested?.Invoke();
     }
@@ -199,7 +190,8 @@ public class Level : IUpdatable, IDrawable
         foreach (ItemData item in loot)
         {
             ItemPickUp itemPickUp = CreatePickupItem(tombstone, item, occupiedAreas);
-            itemPickUp.Start();
+            if (itemPickUp != null)
+                itemPickUp.Start();
         }
     }
     
@@ -399,11 +391,15 @@ public class Level : IUpdatable, IDrawable
 
         Vector2? position = LootPlacementService.FindFreePosition(origin, itemSize, occupiedAreas);
 
-        if (position.HasValue)
+        Console.WriteLine($"Loot position found: {position.HasValue}");
+        if (!position.HasValue)
         {
-            itemPickUp.Transform.Position = position.Value;
-            occupiedAreas.Add(itemPickUp.GetDestRectangle(itemPickUp.SourceRectangle));
+            RemovePickup(itemPickUp);
+            return null;
         }
+        
+        itemPickUp.Transform.Position = position.Value;
+        occupiedAreas.Add(itemPickUp.GetDestRectangle(itemPickUp.SourceRectangle));
         
         PickUpInteraction interaction = new PickUpInteraction(itemPickUp);
         interaction.OnItemPickedUp += PickUpItem;
@@ -475,7 +471,6 @@ public class Level : IUpdatable, IDrawable
         fountain.DecorationType = DecorationType.FountainUpgrade;
         fountain.Transform.Scale = new Vector2(1f, 1f);
         fountain.Pivot = new Vector2(0.5f, 1f);
-        //fountain.ShadowOffsetY = -60;
     }
 
     private void CreateHouse()
@@ -723,8 +718,7 @@ public class Level : IUpdatable, IDrawable
         GraveSite graveSite = state.HasValue
             ? new GraveSite(status, state.Value)
             : new GraveSite(status);
-        
-        graveSite.DecayInterval = gameContext.RandomService.Next(2, 5);
+
         graveSite.Transform.Position = position;
         graveSite.SetTombstone(tombstone);
         graveSite.SetGrave(grave);
