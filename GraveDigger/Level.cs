@@ -23,7 +23,7 @@ namespace GraveDigger;
 public class Level : IUpdatable, IDrawable
 {
     private const int MaxGhosts = 5;
-    private const int HungerPerDay = 15;
+    private const int HungerPerDay = 20;
     private const int InitialHunger = 20;
     private const int MapTileTypesCount = 3;
     private readonly int[,] tileMapSchema =

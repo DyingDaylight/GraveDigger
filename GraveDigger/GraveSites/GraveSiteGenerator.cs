@@ -157,10 +157,10 @@ public class GraveSiteGenerator
 
     private static readonly Dictionary<Wealth, int> PaymentForBurial = new()
     {
-        [Wealth.Poor] = 25,
-        [Wealth.Average] = 35,
-        [Wealth.Rich] = 45,
-        [Wealth.Wealthy] = 55,
+        [Wealth.Poor] = 8,
+        [Wealth.Average] = 12,
+        [Wealth.Rich] = 18,
+        [Wealth.Wealthy] = 25,
     };
     
     public static int GetRewardForBurial(Wealth wealth)
