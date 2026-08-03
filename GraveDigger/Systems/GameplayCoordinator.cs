@@ -5,6 +5,7 @@ using GraveDigger.Characters;
 using GraveDigger.Data;
 using GraveDigger.Enemies;
 using GraveDigger.GraveSites;
+using GraveDigger.GUI.Windows;
 using GraveDigger.Items;
 using GraveDigger.Props;
 using GraveDigger.Utils;
@@ -59,7 +60,8 @@ public class GameplayCoordinator : IUpdatable
 
     public void Update(GameTime gameTime)
     {
-        timeSystem.Update(gameTime);
+        if (!level.IsBlackoutRunning)
+            timeSystem.Update(gameTime);
     }
 
     public void ToggleInventory()
@@ -144,15 +146,19 @@ public class GameplayCoordinator : IUpdatable
     
     private void PrepareRequested(GraveSite graveSite)
     {
-        if (!graveSite.Prepare())
+        if (!graveSite.CanPrepare)
             return;
-
-        RecalculateReputation();
+        
+        RunTimedAction(Game1.DiggingTime, () => PrepareGrave(graveSite));
     }
     
     private void DigRequested(Tombstone tombstone)
     {
-        DigGrave(tombstone.ParentSite);
+        GraveSite graveSite = tombstone.ParentSite;
+        if (!graveSite.CanDig)
+            return;
+        
+        RunTimedAction(Game1.DiggingTime, () => DigGrave(graveSite));
     }
 
     private void RepairRequested(Tombstone tombstone)
@@ -160,11 +166,29 @@ public class GameplayCoordinator : IUpdatable
         RepairGrave(tombstone.ParentSite);
     }
 
+    private void RunTimedAction(int seconds, Action action)
+    {
+        gui.CloseCurrentWindow();
+
+        bool started = level.RunBlackout(() =>
+        {
+            AudioManager.Instance.StopSFX("shovel");
+            timeSystem.AdvanceTime(seconds);
+            if (gameEnded)
+                return;
+            
+            action();
+        });
+
+        if (started)
+            AudioManager.Instance.PlaySFX("shovel");
+    }
+    
     private void DigGrave(GraveSite graveSite)
     {
         if (graveSite == null)
             return;
-
+        
         bool isDug = graveSite.Dig();
         if (!isDug)
             return;
@@ -172,7 +196,6 @@ public class GameplayCoordinator : IUpdatable
         List<ItemData> itemsData = LootGenerator.Generate(graveSite.Tombstone.Data, randomService);
         level.SpawnLoot(itemsData, graveSite.Tombstone);
         
-        gui.CloseCurrentWindow();
         RecalculateReputation();
         
         EnemyType enemyType = UndeadGenerator.Generate(graveSite.Tombstone.Data, randomService, 
@@ -181,7 +204,6 @@ public class GameplayCoordinator : IUpdatable
         {
             level.SpawnUndead(enemyType, graveSite);
         }
-
     }
 
     private void RepairGrave(GraveSite graveSite)
@@ -200,6 +222,14 @@ public class GameplayCoordinator : IUpdatable
         
         inventory.SpendMoney(repairCost);
         gui.RefreshTombstoneWindow(inventory.HasEnoughMoney(graveSite.RepairCost));
+        RecalculateReputation();
+    }
+
+    private void PrepareGrave(GraveSite graveSite)
+    {
+        if (!graveSite.Prepare())
+            return;
+
         RecalculateReputation();
     }
 

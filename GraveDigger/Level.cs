@@ -52,6 +52,7 @@ public class Level : IUpdatable, IDrawable
     private readonly List<Ghost> ghosts = new();
     
     private readonly DayNightOverlay dayNightOverlay;
+    private readonly BlackoutOverlay blackoutOverlay;
 
     private bool isNight = false;
     
@@ -60,6 +61,7 @@ public class Level : IUpdatable, IDrawable
 
     public InteractionSystem InteractionSystem { get; }
     public IReadOnlyList<GraveSite> GraveSites => graveSites;
+    public bool IsBlackoutRunning => blackoutOverlay.IsRunning;
 
     public event Action ReputationRecalculationRequested;
     public event Action<GraveSite> GraveInteractionRequested;
@@ -71,7 +73,8 @@ public class Level : IUpdatable, IDrawable
     {
         this.gameContext = gameContext;
         this.dayNightOverlay = dayNightOverlay;
-        
+
+        blackoutOverlay = new BlackoutOverlay(gameContext.ScreenSize);
         InteractionSystem = new InteractionSystem(gameContext.CoordinatesConverter);
         playerTrail = new PlayerTrail();
     }
@@ -121,6 +124,11 @@ public class Level : IUpdatable, IDrawable
             ghosts[i].TargetPosition = playerTrail.GetFollowerPosition(i) 
                                        + new Vector2(offsetX, offsetY);
         }
+        
+        blackoutOverlay.Update(gameTime);
+
+        if (blackoutOverlay.IsRunning)
+            return;
 
         foreach (IUpdatable updatable in updatables)
             updatable.Update(gameTime);
@@ -156,6 +164,7 @@ public class Level : IUpdatable, IDrawable
     public void DrawOverlay(SpriteBatch spriteBatch)
     {
         dayNightOverlay.Draw(spriteBatch);
+        blackoutOverlay.Draw(spriteBatch);
     }
     
     public void DayTimeChange(DayTime dayTime)
@@ -181,6 +190,15 @@ public class Level : IUpdatable, IDrawable
         ReputationRecalculationRequested?.Invoke();
     }
 
+    public bool RunBlackout(Action onCovered)
+    {
+        if (blackoutOverlay.IsRunning)
+            return false;
+
+        blackoutOverlay.Run(onCovered);
+        return true;
+    }
+    
     public void SpawnLoot(List<ItemData> loot, Tombstone tombstone)
     {
         List<Rectangle> occupiedAreas = props.Where(prop => prop.Visible)

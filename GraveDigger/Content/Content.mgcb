@@ -1887,6 +1887,12 @@
 /processorParam:Quality=Best
 /build:Sound/Effects/scratch.wav
 
+#begin Sound/Effects/shovel.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/Effects/shovel.wav;Sound/Effects/shovel
+
 #begin Sound/Effects/steps.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

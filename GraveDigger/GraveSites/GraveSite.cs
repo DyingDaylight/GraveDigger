@@ -18,6 +18,11 @@ public class GraveSite
     public Prop DirtPile { get; private set; }
     
     public GraveSiteStatus Status { get; private set; }
+    public bool CanPrepare => Status == GraveSiteStatus.Locked;
+
+    public bool CanDig =>
+        Status == GraveSiteStatus.Occupied &&
+        State != GraveState.DugOut;
 
     public int RepairCost => State switch
     {

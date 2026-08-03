@@ -14,6 +14,7 @@ namespace GraveDigger;
 
 public class Game1 : Game
 {
+    public const int DiggingTime = 15;
     private const int DayDuration = 30;
     private const int NightDuration = 30;
     private static readonly Vector2 WorldSize = new(4480, 3840);

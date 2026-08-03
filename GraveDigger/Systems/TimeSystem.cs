@@ -36,27 +36,38 @@ public class TimeSystem : IUpdatable
     public void Update(GameTime gameTime)
     {
         elapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+        
+        Advance();
+    }
 
-        float duration = CurrentDayTime == DayTime.Day
-            ? DayDuration
-            : NightDuration;
+    public void AdvanceTime(int seconds)
+    {
+        elapsedTime += seconds;
+        Advance();
+    }
+    
+    private void Advance()
+    {
+        float duration = CurrentPhaseDuration;
 
-        if (elapsedTime >= duration)
+        while (elapsedTime >= duration)
         {
             elapsedTime -= duration;
 
-            CurrentDayTime = CurrentDayTime == DayTime.Day
-                ? DayTime.Night
-                : DayTime.Day;
-            
+            CurrentDayTime =
+                CurrentDayTime == DayTime.Day
+                    ? DayTime.Night
+                    : DayTime.Day;
+
             if (CurrentDayTime == DayTime.Day)
             {
                 CurrentDay++;
                 DayStarted?.Invoke(CurrentDay);
             }
-            
+
             DayTimeChanged?.Invoke(CurrentDayTime);
+
+            duration = CurrentPhaseDuration;
         }
     }
-
 }
