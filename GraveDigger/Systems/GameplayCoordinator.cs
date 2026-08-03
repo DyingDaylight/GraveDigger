@@ -393,6 +393,7 @@ public class GameplayCoordinator : IUpdatable
         
         // TimeSystem -> Coordinator
         timeSystem.DayStarted += OnDayStart;
+        timeSystem.TimeUpdated += OnTimeUpdated;
         
         // ReputationSystem -> Coordinator
         reputationSystem.ReputationChanged += OnReputationChanged;
@@ -471,5 +472,10 @@ public class GameplayCoordinator : IUpdatable
 
         gameEnded = true;
         GameEnded?.Invoke(result);
+    }
+    
+    private void OnTimeUpdated(float progress)
+    {
+        gui.Hud.UpdateDayTime(progress);
     }
 }

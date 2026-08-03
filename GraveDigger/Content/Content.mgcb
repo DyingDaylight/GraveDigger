@@ -591,6 +591,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/GUI/cursor.png
 
+#begin Images/GUI/day.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/day.png;Images/GUI/day
+
 #begin Images/GUI/hunger.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -662,6 +674,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/GUI/mainmenu.png
+
+#begin Images/GUI/night.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/night.png;Images/GUI/night
 
 #begin Images/GUI/reputation_bad.png
 /importer:TextureImporter

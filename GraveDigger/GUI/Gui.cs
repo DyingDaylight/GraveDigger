@@ -58,6 +58,8 @@ public class Gui: IUpdatable, IDrawable
         SpriteManager.AddSprite("ReputationGoodIcon", "Images/GUI/reputation_good");
         SpriteManager.AddSprite("ReputationLineIcon", "Images/GUI/reputation_line");
         SpriteManager.AddSprite("ReputationSliderIcon", "Images/GUI/reputation_slider");
+        SpriteManager.AddSprite("DayIcon", "Images/GUI/day");
+        SpriteManager.AddSprite("NightIcon", "Images/GUI/night");
 
         SpriteManager.AddSprite("Coin", "Images/Icons/Coin");
         SpriteManager.AddSprite("Hunger", "Images/Gui/hunger");
