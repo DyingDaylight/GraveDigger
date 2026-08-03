@@ -9,6 +9,8 @@ public abstract class Window : UIContainer
 {
     protected readonly QuantitySelector quantitySelector;
     protected readonly ContextMenu contextMenu;
+
+    public bool IsActive { get; set; } = true;
     
     protected Window(Rectangle parentBounds)
     {

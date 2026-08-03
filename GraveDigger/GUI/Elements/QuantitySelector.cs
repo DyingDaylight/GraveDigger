@@ -27,6 +27,7 @@ public class QuantitySelector : UIContainer
     
     
     public event Action<int> ConfirmRequested;
+    public event Action Closed;
     
     public QuantitySelector(Rectangle parentBounds)
     {
@@ -109,6 +110,7 @@ public class QuantitySelector : UIContainer
     public void Hide()
     {
         Visible = false;
+        Closed?.Invoke();
     }
 
     private void Refresh()

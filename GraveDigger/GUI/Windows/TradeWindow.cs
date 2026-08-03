@@ -43,6 +43,7 @@ public class TradeWindow : Window
     
     private InventoryEntry itemBeingDragged;
     
+    
     public event Action<ItemData, int> DiscardRequested;
     public event Action<ItemData, int> UseRequested;
     public event Action<ItemData, int> SellRequested;
@@ -104,14 +105,23 @@ public class TradeWindow : Window
 
         playerInventoryView.ContextMenuRequested += OpenPlayerContextMenu;
         merchantInventoryView.ContextMenuRequested += OpenMerchantContextMenu;
+        quantitySelector.Closed += OnQuantitySelectorClosed;
         
         RefreshLayout();
     }
-    
+
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime); 
 
+        if (IsActive)
+            HandleDragAndDrop();
+
+        TradeResultTimer(gameTime);
+    }
+
+    private void HandleDragAndDrop()
+    {
         MouseState mouse = Mouse.GetState();
 
         if (!isDragging && mouse.LeftButton == ButtonState.Pressed)
@@ -145,8 +155,6 @@ public class TradeWindow : Window
             draggedSlot = null;
             itemBeingDragged = null;
         }
-
-        TradeResultTimer(gameTime);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -277,6 +285,12 @@ public class TradeWindow : Window
         selectedAction = action;
         
         quantitySelector.Show(title, 1, entry.Quantity);
+        IsActive = false;
+    }
+    
+    private void OnQuantitySelectorClosed()
+    {
+        IsActive = true;
     }
     
     private InventorySlot FindSlotUnderMouse(Point mousePos)
