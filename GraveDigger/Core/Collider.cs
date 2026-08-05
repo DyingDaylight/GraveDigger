@@ -16,6 +16,15 @@ public class Collider : IUpdatable, IDrawable
     
     public Sprite Parent { get; private set; }
     private Rectangle Bounds { get; set; }
+    
+    // TODO:
+    // SizeRatio is a deliberate simplification.
+    // The collider is scaled relative to the sprite bounds and anchored to the
+    // bottom-center of the sprite.
+    // A more flexible solution would support configurable hitboxes
+    // (offset + size) instead of relying on a single scale ratio.
+    public Vector2 SizeRatio { get; set; } = Vector2.One;
+    
     private int Thickness { get; set; } = 1;
     private Color Color { get; set; } = Color.White;
     private Texture2D DebugTexture => SpriteManager.GetSprite("pixel").Texture;
@@ -37,7 +46,19 @@ public class Collider : IUpdatable, IDrawable
     
     public void Update(GameTime gameTime)
     {
-        Bounds = Parent.DestRectangle;
+        Rectangle parentBounds = Parent.DestRectangle;
+
+        int width = (int)(parentBounds.Width * SizeRatio.X);
+        int height = (int)(parentBounds.Height * SizeRatio.Y);
+
+        Bounds = new Rectangle(
+            parentBounds.Center.X - width / 2,
+            parentBounds.Bottom - height,
+            width,
+            height
+        );
+        
+        //Bounds = Parent.DestRectangle;
     }
     
     public void Draw(SpriteBatch spriteBatch)

@@ -16,6 +16,7 @@ public class Prop : Sprite, IReputationContributor, IHasCollider
     public Prop(string name) : base(name)
     {
         Collider = new Collider(this);
+        Collider.SizeRatio = new Vector2(1, 0.2f);
     }
 
     public override void Start()

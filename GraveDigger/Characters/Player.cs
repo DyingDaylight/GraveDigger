@@ -54,6 +54,7 @@ public class Player : Animation, IHasCollider
             CollisionLayer.Prop |
             CollisionLayer.Loot;
         Collider.Collided += OnCollisionEnter;
+        Collider.SizeRatio = new Vector2(1, 0.3f);
     }
     
     public override void Update(GameTime gameTime)

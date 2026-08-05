@@ -15,6 +15,7 @@ public class ItemPickUp : Prop, IInteractionOwner
     public ItemPickUp(string name) : base(name)
     {
         Collider.Triggered += OnTriggerEnter;
+        Collider.SizeRatio = Vector2.One;
     }
 
     public void SetHighlighted(bool highlighted)
