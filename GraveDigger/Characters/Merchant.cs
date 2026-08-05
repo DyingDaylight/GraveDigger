@@ -5,12 +5,13 @@ using GraveDigger.Items;
 using GraveDigger.Props;
 using GraveDigger.Systems;
 using GraveDigger.Utils;
+using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GraveDigger.Characters;
 
-public class Merchant : Animation, IInteractionOwner
+public class Merchant : Animation, IInteractionOwner, IHasCollider
 {
     private const float ArrivalThreshold = 10f;
     private const float MovementSpeed = 200f;
@@ -31,10 +32,15 @@ public class Merchant : Animation, IInteractionOwner
     public Rectangle InteractionArea => DestRectangle;
     public Inventory Inventory { get; set; }
     public TraderInteraction TraderInteraction { get; set; }
+    
+    public Collider Collider { get; }
 
     public Merchant() : base("merchant")
     {
         Inventory = new Inventory();
+        Collider = new Collider(this);
+        Collider.Layer = CollisionLayer.Character;
+        Collider.Mask = CollisionLayer.Player;
     }
 
     public void SetOffMapPosition(Vector2 position)

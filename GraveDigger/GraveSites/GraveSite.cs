@@ -144,6 +144,7 @@ public class GraveSite
         GraveTile?.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y);
         GraveTile?.Transform.Scale = new Vector2(0.08f, 0.08f);
         GraveTile?.Mode = SortingMode.Fixed;
+        GraveTile?.Collider.Mask = CollisionLayer.None;
         UpdateVisuals();
     }
 

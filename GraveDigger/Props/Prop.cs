@@ -5,14 +5,18 @@ using Microsoft.Xna.Framework;
 
 namespace GraveDigger.Props;
 
-public class Prop : Sprite, IReputationContributor
+public class Prop : Sprite, IReputationContributor, IHasCollider
 {
     private const float GroundSortingOrder = 0.99f;
     
     public SortingMode Mode { get; set; } = SortingMode.Dynamic;
 
-    
-    public Prop(string name) : base(name) { }
+    public Collider Collider { get; }
+
+    public Prop(string name) : base(name)
+    {
+        Collider = new Collider(this);
+    }
 
     public override void Start()
     {

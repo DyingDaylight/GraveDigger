@@ -33,6 +33,8 @@ public class Decoration : Prop, IInteractionOwner
         placeholder.Transform.Scale = new Vector2(0.3f, 0.3f);
         placeholder.Opacity = 0.3f;
         
+        Collider.IsActive = false;
+        
         HintInteraction = new HintInteraction(this);
     }
 
@@ -52,6 +54,7 @@ public class Decoration : Prop, IInteractionOwner
         if (IsUnlocked)
             return false;
         
+        Collider.IsActive = true;
         IsUnlocked = true;
         ChangeSprite(spriteName);
         return true;

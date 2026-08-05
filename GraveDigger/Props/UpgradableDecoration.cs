@@ -15,6 +15,7 @@ public class UpgradableDecoration : Decoration
         spriteName = name;
         upgradeLevel = 0;
         IsUnlocked = true;
+        Collider.IsActive = true;
     }
     
     protected override bool Upgrade()

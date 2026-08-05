@@ -2,24 +2,24 @@
 using GraveDigger.Core;
 using GraveDigger.Systems;
 using GraveDigger.Utils;
+using Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace GraveDigger.Characters;
 
-public class Player : Animation
+public class Player : Animation, IHasCollider
 {
     private const float MovementSpeed = 300f;
     private const int AnimationFps = 4;
 
     public Collider Collider { get; }
-
     private Vector2 previousPosition;
+    private bool isColliding = false;
     
     private Vector2 worldSize = Vector2.Zero;
     private int previousAnimationRow = -1;
-    private bool isColliding = false;
     
     public int Hunger { get; private set; }
     public int MaxHunger { get; } = 100;
@@ -47,12 +47,17 @@ public class Player : Animation
         CurrentRow = 1; 
         Stop();
         
-        Collider.Start();
+        Collider.Start(); 
+        Collider.Layer = CollisionLayer.Player;
+        Collider.Mask =
+            CollisionLayer.Character |
+            CollisionLayer.Prop |
+            CollisionLayer.Loot;
+        Collider.Collided += OnCollisionEnter;
     }
     
     public override void Update(GameTime gameTime)
     {
-        // Collisions are not working
         if (isColliding)
         {
             Transform.Position = previousPosition;
@@ -65,8 +70,6 @@ public class Player : Animation
         
         UpdateMovement(dt);
         UpdateSortingOrder();
-        
-        Collider.Update(gameTime);
         
         base.Update(gameTime);
     }
@@ -83,6 +86,7 @@ public class Player : Animation
     
     public void OnCollisionEnter(Collider self, Collider other)
     {
+        isColliding = true;
     }
     
     public void DecreaseHunger(int amount)

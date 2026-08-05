@@ -101,7 +101,7 @@ public class Level : IUpdatable, IDrawable
         CreateMerchant();
         
         Player = CreateLevelCharacter<Player>();
-        Player.Transform.Position = new Vector2(746, 3463);
+        Player.Transform.Position = new Vector2(800, 3463);
         Player.SetWorldSize(gameContext.WorldSize);
         Player.IncreaseHunger(InitialHunger);
         playerTrail.Record(Player.Transform.Position);
@@ -135,9 +135,36 @@ public class Level : IUpdatable, IDrawable
         
         foreach (Collider collider in colliders)
             collider.Update(gameTime);
+
+        CollideAll();
         
         InteractionSystem.Update(gameTime);
         playerTrail.Record(Player.Transform.Position);
+    }
+
+    private void CollideAll()
+    {
+        for (int i = 0; i < colliders.Count; i++)
+        {
+            Collider collider = colliders[i];
+
+            for (int j = i + 1; j < colliders.Count; j++)
+            {
+                Collider otherCollider = colliders[j];
+                
+                if (!collider.CanCollide(otherCollider))
+                    continue;
+                
+                if (!collider.Parent.Visible || !otherCollider.Parent.Visible)
+                    continue;
+                
+                if (collider.Intersect(otherCollider))
+                {
+                    collider.Notify(collider, otherCollider);
+                    otherCollider.Notify(otherCollider, collider);
+                }
+            }
+        }
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -342,6 +369,8 @@ public class Level : IUpdatable, IDrawable
             road.Transform.Scale = new Vector2(1f, 1f);
             road.Mode = SortingMode.Fixed;
             road.CastShadow = false;
+            road.Collider.Layer = CollisionLayer.GroundTile;
+            road.Collider.Mask = CollisionLayer.None;
         }
     }
 
@@ -357,6 +386,8 @@ public class Level : IUpdatable, IDrawable
         T prop = factory(name);
         prop.Transform.Position = position;
         prop.CastShadow = true;
+        prop.Collider.Layer = CollisionLayer.Prop;
+        prop.Collider.Mask = CollisionLayer.Player;
         switch (name)
         {
             case "lampost":

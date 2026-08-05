@@ -9,17 +9,20 @@ namespace GraveDigger.Core;
 public class Collider : IUpdatable, IDrawable
 {
     public bool IsTrigger { get; set; }
+    public bool IsActive { get; set; } = true;
     
-    public Color Color { get; set; } = Color.White;
-    public int Thickness { get; set; } = 1;
+    public CollisionLayer Layer { get; set; } = CollisionLayer.None;
+    public CollisionLayer Mask { get; set; } = CollisionLayer.None;
     
-    public Rectangle Bounds { get; private set; }
     public Sprite Parent { get; private set; }
-    
-    public Action<Collider, Collider> onTrigger;
-    public Action<Collider, Collider> onCollision;
-        
+    private Rectangle Bounds { get; set; }
+    private int Thickness { get; set; } = 1;
+    private Color Color { get; set; } = Color.White;
     private Texture2D DebugTexture => SpriteManager.GetSprite("pixel").Texture;
+    
+    
+    public Action<Collider, Collider> Triggered;
+    public Action<Collider, Collider> Collided;
     
 
     public Collider(Sprite parent)
@@ -65,6 +68,13 @@ public class Collider : IUpdatable, IDrawable
 #endif
     }
     
+    public bool CanCollide(Collider other)
+    {
+        return IsActive && other.IsActive && 
+               (Mask & other.Layer) != 0 &&
+               (other.Mask & Layer) != 0;
+    }
+    
     public bool Intersect(Collider other)
     {
         return Bounds.Intersects(other.Bounds);
@@ -73,8 +83,8 @@ public class Collider : IUpdatable, IDrawable
     public void Notify(Collider selfCollider, Collider otherCollider)
     {
         if (IsTrigger || otherCollider.IsTrigger)
-            onTrigger?.Invoke(selfCollider, otherCollider);
+            Triggered?.Invoke(selfCollider, otherCollider);
         else
-            onCollision?.Invoke(selfCollider, otherCollider);
+            Collided?.Invoke(selfCollider, otherCollider);
     }
 }
