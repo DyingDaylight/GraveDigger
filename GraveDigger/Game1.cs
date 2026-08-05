@@ -75,13 +75,10 @@ public class Game1 : Game
         cursorTexture = Content.Load<Texture2D>("Images/GUI/cursor"); // custom cursor
         
         LoadCoreSprites();
-        CreateGameObjects();
-        StartObjects();
-        SubscribeToEvents();
+        
+        CreateGameSession();
         
         SetGameState(GameState.Menu);
-        
-        gui.Hud.UpdateHunger(level.Player.Hunger, 0, level.Player.MaxHunger);
     }
 
     protected override void Update(GameTime gameTime)
@@ -178,7 +175,21 @@ public class Game1 : Game
     
     private void RestartGame()
     {
-        Console.WriteLine("Restarting game... Maybe...");
+        AudioManager.Instance.StopAllSFX();
+        
+        UnsubscribeFromEvents();
+        CreateGameSession();
+
+        gameStarted = true;
+        SetGameState(GameState.Playing);
+    }
+
+    private void CreateGameSession()
+    {
+        CreateGameObjects();
+        StartObjects();
+        SubscribeToEvents();
+        gui.Hud.UpdateHunger(level.Player.Hunger, 0, level.Player.MaxHunger);
     }
 
     private void EndGame(GameResult gameResult)
@@ -230,6 +241,20 @@ public class Game1 : Game
         gameplayCoordinator.GameEnded += EndGame;
             
         level.InteractionSystem.OnHoveredInteractionChanged += gui.InteractionTooltip.SetInteraction;
+    }
+    
+    private void UnsubscribeFromEvents()
+    {
+        gui.MenuUi.OnStartClicked -= StartGame; 
+        gui.MenuUi.OnSettingsClicked -= OpenSettings; 
+        gui.MenuUi.OnExitClicked -= CloseGame;
+        
+        gui.WindowManager.GameOverWindow.RestartButtonPressed -= RestartGame;
+        gui.WindowManager.GameOverWindow.ExitButtonPressed -= CloseGame;
+        
+        gameplayCoordinator.GameEnded -= EndGame;
+            
+        level.InteractionSystem.OnHoveredInteractionChanged -= gui.InteractionTooltip.SetInteraction;
     }
 
     private void StartObjects()

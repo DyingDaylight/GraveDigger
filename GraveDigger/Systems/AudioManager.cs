@@ -112,4 +112,11 @@ public sealed class AudioManager
         SoundEffect.MasterVolume = clampedVolume;
     }
     
+    public void StopAllSFX()
+    {
+        foreach (SoundEffectInstance instance in sfxInstances.Values)
+        {
+            instance.Stop();
+        }
+    }
 }
