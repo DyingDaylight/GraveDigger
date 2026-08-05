@@ -455,6 +455,10 @@ public class Level : IUpdatable, IDrawable
         itemPickUp.Interaction = interaction;
         InteractionSystem.RegisterInteraction(interaction);
 
+        itemPickUp.Collider.Layer = CollisionLayer.Loot;
+        itemPickUp.Collider.Mask = CollisionLayer.Player;
+        itemPickUp.Collider.IsTrigger = true;
+        
         return itemPickUp;
     }
     
