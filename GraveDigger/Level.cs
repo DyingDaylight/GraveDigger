@@ -108,6 +108,9 @@ public class Level : IUpdatable, IDrawable
 
         foreach (IUpdatable updatable in updatables)
             updatable.Start();
+
+        foreach (GraveSite graveSite in graveSites)
+            graveSite.UpdateLayout();
         
         ReputationRecalculationRequested?.Invoke();
     }
@@ -709,40 +712,40 @@ public class Level : IUpdatable, IDrawable
     private void CreateGraveSites()
     {
         // Above crypt
-        CreateOccupiedGraveSite("tombstone5", new Vector2(200, 1500));
-        CreateOccupiedGraveSite("tombstone1", new Vector2(550, 1500));
-        CreateOccupiedGraveSite("tombstone2", new Vector2(900, 1500));
-        CreateLockedGraveSite(new Vector2(1250, 1500));    
+        CreateOccupiedGraveSite("tombstone5", new Vector2(200, 1350));
+        CreateOccupiedGraveSite("tombstone1", new Vector2(550, 1350));
+        CreateOccupiedGraveSite("tombstone2", new Vector2(900, 1350));
+        CreateLockedGraveSite(new Vector2(1250, 1350));    
         
         // Above house
-        CreateOccupiedGraveSite("tombstone2", new Vector2(200, 2800));
-        CreateOccupiedGraveSite("tombstone6", new Vector2(550, 2800));
-        CreateOccupiedGraveSite("tombstone1", new Vector2(900, 2800));
+        CreateOccupiedGraveSite("tombstone2", new Vector2(200, 2650));
+        CreateOccupiedGraveSite("tombstone6", new Vector2(550, 2650));
+        CreateOccupiedGraveSite("tombstone1", new Vector2(900, 2650));
         
         // Above Merchant
-        CreateOccupiedGraveSite("tombstone1", new Vector2(3400, 2800));
-        CreateOccupiedGraveSite("tombstone4", new Vector2(3700, 2800));
-        CreateOccupiedGraveSite("tombstone5", new Vector2(4000, 2800));
-        CreateOccupiedGraveSite("tombstone7", new Vector2(4300, 2800));
+        CreateOccupiedGraveSite("tombstone1", new Vector2(3400, 2650));
+        CreateOccupiedGraveSite("tombstone4", new Vector2(3700, 2650));
+        CreateOccupiedGraveSite("tombstone5", new Vector2(4000, 2650));
+        CreateOccupiedGraveSite("tombstone7", new Vector2(4300, 2650));
         
         // Above Angel
-        CreateOccupiedGraveSite("tombstone8", new Vector2(3400, 1655));
-        CreateOccupiedGraveSite("tombstone1", new Vector2(3700, 1655));
-        CreateOccupiedGraveSite("tombstone3", new Vector2(4000, 1655));
-        CreateOccupiedGraveSite("tombstone2", new Vector2(4300, 1655));
+        CreateOccupiedGraveSite("tombstone8", new Vector2(3400, 1505));
+        CreateOccupiedGraveSite("tombstone1", new Vector2(3700, 1505));
+        CreateOccupiedGraveSite("tombstone3", new Vector2(4000, 1505));
+        CreateOccupiedGraveSite("tombstone2", new Vector2(4300, 1505));
         
         // Top
-        CreateOccupiedGraveSite("tombstone6", new Vector2(1578, 755));
-        CreateOccupiedGraveSite("tombstone3", new Vector2(2646, 755));
+        CreateOccupiedGraveSite("tombstone6", new Vector2(1578, 605));
+        CreateOccupiedGraveSite("tombstone3", new Vector2(2646, 605));
         
-        CreateLockedGraveSite(new Vector2(4098, 400)); 
-        CreateLockedGraveSite(new Vector2(3598, 400)); 
-        CreateLockedGraveSite(new Vector2(3098, 400)); 
-        CreateLockedGraveSite(new Vector2(2598, 400)); 
-        CreateLockedGraveSite(new Vector2(2098, 400));   
-        CreateLockedGraveSite(new Vector2(1598, 400));   
-        CreateLockedGraveSite(new Vector2(1098, 400));   
-        CreateLockedGraveSite(new Vector2(598, 400));   
+        CreateLockedGraveSite(new Vector2(4098, 250)); 
+        CreateLockedGraveSite(new Vector2(3598, 250)); 
+        CreateLockedGraveSite(new Vector2(3098, 250)); 
+        CreateLockedGraveSite(new Vector2(2598, 250)); 
+        CreateLockedGraveSite(new Vector2(2098, 250));   
+        CreateLockedGraveSite(new Vector2(1598, 250));   
+        CreateLockedGraveSite(new Vector2(1098, 250));   
+        CreateLockedGraveSite(new Vector2(598, 250));   
     }
     
     private void CreateLockedGraveSite(Vector2 position)

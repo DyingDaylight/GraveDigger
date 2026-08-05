@@ -1,4 +1,5 @@
-﻿using GraveDigger.Core;
+﻿using System;
+using GraveDigger.Core;
 using GraveDigger.Data;
 using Microsoft.Xna.Framework;
 using GraveDigger.Props;
@@ -9,8 +10,9 @@ namespace GraveDigger.GraveSites;
 public class GraveSite
 {
     private const int BaseRepairCost = 10;
+    private const float GravePartsGap = 15f;
     private const int AdditionalDugOutRepairCost = 5;
-    
+
     public Transform Transform { get; } = new Transform();
     
     public Tombstone Tombstone { get; private set; }
@@ -132,7 +134,6 @@ public class GraveSite
     public void SetTombstone(Tombstone tombstone)
     {
         Tombstone = tombstone;
-        Tombstone?.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y - 200);
         Tombstone?.Transform.Scale = new Vector2(0.3f, 0.3f);
         Tombstone?.ParentSite = this;
         UpdateVisuals();
@@ -141,7 +142,6 @@ public class GraveSite
     public void SetGrave(Prop graveTile)
     {
         GraveTile = graveTile;
-        GraveTile?.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y);
         GraveTile?.Transform.Scale = new Vector2(0.08f, 0.08f);
         GraveTile?.Mode = SortingMode.Fixed;
         GraveTile?.Collider.Mask = CollisionLayer.None;
@@ -159,16 +159,15 @@ public class GraveSite
     
     private void UpdateVisuals()
     {
+        GraveTile?.Transform.Scale = new Vector2(0.5f, 0.5f);
         switch (Status)
         {
             case GraveSiteStatus.Locked:
                 GraveTile?.ChangeSprite("grave_locked");    
-                GraveTile?.Transform.Scale = new Vector2(0.35f, 0.35f);
                 break;
 
             case GraveSiteStatus.Prepared:
                 GraveTile?.ChangeSprite("grave_prepared");
-                GraveTile?.Transform.Scale = new Vector2(0.18f, 0.18f);
                 break;
 
             case GraveSiteStatus.Occupied:
@@ -178,7 +177,7 @@ public class GraveSite
                     GraveState.Broken => "grave_broken",
                     GraveState.DugOut => "grave_digged"
                 });
-                GraveTile?.Transform.Scale = new Vector2(0.08f, 0.08f);
+                
                 break;
         }
         
@@ -192,5 +191,30 @@ public class GraveSite
                 State == GraveState.DugOut;
         }
         
+    }
+
+    public void UpdateLayout()
+    {
+        if (Tombstone != null)
+        {
+            Tombstone.Transform.Position = new Vector2(
+                Transform.Position.X,
+                Transform.Position.Y - Tombstone.Height * 0.5f - GravePartsGap * 0.5f
+            );
+        }
+
+        if (GraveTile != null)
+        {
+            GraveTile.Transform.Position = new Vector2(
+                Transform.Position.X,
+                Transform.Position.Y + GraveTile.Height * 0.5f + GravePartsGap * 0.5f
+            );
+        }
+
+        if (DirtPile != null && GraveTile != null)
+        {
+            DirtPile.Transform.Position = new Vector2(
+                Transform.Position.X, Transform.Position.Y + GraveTile.Height);
+        }
     }
 }
