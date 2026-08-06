@@ -27,6 +27,13 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/LargeFile.spritefont
 
+#begin Fonts/TutorialFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/TutorialFont.spritefont
+
 #begin Images/Characters/digger.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -435,6 +442,30 @@
 /processorParam:TextureFormat=Color
 /build:Images/Food/Food9.png
 
+#begin Images/GUI/arrow_left.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/arrow_left.png
+
+#begin Images/GUI/arrow_right.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/arrow_right.png
+
 #begin Images/GUI/background.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -782,6 +813,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/GUI/slothover.png;Images/GUI/slothover
+
+#begin Images/GUI/tutorialbackground.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/tutorialbackground.png
 
 #begin Images/Icons/Coin.png
 /importer:TextureImporter

@@ -29,4 +29,10 @@
     <ItemGroup>
       <Folder Include="Content\Images\" />
     </ItemGroup>
+    <ItemGroup>
+      <None Remove="Content\Data\tutorial.json" />
+      <Content Include="Content\Data\tutorial.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
 </Project>

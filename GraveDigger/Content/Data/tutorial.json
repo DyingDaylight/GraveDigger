@@ -1,0 +1,27 @@
+{
+  "documentNumber": "--EMPLOYMENT CONTRACT NO. GUIDE--",
+  "documentTitle": "On the duties of the Graveyard Keeper and compliance with sanitary-mystical standards",
+  "preamble": "By this document, Moth (hereinafter referred to as Vendor/Trader) and You (hereinafter referred to as Keeper) enter into a business relationship under the following terms:",
+  "sections": [
+    {
+      "title": "DUTIES AND GAME CYCLE:",
+      "items": [
+        "1. Territory Condition and Reputation:\nYour main task is to keep the cemetery looking 'fragrant'. Place benches, fences, and order Blueprints from me for improvements. The prettier the cemetery, the higher your Reputation.",
+        "2. Restoration and... Night Excavations:\nGraves tend to decay over time. You are obligated to repair them.\nUnofficial clause: Digging up old graves with a shovel in search of valuable loot is entirely a matter of your own choice and conscience. The main thing is that everything looks intact by the time the mourners arrive!!!",
+        "3. Daily Schedule and Trade:\nDuring the day, the cemetery is quiet. At this time, I will come to my usual spot. Exchange the loot found in the lands for Buttons, buy fresh food from me (so as not to die of exhaustion), and construction blueprints.",
+        "4. Mystical Circumstances:\nThey say that if you dig up the graves of hardened button hunters, their ghosts may appear and follow you. They will linger behind you and rapidly decrease the graveyard's reputation. Do not let them accumulate!",
+        "5. Reading Tombstones:\nApproach tombstones and read the epitaphs. This will allow you to learn the history of the deceased and evaluate the wealth of the burial before digging."
+      ]
+    },
+    {
+      "title": "PENALTIES AND TERMINATION OF TERM:",
+      "items": [
+        "- Death from starvation or zombie bites annuls this contract.\n- Drop in Reputation to a critical minimum will deprive you of the keeper position."
+      ]
+    }
+  ],
+  "footerDeclaration": "Having read the terms and promising not to feed the Keeper to ghosts:",
+  "traderSignature": "Vendor: Moth",
+  "keeperSignaturePlaceholder": "Keeper: ____________________ (SIGN)",
+  "signButtonText": "SIGN CONTRACT"
+}

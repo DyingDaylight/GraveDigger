@@ -100,6 +100,9 @@ public class Game1 : Game
             case GameState.Menu:
                 UpdateMenu(currentKeyboardState);
                 break;
+            
+            case GameState.Tutorial:
+                break;
         
             case GameState.Playing:
                 UpdateGameplay(gameTime, currentKeyboardState);
@@ -124,6 +127,14 @@ public class Game1 : Game
         switch (currentGameState)
         {
             case GameState.Menu:
+                DrawGUI();
+                break;
+            
+            case GameState.Tutorial:
+                spriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend);
+                gui.MenuUi.Draw(spriteBatch);
+                spriteBatch.End();
+
                 DrawGUI();
                 break;
 
@@ -231,11 +242,16 @@ public class Game1 : Game
 
     private void SubscribeToEvents()
     {
-        gui.MenuUi.OnStartClicked += StartGame; 
+        gui.MenuUi.OnStartClicked += OpenTutorial;
         gui.MenuUi.OnSettingsClicked += OpenSettings; 
         gui.MenuUi.OnExitClicked += CloseGame;
         
         gui.MenuUi.OnFullScreenToggled += HandleFullScreenToggle;
+        
+        if (gui.TutorialWindow != null)
+        {
+            gui.TutorialWindow.OnContractSigned += StartGame;
+        }
         
         gui.WindowManager.GameOverWindow.RestartButtonPressed += RestartGame;
         gui.WindowManager.GameOverWindow.ExitButtonPressed += CloseGame;
@@ -278,6 +294,18 @@ public class Game1 : Game
         level.Start();
         
         gameplayCoordinator.Start();
+    }
+    
+    private void OpenTutorial()
+    {
+        if (gameStarted)
+        {
+            SetGameState(GameState.Playing);
+        }
+        else
+        {
+            SetGameState(GameState.Tutorial);
+        }
     }
 
     private void SetGameState(GameState gameState)

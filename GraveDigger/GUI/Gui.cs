@@ -28,6 +28,8 @@ public class Gui: IUpdatable, IDrawable
     public MenuUI MenuUi { get; private set; }
     public HUD Hud { get; private set; }
     
+    public TutorialWindow TutorialWindow { get; private set; }
+    
     public event Action MarketClosed;
     
 
@@ -56,6 +58,11 @@ public class Gui: IUpdatable, IDrawable
         
         SpriteManager.AddSprite("FullScreenIcon", "Images/GUI/fullscreen");
         SpriteManager.AddSprite("FullScreenIconHover", "Images/GUI/fullscreen_hover");
+
+        SpriteManager.AddSprite("TutorialWindow", "Images/GUI/tutorialbackground");
+        
+        SpriteManager.AddSprite("ArrowLeft", "Images/GUI/arrow_left");
+        SpriteManager.AddSprite("ArrowRight", "Images/GUI/arrow_right");
 
 
         SpriteManager.AddSprite("ReputationBadIcon", "Images/GUI/reputation_bad");
@@ -86,6 +93,10 @@ public class Gui: IUpdatable, IDrawable
         // Prevent configuring and subscribing buttons more than once.
         if (started)
             throw new InvalidOperationException("GUI has already been started.");
+        
+        Rectangle screenBounds = new Rectangle(0, 0, (int)gameContext.ScreenSize.X, (int)gameContext.ScreenSize.Y);
+        TutorialWindow = new TutorialWindow(screenBounds);
+        TutorialWindow.Start();
 
         notificationPopup = new NotificationPopup(new Rectangle(0, 0, 
             (int) gameContext.ScreenSize.X, 
@@ -113,6 +124,12 @@ public class Gui: IUpdatable, IDrawable
             MenuUi.Update(gameTime);
             return;
         }
+        
+        if (gameState == GameState.Tutorial)
+        {
+            TutorialWindow?.Update(gameTime);
+            return;
+        }
 
         notificationPopup.Update(gameTime);
         WindowManager.Update(gameTime);
@@ -128,6 +145,12 @@ public class Gui: IUpdatable, IDrawable
         if (gameState == GameState.Menu)
         {
             MenuUi.Draw(spriteBatch);
+            return;
+        }
+        
+        if (gameState == GameState.Tutorial)
+        {
+            TutorialWindow?.Draw(spriteBatch);
             return;
         }
 

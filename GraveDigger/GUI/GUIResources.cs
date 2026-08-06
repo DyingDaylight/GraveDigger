@@ -8,8 +8,10 @@ public static class GUIResources
 {
     public static Texture2D ButtonDefaultTexture { get; private set; }
     public static SpriteFont DefaultFont { get; private set; }
-    
     public static SpriteFont LargeFont { get; private set; }
+    
+    public static SpriteFont TutorialFont { get; private set; }
+
     
     public static readonly Color ButtonNormalColor = Color.White;
     public static readonly Color ButtonHoverColor = Color.DarkSeaGreen;
@@ -28,5 +30,7 @@ public static class GUIResources
         ButtonDefaultTexture = content.Load<Texture2D>("Images/GUI/Button");
         DefaultFont = content.Load<SpriteFont>("Fonts/File");
         LargeFont = content.Load<SpriteFont>("Fonts/LargeFile");
+        TutorialFont = content.Load<SpriteFont>("Fonts/TutorialFont");
+
     }
 }
