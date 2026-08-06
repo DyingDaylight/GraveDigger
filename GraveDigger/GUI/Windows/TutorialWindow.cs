@@ -16,7 +16,7 @@ namespace GraveDigger.GUI.Windows
 {
     public class TutorialWindow : Window
     {
-        public event Action? OnContractSigned;
+        public event Action OnContractSigned;
 
         private readonly Image backgroundPaper;
         
@@ -28,7 +28,7 @@ namespace GraveDigger.GUI.Windows
         private readonly Button nextButton;
         private readonly Label pageIndicatorLabel;
 
-        private TutorialContractData? contractData;
+        private TutorialContractData contractData;
 
         private int currentPage = 1;
         private int totalPages = 1;
@@ -43,7 +43,7 @@ namespace GraveDigger.GUI.Windows
             Texture = null;
 
             backgroundPaper = CreateElement<Image>();
-            SpriteSheet? paperSheet = SpriteManager.GetSprite("TutorialWindow");
+            SpriteSheet paperSheet = SpriteManager.GetSprite("TutorialWindow");
             Texture2D paperTex = paperSheet?.Texture ?? GUIResources.ButtonDefaultTexture;
             backgroundPaper.SetImage(paperTex);
 
