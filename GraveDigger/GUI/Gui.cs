@@ -53,6 +53,10 @@ public class Gui: IUpdatable, IDrawable
         SpriteManager.AddSprite("InventoryButtonHover", "Images/GUI/inventory_button_hover");
         SpriteManager.AddSprite("InventoryButtonPressed", "Images/GUI/inventory_button_pressed");
         SpriteManager.AddSprite("InventoryButtonDisabled", "Images/GUI/inventory_button_disabled");
+        
+        SpriteManager.AddSprite("FullScreenIcon", "Images/GUI/fullscreen");
+        SpriteManager.AddSprite("FullScreenIconHover", "Images/GUI/fullscreen_hover");
+
 
         SpriteManager.AddSprite("ReputationBadIcon", "Images/GUI/reputation_bad");
         SpriteManager.AddSprite("ReputationGoodIcon", "Images/GUI/reputation_good");

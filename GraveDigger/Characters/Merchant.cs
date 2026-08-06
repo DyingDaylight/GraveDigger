@@ -61,7 +61,7 @@ public class Merchant : Animation, IInteractionOwner, IHasCollider
         Transform.Position = offMapPosition;
         ChangeState(MerchantState.Arriving);
         
-        Transform.Scale = new Vector2(0.7f, 0.7f);
+        Transform.Scale = new Vector2(0.45f, 0.45f);
         
         CurrentRow = 1; 
         Play(3);

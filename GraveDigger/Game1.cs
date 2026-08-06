@@ -235,6 +235,8 @@ public class Game1 : Game
         gui.MenuUi.OnSettingsClicked += OpenSettings; 
         gui.MenuUi.OnExitClicked += CloseGame;
         
+        gui.MenuUi.OnFullScreenToggled += HandleFullScreenToggle;
+        
         gui.WindowManager.GameOverWindow.RestartButtonPressed += RestartGame;
         gui.WindowManager.GameOverWindow.ExitButtonPressed += CloseGame;
         
@@ -249,12 +251,25 @@ public class Game1 : Game
         gui.MenuUi.OnSettingsClicked -= OpenSettings; 
         gui.MenuUi.OnExitClicked -= CloseGame;
         
+        if (gui?.MenuUi != null)
+        {
+            gui.MenuUi.OnFullScreenToggled -= HandleFullScreenToggle;
+        }
+        
         gui.WindowManager.GameOverWindow.RestartButtonPressed -= RestartGame;
         gui.WindowManager.GameOverWindow.ExitButtonPressed -= CloseGame;
         
         gameplayCoordinator.GameEnded -= EndGame;
             
         level.InteractionSystem.OnHoveredInteractionChanged -= gui.InteractionTooltip.SetInteraction;
+    }
+    
+    private void HandleFullScreenToggle(bool wantFullScreen)
+    {
+        graphics.IsFullScreen = wantFullScreen;
+        graphics.ApplyChanges();
+        
+        Console.WriteLine($"FullScreen toggled to: {wantFullScreen}"); 
     }
 
     private void StartObjects()
@@ -269,19 +284,18 @@ public class Game1 : Game
     {
         currentGameState = gameState;
         gui.SetGameState(currentGameState);
-        
+    
         if (currentGameState == GameState.Menu)
         {
-            AudioManager.Instance.SetMusicVolume(0.1f);
             
-            if (MediaPlayer.State == MediaState.Stopped)
+            if (MediaPlayer.State == MediaState.Stopped || MediaPlayer.State == MediaState.Paused)
             {
-                AudioManager.Instance.PlayMusic("theme1", loop: false);
+                AudioManager.Instance.PlayNextMusic();
             }
         }
-        else
+        else if (currentGameState == GameState.Playing)
         {
-            AudioManager.Instance.SetMusicVolume(0f);
+            AudioManager.Instance.StopMusic();
         }
     }
     

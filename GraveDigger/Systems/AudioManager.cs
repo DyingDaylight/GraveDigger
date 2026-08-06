@@ -11,12 +11,56 @@ public sealed class AudioManager
 {
     private static readonly Lazy<AudioManager> instance = new(() => new AudioManager());
     public static AudioManager Instance => instance.Value;
+    
+    private float masterVolume = 0.2f;
+    private float musicVolume = 0.2f;
+    private float sfxVolume = 0.2f;
 
+    
+    public float SoundVolume
+    {
+        get => masterVolume;
+        set
+        {
+            masterVolume = Math.Clamp(value, 0f, 1f);
+            ApplyVolumes();
+        }
+    }
+
+    public float MusicVolume
+    {
+        get => musicVolume;
+        set
+        {
+            musicVolume = Math.Clamp(value, 0f, 1f);
+            ApplyVolumes();
+        }
+    }
+    
+    public float SfxVolume
+    {
+        get => sfxVolume;
+        set
+        {
+            sfxVolume = Math.Clamp(value, 0f, 1f);
+            ApplyVolumes();
+        }
+    }
+    
     private ContentManager content;
     private readonly Dictionary<string, SoundEffectInstance> sfxInstances = new();
 
-    private AudioManager() { }
+    private AudioManager()
+    {
+        ApplyVolumes();
+    }
 
+    private void ApplyVolumes()
+    {
+        MediaPlayer.Volume = musicVolume * masterVolume;
+        SoundEffect.MasterVolume = sfxVolume * masterVolume;
+    }
+    
     public void Initialize(ContentManager contentManager)
     {
         content = contentManager ?? throw new ArgumentNullException(nameof(contentManager));
@@ -87,7 +131,7 @@ public sealed class AudioManager
         {
             Song song = content.Load<Song>($"Sound/Music/{name}");
             MediaPlayer.IsRepeating = loop; 
-            MediaPlayer.Volume = MathHelper.Clamp(volume, 0f, 1f);
+            MediaPlayer.Volume = musicVolume;
             MediaPlayer.Play(song);
         }
         catch (Exception ex)
@@ -103,7 +147,7 @@ public sealed class AudioManager
     
     public void SetMusicVolume(float volume)
     {
-        MediaPlayer.Volume = MathHelper.Clamp(volume, 0f, 1f);
+        MusicVolume = volume;
     }
 
     public void SetSFXVolume(float volume)
