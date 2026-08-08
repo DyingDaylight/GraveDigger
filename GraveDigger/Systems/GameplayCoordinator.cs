@@ -12,6 +12,7 @@ using GraveDigger.Utils;
 using GUI;
 using Interfaces;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace GraveDigger.Systems;
 
@@ -29,6 +30,9 @@ public class GameplayCoordinator : IUpdatable
     private int previousReputation;
     private bool reputationInitialized;
     private bool gameEnded;
+    
+    private KeyboardState previousKeyboardState;
+    private int debugReputationOffset = 0;
     
     public event Action<TradeResult> TradeCompleted;
     public event Action<string> NotificationRequested;
@@ -62,6 +66,13 @@ public class GameplayCoordinator : IUpdatable
     {
         if (!level.IsBlackoutRunning)
             timeSystem.Update(gameTime);
+        
+#if DEBUG
+        HandleDebugInput();
+#endif
+    
+        CheckNearDeathWarning();
+        
     }
 
     public void ToggleInventory()
@@ -464,6 +475,66 @@ public class GameplayCoordinator : IUpdatable
             EndGame(GameResult.Win);
         }
     }
+    
+    private void CheckNearDeathWarning()
+    {
+        if (gameEnded)
+        {
+            gui.HideNearDeathWarning();
+            return;
+        }
+        
+        int currentRep = GetEffectiveReputation();
+
+        bool isLowReputation = currentRep <= -70;
+        bool isStarving = level.Player.Hunger >= 75;
+        
+        if (isLowReputation && isStarving)
+        {
+            gui.ShowNearDeathWarning("CRITICAL WARNING: You are starving and your reputation is critically low!");
+        }
+        else if (isLowReputation)
+        {
+            gui.ShowNearDeathWarning("WARNING: Reputation is critically low! You are about to lose.");
+        }
+        else if (isStarving)
+        {
+            gui.ShowNearDeathWarning("WARNING: You are starving! Find food before you die.");
+        }
+        else
+        {
+            gui.HideNearDeathWarning();
+        }
+    }
+    
+    // to test popup logic
+#if DEBUG
+    private void HandleDebugInput()
+    {
+        KeyboardState currentKeyboardState = Keyboard.GetState();
+
+        // [H] - to add hunger
+        if (currentKeyboardState.IsKeyDown(Keys.H) && previousKeyboardState.IsKeyUp(Keys.H))
+        {
+            level.Player.IncreaseHunger(5);
+            NotificationRequested?.Invoke("DEBUG: Hunger +5");
+        }
+
+        // [R] - to decrease reputation
+        if (currentKeyboardState.IsKeyDown(Keys.R) && previousKeyboardState.IsKeyUp(Keys.R))
+        {
+            debugReputationOffset -= 30;
+            OnReputationChanged(GetEffectiveReputation(), ReputationSystem.MinValue, ReputationSystem.MaxValue);
+        }
+        
+        previousKeyboardState = currentKeyboardState;
+    }
+#endif
+    
+    private int GetEffectiveReputation()
+    {
+        return Math.Clamp(reputationSystem.Value + debugReputationOffset, ReputationSystem.MinValue, ReputationSystem.MaxValue);
+    }
 
     private void EndGame(GameResult result)
     {
@@ -471,6 +542,7 @@ public class GameplayCoordinator : IUpdatable
             return;
 
         gameEnded = true;
+        gui.HideNearDeathWarning();
         GameEnded?.Invoke(result);
     }
     

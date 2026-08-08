@@ -19,6 +19,7 @@ public class Gui: IUpdatable, IDrawable
 {
     private readonly GameContext gameContext;
     private NotificationPopup notificationPopup;
+    private WarningPopup warningPopup;
 
     private bool started;
     private GameState gameState;
@@ -66,6 +67,7 @@ public class Gui: IUpdatable, IDrawable
         SpriteManager.AddSprite("ArrowRightHover", "Images/GUI/arrow_right_hover");
         SpriteManager.AddSprite("ArrowLeftHover", "Images/GUI/arrow_left_hover");
 
+        SpriteManager.AddSprite("DeathIcon", "Images/GUI/neardeath");
 
 
         SpriteManager.AddSprite("ReputationBadIcon", "Images/GUI/reputation_bad");
@@ -104,6 +106,8 @@ public class Gui: IUpdatable, IDrawable
         notificationPopup = new NotificationPopup(new Rectangle(0, 0, 
             (int) gameContext.ScreenSize.X, 
             (int) gameContext.ScreenSize.Y));
+        warningPopup = new WarningPopup();
+        
         WindowManager = new WindowManager(gameContext);
         MenuUi = new MenuUI(gameContext.ScreenSize);
         InteractionTooltip = new InteractionTooltip(gameContext.CoordinatesConverter);
@@ -135,6 +139,7 @@ public class Gui: IUpdatable, IDrawable
         }
 
         notificationPopup.Update(gameTime);
+        warningPopup.Update(gameTime);
         WindowManager.Update(gameTime);
         if (WindowManager.IsModalWindow)
             return;
@@ -160,6 +165,7 @@ public class Gui: IUpdatable, IDrawable
         Hud.Draw(spriteBatch);
         WindowManager.Draw(spriteBatch);
         notificationPopup.Draw(spriteBatch);
+        warningPopup.Draw(spriteBatch);
         
         if (gameState == GameState.Playing)
             InteractionTooltip.Draw(spriteBatch);
@@ -198,6 +204,18 @@ public class Gui: IUpdatable, IDrawable
     public bool IsModalWindowOpen()
     {
         return WindowManager.IsModalWindow;
+    }
+    
+    public void ShowNearDeathWarning(string message)
+    {
+        Texture2D icon = SpriteManager.GetSprite("DeathIcon").Texture;
+        Rectangle screenBounds = new Rectangle(0, 0, (int)gameContext.ScreenSize.X, (int)gameContext.ScreenSize.Y);
+        warningPopup.Show(message, icon, screenBounds, "deathmusic");
+    }
+
+    public void HideNearDeathWarning()
+    {
+        warningPopup.Hide();
     }
 
     public void RefreshTombstoneWindow(bool hasEnoughMoney)

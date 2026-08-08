@@ -754,6 +754,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/GUI/mainmenu.png
 
+#begin Images/GUI/neardeath.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/neardeath.png
+
 #begin Images/GUI/night.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1965,18 +1977,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/Results/WinResult3.png
-
-#begin neardeath.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:neardeath.png
 
 #begin Sound/Effects/chest-close.wav
 /importer:WavImporter
