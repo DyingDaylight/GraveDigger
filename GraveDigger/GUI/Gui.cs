@@ -63,6 +63,9 @@ public class Gui: IUpdatable, IDrawable
         
         SpriteManager.AddSprite("ArrowLeft", "Images/GUI/arrow_left");
         SpriteManager.AddSprite("ArrowRight", "Images/GUI/arrow_right");
+        SpriteManager.AddSprite("ArrowRightHover", "Images/GUI/arrow_right_hover");
+        SpriteManager.AddSprite("ArrowLeftHover", "Images/GUI/arrow_left_hover");
+
 
 
         SpriteManager.AddSprite("ReputationBadIcon", "Images/GUI/reputation_bad");

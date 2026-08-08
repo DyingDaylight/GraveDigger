@@ -51,10 +51,13 @@ namespace GraveDigger.GUI.Windows
             nextButton = CreateElement<Button>(Button.UiButtonMode.Texture);
 
             Texture2D leftArrowTex = SpriteManager.GetSprite("ArrowLeft").Texture;
+            Texture2D leftArrowHoverTex = SpriteManager.GetSprite("ArrowLeftHover").Texture;
+            
             Texture2D rightArrowTex = SpriteManager.GetSprite("ArrowRight").Texture;
-
-            prevButton.SetTextures(leftArrowTex, leftArrowTex, leftArrowTex);
-            nextButton.SetTextures(rightArrowTex, rightArrowTex, rightArrowTex);
+            Texture2D rightArrowHoverTex = SpriteManager.GetSprite("ArrowRightHover").Texture;
+            
+            prevButton.SetTextures(leftArrowTex, leftArrowHoverTex, leftArrowHoverTex);
+            nextButton.SetTextures(rightArrowTex, rightArrowHoverTex, rightArrowHoverTex);
 
             prevButton.LockSize(ArrowWidth, ArrowHeight);
             nextButton.LockSize(ArrowWidth, ArrowHeight);

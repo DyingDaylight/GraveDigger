@@ -107,7 +107,24 @@ public class Button : ClickableUIElement
     
     public override void Draw(SpriteBatch spriteBatch)
     {
-        base.Draw(spriteBatch);
+        Rectangle renderBounds = Bounds;
+
+        if (currentState == UiButtonState.Pressed)
+        {
+            int shrink = 6; 
+            renderBounds = new Rectangle(
+                Bounds.X + shrink / 2,
+                Bounds.Y + shrink / 2,
+                Math.Max(1, Bounds.Width - shrink),
+                Math.Max(1, Bounds.Height - shrink)
+            );
+        }
+
+        if (Texture != null)
+        {
+            spriteBatch.Draw(Texture, renderBounds, Color);
+        }
+
         label.Draw(spriteBatch);
         if (icon.Visible)
             icon.Draw(spriteBatch);

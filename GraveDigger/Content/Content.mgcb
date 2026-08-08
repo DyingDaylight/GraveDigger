@@ -442,6 +442,18 @@
 /processorParam:TextureFormat=Color
 /build:Images/Food/Food9.png
 
+#begin Images/GUI/arrow_left_hover.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/arrow_left_hover.png;Images/GUI/arrow_left_hover
+
 #begin Images/GUI/arrow_left.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -453,6 +465,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Images/GUI/arrow_left.png
+
+#begin Images/GUI/arrow_right_hover.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Images/GUI/arrow_right_hover.png;Images/GUI/arrow_right_hover
 
 #begin Images/GUI/arrow_right.png
 /importer:TextureImporter
