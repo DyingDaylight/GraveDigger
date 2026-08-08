@@ -153,6 +153,13 @@ public class GraveSite
         DirtPile = dirt;
         DirtPile?.Transform.Position = new Vector2(Transform.Position.X, Transform.Position.Y + 120);
         DirtPile?.Transform.Scale = new Vector2(0.05f, 0.05f);
+        
+        // to prevent bug when player is stuck 
+        if (DirtPile != null)
+        {
+            DirtPile.Collider.IsTrigger = true; 
+        }
+        
         DirtPile?.Visible = State == GraveState.DugOut;
         UpdateVisuals();
     }
