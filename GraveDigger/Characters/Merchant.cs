@@ -57,13 +57,11 @@ public class Merchant : Animation, IInteractionOwner, IHasCollider
     {
         base.Start();
         CastShadow = true;
+        Transform.Scale = new Vector2(0.45f, 0.45f);
         
         Transform.Position = offMapPosition;
         ChangeState(MerchantState.Arriving);
         
-        Transform.Scale = new Vector2(0.45f, 0.45f);
-        
-        CurrentRow = 1; 
         Play(3);
     }
     
@@ -97,24 +95,30 @@ public class Merchant : Animation, IInteractionOwner, IHasCollider
         {
             case MerchantState.Hidden:
                 TraderInteraction.IsActive = false;
+                Stop();
                 break;
 
             case MerchantState.Arriving:
+                Transform.Position = offMapPosition; 
                 targetPosition = onMapPosition;
                 TraderInteraction.IsActive = false;
+                Play(3);
                 break;
 
             case MerchantState.Idle:
                 TraderInteraction.IsActive = true;
+                SetIdleFrontFacing();
                 break;
 
             case MerchantState.Trading:
                 TraderInteraction.IsActive = false;
+                SetIdleFrontFacing();
                 break;
 
             case MerchantState.Leaving:
                 targetPosition = offMapPosition;
                 TraderInteraction.IsActive = false;
+                Play(3);
                 break;
         }
 
@@ -144,7 +148,6 @@ public class Merchant : Animation, IInteractionOwner, IHasCollider
         {
             Transform.Position = targetPosition;
             ReachDestination();
-            CurrentRow = IdleRow;
             return;
         }
 
@@ -163,6 +166,14 @@ public class Merchant : Animation, IInteractionOwner, IHasCollider
             ChangeState(MerchantState.Idle);
     }
 
+    private void SetIdleFrontFacing()
+    {
+        CurrentRow = MoveDownRow;          
+        SpriteEffect = SpriteEffects.None;  
+        currentColumn = 0;                 
+        Stop();                           
+    }
+    
     public void RefreshInventory(RandomService randomService,
         Func<DecorationType, bool> hasLockedDecorations)
     {
