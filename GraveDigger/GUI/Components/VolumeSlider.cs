@@ -1,6 +1,7 @@
 ﻿using System;
 using GraveDigger.Core;
 using GraveDigger.GUI.Elements;
+using GraveDigger.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -103,7 +104,7 @@ public class VolumeSlider : UIContainer
     {
         base.Update(gameTime);
 
-        MouseState mouse = Mouse.GetState();
+        MouseState mouse = MouseHelper.GetState();
         Point mousePos = mouse.Position;
 
         Rectangle lineBounds = lineIcon.Bounds;

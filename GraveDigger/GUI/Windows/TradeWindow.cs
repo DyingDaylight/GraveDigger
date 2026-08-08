@@ -6,6 +6,7 @@ using GraveDigger.GUI.Elements;
 using GraveDigger.GUI.Layouts;
 using GraveDigger.Items;
 using GraveDigger.Systems;
+using GraveDigger.Utils;
 using GUI.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -122,7 +123,7 @@ public class TradeWindow : Window
 
     private void HandleDragAndDrop()
     {
-        MouseState mouse = Mouse.GetState();
+        MouseState mouse = MouseHelper.GetState();
 
         if (!isDragging && mouse.LeftButton == ButtonState.Pressed)
         {
@@ -163,7 +164,7 @@ public class TradeWindow : Window
 
         if (isDragging && itemBeingDragged != null)
         {
-            MouseState mouse = Mouse.GetState();
+            MouseState mouse = MouseHelper.GetState();
             Texture2D texture = SpriteManager.GetSprite(itemBeingDragged.ItemData.SpriteName).Texture;
             
             Rectangle destination = new Rectangle(mouse.X - 50, mouse.Y - 50, 100, 100);

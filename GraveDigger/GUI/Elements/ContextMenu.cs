@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraveDigger.GUI.Layouts;
+using GraveDigger.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -27,7 +28,7 @@ public class ContextMenu : UIContainer
 
         base.Update(gameTime);
 
-        MouseState currentMouseState = Mouse.GetState();
+        MouseState currentMouseState = MouseHelper.GetState();
 
         bool leftClicked =
             currentMouseState.LeftButton == ButtonState.Pressed &&

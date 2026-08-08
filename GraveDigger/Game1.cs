@@ -90,6 +90,8 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
+        MouseHelper.Configure(GetDestinationRectangle(), VirtualWidth, VirtualHeight);
+        
         if (!IsActive)
         {
             // TODO: investigate missed short key presses after restoring focus.
@@ -179,11 +181,8 @@ public class Game1 : Game
     
     private Rectangle GetDestinationRectangle()
     {
-        int screenWidth =
-            GraphicsDevice.PresentationParameters.BackBufferWidth;
-
-        int screenHeight =
-            GraphicsDevice.PresentationParameters.BackBufferHeight;
+        int screenWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
+        int screenHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
 
         float scale = Math.Min(
             screenWidth / (float)VirtualWidth,
@@ -224,7 +223,7 @@ public class Game1 : Game
     {
         spriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend); 
         gui.Draw(spriteBatch);
-        MouseState mouseState = Mouse.GetState();
+        MouseState mouseState = MouseHelper.GetState();
         spriteBatch.Draw(cursorTexture, new Vector2(mouseState.X, mouseState.Y), Color.White);
         spriteBatch.End();
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using GraveDigger.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -39,14 +40,14 @@ public abstract class ClickableUIElement : UIElement
         rightPressedInside = false;
         wasHovered = false;
 
-        MouseState mouse = Mouse.GetState();
+        MouseState mouse = MouseHelper.GetState();
         previousLeftButtonState = mouse.LeftButton;
         previousRightButtonState = mouse.RightButton;
     }
     
     protected void UpdateInteraction()
     {
-        MouseState mouse = Mouse.GetState();
+        MouseState mouse = MouseHelper.GetState();
 
         UpdateHover(mouse);
         UpdateLeftButton(mouse);

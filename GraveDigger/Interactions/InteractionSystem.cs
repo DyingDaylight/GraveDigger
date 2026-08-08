@@ -41,7 +41,7 @@ public class InteractionSystem : IUpdatable
 
     public void Update(GameTime gameTime)
     {
-        MouseState currentMouseState = Mouse.GetState();
+        MouseState currentMouseState = MouseHelper.GetState();
         Vector2 screenMouse = currentMouseState.Position.ToVector2();
         Vector2 mousePosition = coordinatesConverter.ScreenToWorld(screenMouse);
         
