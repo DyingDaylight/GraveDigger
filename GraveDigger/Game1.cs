@@ -19,6 +19,11 @@ public class Game1 : Game
     private const int NightDuration = 30;
     private static readonly Vector2 WorldSize = new(4480, 3840);
     
+    private const int VirtualWidth = 1920;
+    private const int VirtualHeight = 1080;
+
+    private RenderTarget2D renderTarget;
+    
     private readonly GraphicsDeviceManager graphics;
     
     private SpriteBatch spriteBatch;
@@ -72,6 +77,8 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
+
+        renderTarget = new RenderTarget2D(GraphicsDevice, VirtualWidth, VirtualHeight);
         cursorTexture = Content.Load<Texture2D>("Images/GUI/cursor"); // custom cursor
         
         LoadCoreSprites();
@@ -122,7 +129,9 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.Black); 
+        // Render the game at the fixed virtual resolution.
+        GraphicsDevice.SetRenderTarget(renderTarget);
+        GraphicsDevice.Clear(Color.Black);
         
         switch (currentGameState)
         {
@@ -145,7 +154,49 @@ public class Game1 : Game
                 break;
         }
 
+        // Switch back to the actual back buffer.
+        GraphicsDevice.SetRenderTarget(null);
+        GraphicsDevice.Clear(Color.Black);
+        
+        // Scale the virtual frame to fit the screen while preserving the aspect ratio.
+        Rectangle destination = GetDestinationRectangle();
+
+        spriteBatch.Begin(
+            samplerState: SamplerState.LinearClamp,
+            blendState: BlendState.Opaque
+        );
+
+        spriteBatch.Draw(
+            renderTarget,
+            destination,
+            Color.White
+        );
+
+        spriteBatch.End();
+
         base.Draw(gameTime);
+    }
+    
+    private Rectangle GetDestinationRectangle()
+    {
+        int screenWidth =
+            GraphicsDevice.PresentationParameters.BackBufferWidth;
+
+        int screenHeight =
+            GraphicsDevice.PresentationParameters.BackBufferHeight;
+
+        float scale = Math.Min(
+            screenWidth / (float)VirtualWidth,
+            screenHeight / (float)VirtualHeight
+        );
+
+        int width = (int)(VirtualWidth * scale);
+        int height = (int)(VirtualHeight * scale);
+
+        int x = (screenWidth - width) / 2;
+        int y = (screenHeight - height) / 2;
+
+        return new Rectangle(x, y, width, height);
     }
 
     private void DrawGameplay()
