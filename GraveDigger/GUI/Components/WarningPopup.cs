@@ -46,6 +46,10 @@ namespace GraveDigger.GUI.Components
 
             layout.AddElement(warningIcon);
             layout.AddElement(warningLabel);
+
+            warningIcon.Visible = false;
+            warningLabel.Visible = false;
+            Visible = false;
         }
 
         public void Show(string textMessage, Texture2D iconTexture, Rectangle screenBounds, string musicTrackName = "deathmusic")
@@ -62,6 +66,8 @@ namespace GraveDigger.GUI.Components
 
             isVisible = true;
             Visible = true;
+            warningIcon.Visible = true;
+            warningLabel.Visible = true;
             pulseTimer = 0f;
 
             warningIcon.SetImage(iconTexture);
@@ -90,9 +96,15 @@ namespace GraveDigger.GUI.Components
 
         public void Hide()
         {
+            if (!isVisible) return;
+
             isVisible = false;
             Visible = false;
+            warningIcon.Visible = false;
+            warningLabel.Visible = false;
             musicTriggered = false;
+            
+            AudioManager.Instance.StopMusic();
         }
 
         public override void Update(GameTime gameTime)

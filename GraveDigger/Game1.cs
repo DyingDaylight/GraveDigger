@@ -399,6 +399,7 @@ public class Game1 : Game
         if (gui.IsModalWindowOpen())
         {
             level.Player.StopMoving();
+            gameplayCoordinator.Update(gameTime);
             return;
         }
         

@@ -115,6 +115,10 @@ public class GameplayCoordinator : IUpdatable
     
     private void RecalculateReputation()
     {
+        #if DEBUG
+        debugReputationOffset = 0;
+        #endif
+        
         IEnumerable<IReputationContributor> contributors = level.GetReputationContributors();
         reputationSystem.Recalculate(contributors);
     }
@@ -483,12 +487,18 @@ public class GameplayCoordinator : IUpdatable
             gui.HideNearDeathWarning();
             return;
         }
-        
+    
         int currentRep = GetEffectiveReputation();
 
         bool isLowReputation = currentRep <= -70;
         bool isStarving = level.Player.Hunger >= 75;
-        
+    
+        if (!isLowReputation && !isStarving)
+        {
+            gui.HideNearDeathWarning();
+            return;
+        }
+
         if (isLowReputation && isStarving)
         {
             gui.ShowNearDeathWarning("CRITICAL WARNING: You are starving and your reputation is critically low!");
@@ -500,10 +510,6 @@ public class GameplayCoordinator : IUpdatable
         else if (isStarving)
         {
             gui.ShowNearDeathWarning("WARNING: You are starving! Find food before you die.");
-        }
-        else
-        {
-            gui.HideNearDeathWarning();
         }
     }
     
