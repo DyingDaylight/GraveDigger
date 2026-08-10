@@ -201,18 +201,19 @@ public class Game1 : Game
     private void DrawGameplay()
     {
         spriteBatch.Begin(sortMode: SpriteSortMode.BackToFront, 
-            samplerState: SamplerState.PointClamp, 
             transformMatrix: camera.TransformMatrix);
         level.Draw(spriteBatch);
         spriteBatch.End();
             
-        spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
+        spriteBatch.Begin(
+            // Preserves the overlay's alpha
+            blendState: BlendState.NonPremultiplied);
         level.DrawOverlay(spriteBatch);
         spriteBatch.End();
             
         spriteBatch.Begin(
+            // Adds light colors to the scene, creating a glow/illumination effect
             blendState: BlendState.Additive,
-            samplerState: SamplerState.LinearClamp,
             transformMatrix: camera.TransformMatrix
         );
         level.DrawLights(spriteBatch);
